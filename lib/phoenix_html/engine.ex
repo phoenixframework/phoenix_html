@@ -1,18 +1,10 @@
 defmodule Phoenix.HTML.Engine do
   @moduledoc """
-  This is an implementation of EEx.Engine and
-  Phoenix format encoder that guarantees templates are
-  HTML Safe.
+  This is an implementation of EEx.Engine that guarantees
+  templates are HTML Safe.
   """
 
   use EEx.Engine
-
-  @doc false
-  def encode_to_iodata(body), do: {:ok, encode_to_iodata!(body)}
-
-  @doc false
-  def encode_to_iodata!({:safe, body}), do: body
-  def encode_to_iodata!(other), do: Phoenix.HTML.Safe.to_iodata(other)
 
   @doc false
   def handle_body(body), do: body

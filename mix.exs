@@ -1,12 +1,13 @@
 defmodule PhoenixHtml.Mixfile do
   use Mix.Project
 
-  @version "0.5.0"
+  @version "1.0.0"
 
   def project do
     [app: :phoenix_html,
      version: @version,
      elixir: "~> 1.0",
+     description: "Phoenix.HTML functions for working with HTML strings and templates",
      deps: deps,
      docs: [source_ref: "v#{@version}",
             source_url: "https://github.com/phoenixframework/phoenix_html"]]
