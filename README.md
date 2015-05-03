@@ -6,7 +6,7 @@ Although this project was originally extracted from Phoenix,
 it does not depend on Phoenix and can be used with any Plug
 application.
 
-See the [docs](hexdocs.pm/phoenix_html) for more information.
+See the [docs](https://hexdocs.pm/phoenix_html/) for more information.
 
 ## License
 
