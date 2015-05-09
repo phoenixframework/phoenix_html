@@ -15,22 +15,22 @@ defmodule Phoenix.HTML.FormTest do
   A function that executes `form_for/4` and
   extracts its inner contents for assertion.
   """
-  def with_form(fun, opts \\ []) do
+  def safe_form(fun, opts \\ []) do
     mark = "--PLACEHOLDER--"
 
-    {:safe, contents} =
-      form_for(@conn, "/", [name: :search] ++ opts, fn f ->
-        safe_concat [mark, fun.(f), mark]
+    contents =
+      safe_to_string form_for(@conn, "/", [name: :search] ++ opts, fn f ->
+        html_escape [mark, fun.(f), mark]
       end)
 
-    [_, inner, _] = String.split(IO.iodata_to_binary(contents), mark)
-    {:safe, inner}
+    [_, inner, _] = String.split(contents, mark)
+    inner
   end
 
   ## form_for/4
 
   test "form_for/4 with connection" do
-    {:safe, form} = form_for(@conn, "/", [name: :search], fn f ->
+    form = safe_to_string form_for(@conn, "/", [name: :search], fn f ->
       assert f.name == "search"
       assert f.source == @conn
       assert f.params["key"] == "value"
@@ -42,7 +42,7 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "form_for/4 with custom options" do
-    {:safe, form} = form_for(@conn, "/", [name: :search, method: :put, multipart: true], fn f ->
+    form = safe_to_string form_for(@conn, "/", [name: :search, method: :put, multipart: true], fn f ->
       refute f.options[:name]
       assert f.options[:multipart] == true
       assert f.options[:method] == :put
@@ -54,354 +54,355 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "form_for/4 is html safe" do
-    {:safe, form} = form_for(@conn, "/", [name: :search], fn _ -> "<>" end)
+    form = safe_to_string form_for(@conn, "/", [name: :search], fn _ -> "<>" end)
     assert form =~ ~s(&lt;&gt;</form>)
   end
 
   ## text_input/3
 
   test "text_input/3" do
-    assert text_input(:search, :key) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="text">)}
+    assert safe_to_string(text_input(:search, :key)) ==
+           ~s(<input id="search_key" name="search[key]" type="text">)
 
-    assert text_input(:search, :key, value: "foo", id: "key", name: "search[key][]") ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="text" value="foo">)}
+    assert safe_to_string(text_input(:search, :key, value: "foo", id: "key", name: "search[key][]")) ==
+           ~s(<input id="key" name="search[key][]" type="text" value="foo">)
   end
 
   test "text_input/3 with form" do
-    assert with_form(&text_input(&1, :key)) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="text" value="value">)}
+    assert safe_form(&text_input(&1, :key)) ==
+           ~s(<input id="search_key" name="search[key]" type="text" value="value">)
 
-    assert with_form(&text_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="text" value="foo">)}
+    assert safe_form(&text_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+           ~s(<input id="key" name="search[key][]" type="text" value="foo">)
   end
 
   ## textarea/3
 
   test "textarea/3" do
-    assert textarea(:search, :key) ==
-           {:safe, ~s(<textarea id="search_key" name="search[key]">\n</textarea>)}
+    assert safe_to_string(textarea(:search, :key)) ==
+           ~s(<textarea id="search_key" name="search[key]">\n</textarea>)
 
-    assert textarea(:search, :key) ==
-           {:safe, ~s(<textarea id="search_key" name="search[key]">\n</textarea>)}
+    assert safe_to_string(textarea(:search, :key)) ==
+           ~s(<textarea id="search_key" name="search[key]">\n</textarea>)
 
-    assert textarea(:search, :key, id: "key", name: "search[key][]") ==
-           {:safe, ~s(<textarea id="key" name="search[key][]">\n</textarea>)}
+    assert safe_to_string(textarea(:search, :key, id: "key", name: "search[key][]")) ==
+           ~s(<textarea id="key" name="search[key][]">\n</textarea>)
   end
 
   test "textarea/3 with form" do
-    assert with_form(&textarea(&1, :key)) ==
-           {:safe, ~s(<textarea id="search_key" name="search[key]">\nvalue</textarea>)}
+    assert safe_form(&textarea(&1, :key)) ==
+           ~s(<textarea id="search_key" name="search[key]">\nvalue</textarea>)
 
-    assert with_form(&textarea(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
-           {:safe, ~s(<textarea id="key" name="search[key][]">\nfoo</textarea>)}
+    assert safe_form(&textarea(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+           ~s(<textarea id="key" name="search[key][]">\nfoo</textarea>)
   end
 
   ## number_input/3
 
   test "number_input/3" do
-    assert number_input(:search, :key) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="number">)}
+    assert safe_to_string(number_input(:search, :key)) ==
+           ~s(<input id="search_key" name="search[key]" type="number">)
 
-    assert number_input(:search, :key, value: "foo", id: "key", name: "search[key][]") ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="number" value="foo">)}
+    assert safe_to_string(number_input(:search, :key, value: "foo", id: "key", name: "search[key][]")) ==
+           ~s(<input id="key" name="search[key][]" type="number" value="foo">)
   end
 
   test "number_input/3 with form" do
-    assert with_form(&number_input(&1, :key)) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="number" value="value">)}
+    assert safe_form(&number_input(&1, :key)) ==
+           ~s(<input id="search_key" name="search[key]" type="number" value="value">)
 
-    assert with_form(&number_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="number" value="foo">)}
+    assert safe_form(&number_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+           ~s(<input id="key" name="search[key][]" type="number" value="foo">)
   end
 
   ## hidden_input/3
 
   test "hidden_input/3" do
-    assert hidden_input(:search, :key) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="hidden">)}
+    assert safe_to_string(hidden_input(:search, :key)) ==
+           ~s(<input id="search_key" name="search[key]" type="hidden">)
 
-    assert hidden_input(:search, :key, value: "foo", id: "key", name: "search[key][]") ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="hidden" value="foo">)}
+    assert safe_to_string(hidden_input(:search, :key, value: "foo", id: "key", name: "search[key][]")) ==
+           ~s(<input id="key" name="search[key][]" type="hidden" value="foo">)
   end
 
   test "hidden_input/3 with form" do
-    assert with_form(&hidden_input(&1, :key)) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="hidden" value="value">)}
+    assert safe_form(&hidden_input(&1, :key)) ==
+           ~s(<input id="search_key" name="search[key]" type="hidden" value="value">)
 
-    assert with_form(&hidden_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="hidden" value="foo">)}
+    assert safe_form(&hidden_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+           ~s(<input id="key" name="search[key][]" type="hidden" value="foo">)
   end
 
   ## email_input/3
 
   test "email_input/3" do
-    assert email_input(:search, :key) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="email">)}
+    assert safe_to_string(email_input(:search, :key)) ==
+           ~s(<input id="search_key" name="search[key]" type="email">)
 
-    assert email_input(:search, :key, value: "foo", id: "key", name: "search[key][]") ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="email" value="foo">)}
+    assert safe_to_string(email_input(:search, :key, value: "foo", id: "key", name: "search[key][]")) ==
+           ~s(<input id="key" name="search[key][]" type="email" value="foo">)
   end
 
   test "email_input/3 with form" do
-    assert with_form(&email_input(&1, :key)) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="email" value="value">)}
+    assert safe_form(&email_input(&1, :key)) ==
+           ~s(<input id="search_key" name="search[key]" type="email" value="value">)
 
-    assert with_form(&email_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="email" value="foo">)}
+    assert safe_form(&email_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+           ~s(<input id="key" name="search[key][]" type="email" value="foo">)
   end
 
   ## password_input/3
 
   test "password_input/3" do
-    assert password_input(:search, :key) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="password">)}
+    assert safe_to_string(password_input(:search, :key)) ==
+           ~s(<input id="search_key" name="search[key]" type="password">)
 
-    assert password_input(:search, :key, value: "foo", id: "key", name: "search[key][]") ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="password" value="foo">)}
+    assert safe_to_string(password_input(:search, :key, value: "foo", id: "key", name: "search[key][]")) ==
+           ~s(<input id="key" name="search[key][]" type="password" value="foo">)
   end
 
   test "password_input/3 with form" do
-    assert with_form(&password_input(&1, :key)) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="password" value="value">)}
+    assert safe_form(&password_input(&1, :key)) ==
+           ~s(<input id="search_key" name="search[key]" type="password" value="value">)
 
-    assert with_form(&password_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="password" value="foo">)}
+    assert safe_form(&password_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+           ~s(<input id="key" name="search[key][]" type="password" value="foo">)
   end
 
   ## file_input/3
 
   test "file_input/3" do
-    assert file_input(:search, :key) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="file">)}
+    assert safe_to_string(file_input(:search, :key)) ==
+           ~s(<input id="search_key" name="search[key]" type="file">)
 
-    assert file_input(:search, :key, id: "key", name: "search[key][]") ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="file">)}
+    assert safe_to_string(file_input(:search, :key, id: "key", name: "search[key][]")) ==
+           ~s(<input id="key" name="search[key][]" type="file">)
   end
 
   test "file_input/3 with form" do
     assert_raise ArgumentError, fn ->
-      with_form(&file_input(&1, :key))
+      safe_form(&file_input(&1, :key))
     end
 
-    assert with_form(&file_input(&1, :key), multipart: true) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="file">)}
+    assert safe_form(&file_input(&1, :key), multipart: true) ==
+          ~s(<input id="search_key" name="search[key]" type="file">)
   end
 
   ## url_input/3
 
   test "url_input/3" do
-    assert url_input(:search, :key) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="url">)}
+    assert safe_to_string(url_input(:search, :key)) ==
+          ~s(<input id="search_key" name="search[key]" type="url">)
 
-    assert url_input(:search, :key, value: "foo", id: "key", name: "search[key][]") ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="url" value="foo">)}
+    assert safe_to_string(url_input(:search, :key, value: "foo", id: "key", name: "search[key][]")) ==
+          ~s(<input id="key" name="search[key][]" type="url" value="foo">)
   end
 
   test "url_input/3 with form" do
-    assert with_form(&url_input(&1, :key)) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="url" value="value">)}
+    assert safe_form(&url_input(&1, :key)) ==
+          ~s(<input id="search_key" name="search[key]" type="url" value="value">)
 
-    assert with_form(&url_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="url" value="foo">)}
+    assert safe_form(&url_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+          ~s(<input id="key" name="search[key][]" type="url" value="foo">)
   end
 
   ## search_input/3
 
   test "search_input/3" do
-    assert search_input(:search, :key) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="search">)}
+    assert safe_to_string(search_input(:search, :key)) ==
+          ~s(<input id="search_key" name="search[key]" type="search">)
 
-    assert search_input(:search, :key, value: "foo", id: "key", name: "search[key][]") ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="search" value="foo">)}
+    assert safe_to_string(search_input(:search, :key, value: "foo", id: "key", name: "search[key][]")) ==
+          ~s(<input id="key" name="search[key][]" type="search" value="foo">)
   end
 
   test "search_input/3 with form" do
-    assert with_form(&search_input(&1, :key)) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="search" value="value">)}
+    assert safe_form(&search_input(&1, :key)) ==
+          ~s(<input id="search_key" name="search[key]" type="search" value="value">)
 
-    assert with_form(&search_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="search" value="foo">)}
+    assert safe_form(&search_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+          ~s(<input id="key" name="search[key][]" type="search" value="foo">)
   end
 
   ## telephone_input/3
 
   test "telephone_input/3" do
-    assert telephone_input(:search, :key) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="tel">)}
+    assert safe_to_string(telephone_input(:search, :key)) ==
+          ~s(<input id="search_key" name="search[key]" type="tel">)
 
-    assert telephone_input(:search, :key, value: "foo", id: "key", name: "search[key][]") ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="tel" value="foo">)}
+    assert safe_to_string(telephone_input(:search, :key, value: "foo", id: "key", name: "search[key][]")) ==
+          ~s(<input id="key" name="search[key][]" type="tel" value="foo">)
   end
 
   test "telephone_input/3 with form" do
-    assert with_form(&telephone_input(&1, :key)) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="tel" value="value">)}
+    assert safe_form(&telephone_input(&1, :key)) ==
+          ~s(<input id="search_key" name="search[key]" type="tel" value="value">)
 
-    assert with_form(&telephone_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="tel" value="foo">)}
+    assert safe_form(&telephone_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+          ~s(<input id="key" name="search[key][]" type="tel" value="foo">)
   end
 
   ## range_input/3
 
   test "range_input/3" do
-    assert range_input(:search, :key) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="range">)}
+    assert safe_to_string(range_input(:search, :key)) ==
+          ~s(<input id="search_key" name="search[key]" type="range">)
 
-    assert range_input(:search, :key, value: "foo", id: "key", name: "search[key][]") ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="range" value="foo">)}
+    assert safe_to_string(range_input(:search, :key, value: "foo", id: "key", name: "search[key][]")) ==
+          ~s(<input id="key" name="search[key][]" type="range" value="foo">)
   end
 
   test "range_input/3 with form" do
-    assert with_form(&range_input(&1, :key)) ==
-           {:safe, ~s(<input id="search_key" name="search[key]" type="range" value="value">)}
+    assert safe_form(&range_input(&1, :key)) ==
+          ~s(<input id="search_key" name="search[key]" type="range" value="value">)
 
-    assert with_form(&range_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
-           {:safe, ~s(<input id="key" name="search[key][]" type="range" value="foo">)}
+    assert safe_form(&range_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+          ~s(<input id="key" name="search[key][]" type="range" value="foo">)
   end
 
   ## submit/2
 
   test "submit/2" do
-    assert submit("Submit") ==
-           {:safe, ~s(<input type="submit" value="Submit">)}
+    assert safe_to_string(submit("Submit")) ==
+          ~s(<input type="submit" value="Submit">)
 
-    assert submit("Submit", class: "btn") ==
-           {:safe, ~s(<input class="btn" type="submit" value="Submit">)}
+    assert safe_to_string(submit("Submit", class: "btn")) ==
+          ~s(<input class="btn" type="submit" value="Submit">)
   end
 
   ## radio_button/4
 
   test "radio_button/4" do
-    assert radio_button(:search, :key, "admin") ==
-           {:safe, ~s(<input id="search_key_admin" name="search[key]" type="radio" value="admin">)}
+    assert safe_to_string(radio_button(:search, :key, "admin")) ==
+          ~s(<input id="search_key_admin" name="search[key]" type="radio" value="admin">)
 
-    assert radio_button(:search, :key, "admin", checked: true) ==
-           {:safe, ~s(<input checked="checked" id="search_key_admin" name="search[key]" type="radio" value="admin">)}
+    assert safe_to_string(radio_button(:search, :key, "admin", checked: true)) ==
+          ~s(<input checked="checked" id="search_key_admin" name="search[key]" type="radio" value="admin">)
   end
 
   test "radio_button/4 with form" do
-    assert with_form(&radio_button(&1, :key, :admin)) ==
-           {:safe, ~s(<input id="search_key_admin" name="search[key]" type="radio" value="admin">)}
+    assert safe_form(&radio_button(&1, :key, :admin)) ==
+          ~s(<input id="search_key_admin" name="search[key]" type="radio" value="admin">)
 
-    assert with_form(&radio_button(&1, :key, :value)) ==
-           {:safe, ~s(<input checked="checked" id="search_key_value" name="search[key]" type="radio" value="value">)}
+    assert safe_form(&radio_button(&1, :key, :value)) ==
+          ~s(<input checked="checked" id="search_key_value" name="search[key]" type="radio" value="value">)
 
-    assert with_form(&radio_button(&1, :key, :value, checked: false)) ==
-           {:safe, ~s(<input id="search_key_value" name="search[key]" type="radio" value="value">)}
+    assert safe_form(&radio_button(&1, :key, :value, checked: false)) ==
+          ~s(<input id="search_key_value" name="search[key]" type="radio" value="value">)
   end
 
   ## checkbox/3
 
   test "checkbox/3" do
-    assert checkbox(:search, :key) ==
-           {:safe, ~s(<input name="search[key]" type="hidden" value="false">) <>
-                   ~s(<input id="search_key" name="search[key]" type="checkbox" value="true">)}
+    assert safe_to_string(checkbox(:search, :key)) ==
+           ~s(<input name="search[key]" type="hidden" value="false">) <>
+           ~s(<input id="search_key" name="search[key]" type="checkbox" value="true">)
 
-    assert checkbox(:search, :key, value: "true") ==
-           {:safe, ~s(<input name="search[key]" type="hidden" value="false">) <>
-                   ~s(<input checked="checked" id="search_key" name="search[key]" type="checkbox" value="true">)}
+    assert safe_to_string(checkbox(:search, :key, value: "true")) ==
+           ~s(<input name="search[key]" type="hidden" value="false">) <>
+           ~s(<input checked="checked" id="search_key" name="search[key]" type="checkbox" value="true">)
 
-    assert checkbox(:search, :key, checked: true) ==
-           {:safe, ~s(<input name="search[key]" type="hidden" value="false">) <>
-                   ~s(<input checked="checked" id="search_key" name="search[key]" type="checkbox" value="true">)}
+    assert safe_to_string(checkbox(:search, :key, checked: true)) ==
+           ~s(<input name="search[key]" type="hidden" value="false">) <>
+           ~s(<input checked="checked" id="search_key" name="search[key]" type="checkbox" value="true">)
 
-    assert checkbox(:search, :key, value: "true", checked: false) ==
-           {:safe, ~s(<input name="search[key]" type="hidden" value="false">) <>
-                   ~s(<input id="search_key" name="search[key]" type="checkbox" value="true">)}
+    assert safe_to_string(checkbox(:search, :key, value: "true", checked: false)) ==
+           ~s(<input name="search[key]" type="hidden" value="false">) <>
+           ~s(<input id="search_key" name="search[key]" type="checkbox" value="true">)
 
-    assert checkbox(:search, :key, value: 0, checked_value: 1, unchecked_value: 0) ==
-           {:safe, ~s(<input name="search[key]" type="hidden" value="0">) <>
-                   ~s(<input id="search_key" name="search[key]" type="checkbox" value="1">)}
+    assert safe_to_string(checkbox(:search, :key, value: 0, checked_value: 1, unchecked_value: 0)) ==
+           ~s(<input name="search[key]" type="hidden" value="0">) <>
+           ~s(<input id="search_key" name="search[key]" type="checkbox" value="1">)
 
-    assert checkbox(:search, :key, value: 1, checked_value: 1, unchecked_value: 0) ==
-           {:safe, ~s(<input name="search[key]" type="hidden" value="0">) <>
-                   ~s(<input checked="checked" id="search_key" name="search[key]" type="checkbox" value="1">)}
+    assert safe_to_string(checkbox(:search, :key, value: 1, checked_value: 1, unchecked_value: 0)) ==
+           ~s(<input name="search[key]" type="hidden" value="0">) <>
+           ~s(<input checked="checked" id="search_key" name="search[key]" type="checkbox" value="1">)
   end
 
   test "checkbox/3 with form" do
-    assert with_form(&checkbox(&1, :key)) ==
-           {:safe, ~s(<input name="search[key]" type="hidden" value="false">) <>
-                   ~s(<input id="search_key" name="search[key]" type="checkbox" value="true">)}
+    assert safe_form(&checkbox(&1, :key)) ==
+           ~s(<input name="search[key]" type="hidden" value="false">) <>
+           ~s(<input id="search_key" name="search[key]" type="checkbox" value="true">)
 
-    assert with_form(&checkbox(&1, :key, value: true)) ==
-           {:safe, ~s(<input name="search[key]" type="hidden" value="false">) <>
-                   ~s(<input checked="checked" id="search_key" name="search[key]" type="checkbox" value="true">)}
+    assert safe_form(&checkbox(&1, :key, value: true)) ==
+           ~s(<input name="search[key]" type="hidden" value="false">) <>
+           ~s(<input checked="checked" id="search_key" name="search[key]" type="checkbox" value="true">)
 
-    assert with_form(&checkbox(&1, :key, checked_value: :value, unchecked_value: :novalue)) ==
-           {:safe, ~s(<input name="search[key]" type="hidden" value="novalue">) <>
-                   ~s(<input checked="checked" id="search_key" name="search[key]" type="checkbox" value="value">)}
+    assert safe_form(&checkbox(&1, :key, checked_value: :value, unchecked_value: :novalue)) ==
+           ~s(<input name="search[key]" type="hidden" value="novalue">) <>
+           ~s(<input checked="checked" id="search_key" name="search[key]" type="checkbox" value="value">)
   end
 
   # select/4
 
   test "select/4" do
-    assert select(:search, :key, ~w(foo bar)) ==
-           {:safe, ~s(<select id="search_key" name="search[key]">) <>
-                   ~s(<option value="foo">foo</option>) <>
-                   ~s(<option value="bar">bar</option>) <>
-                   ~s(</select>)}
+    assert safe_to_string(select(:search, :key, ~w(foo bar))) ==
+           ~s(<select id="search_key" name="search[key]">) <>
+           ~s(<option value="foo">foo</option>) <>
+           ~s(<option value="bar">bar</option>) <>
+           ~s(</select>)
 
-    assert select(:search, :key, [Foo: "foo", Bar: "bar"]) ==
-           {:safe, ~s(<select id="search_key" name="search[key]">) <>
-                   ~s(<option value="foo">Foo</option>) <>
-                   ~s(<option value="bar">Bar</option>) <>
-                   ~s(</select>)}
+    assert safe_to_string(select(:search, :key, [Foo: "foo", Bar: "bar"])) ==
+           ~s(<select id="search_key" name="search[key]">) <>
+           ~s(<option value="foo">Foo</option>) <>
+           ~s(<option value="bar">Bar</option>) <>
+           ~s(</select>)
 
-    assert select(:search, :key, [Foo: "foo", Bar: "bar"], prompt: "Choose your destiny") ==
-           {:safe, ~s(<select id="search_key" name="search[key]">) <>
-                   ~s(<option value="">Choose your destiny</option>) <>
-                   ~s(<option value="foo">Foo</option>) <>
-                   ~s(<option value="bar">Bar</option>) <>
-                   ~s(</select>)}
+    assert safe_to_string(select(:search, :key, [Foo: "foo", Bar: "bar"], prompt: "Choose your destiny")) ==
+           ~s(<select id="search_key" name="search[key]">) <>
+           ~s(<option value="">Choose your destiny</option>) <>
+           ~s(<option value="foo">Foo</option>) <>
+           ~s(<option value="bar">Bar</option>) <>
+           ~s(</select>)
 
-    {:safe, content} = select(:search, :key, ~w(foo bar), value: "foo")
-    assert content =~ ~s(<option selected="selected" value="foo">foo</option>)
+    assert safe_to_string(select(:search, :key, ~w(foo bar), value: "foo")) =~
+           ~s(<option selected="selected" value="foo">foo</option>)
 
-    {:safe, content} = select(:search, :key, ~w(foo bar), default: "foo")
-    assert content =~ ~s(<option selected="selected" value="foo">foo</option>)
+    assert safe_to_string(select(:search, :key, ~w(foo bar), default: "foo")) =~
+           ~s(<option selected="selected" value="foo">foo</option>)
   end
 
   test "select/4 with form" do
-    assert with_form(&select(&1, :key, ~w(value novalue), default: "novalue")) ==
-           {:safe, ~s(<select id="search_key" name="search[key]">) <>
-                   ~s(<option selected="selected" value="value">value</option>) <>
-                   ~s(<option value="novalue">novalue</option>) <>
-                   ~s(</select>)}
+    assert safe_form(&select(&1, :key, ~w(value novalue), default: "novalue")) ==
+           ~s(<select id="search_key" name="search[key]">) <>
+           ~s(<option selected="selected" value="value">value</option>) <>
+           ~s(<option value="novalue">novalue</option>) <>
+           ~s(</select>)
 
-    assert with_form(&select(&1, :other, ~w(value novalue), default: "novalue")) ==
-           {:safe, ~s(<select id="search_other" name="search[other]">) <>
-                   ~s(<option value="value">value</option>) <>
-                   ~s(<option selected="selected" value="novalue">novalue</option>) <>
-                   ~s(</select>)}
+    assert safe_form(&select(&1, :other, ~w(value novalue), default: "novalue")) ==
+           ~s(<select id="search_other" name="search[other]">) <>
+           ~s(<option value="value">value</option>) <>
+           ~s(<option selected="selected" value="novalue">novalue</option>) <>
+           ~s(</select>)
 
-    assert with_form(&select(&1, :key, ~w(value novalue), value: "novalue")) ==
-           {:safe, ~s(<select id="search_key" name="search[key]">) <>
-                   ~s(<option value="value">value</option>) <>
-                   ~s(<option selected="selected" value="novalue">novalue</option>) <>
-                   ~s(</select>)}
+    assert safe_form(&select(&1, :key, ~w(value novalue), value: "novalue")) ==
+           ~s(<select id="search_key" name="search[key]">) <>
+           ~s(<option value="value">value</option>) <>
+           ~s(<option selected="selected" value="novalue">novalue</option>) <>
+           ~s(</select>)
   end
 
   # date_select/4
 
   test "date_select/4" do
-    {:safe, content} = date_select(:search, :datetime)
+    content = safe_to_string(date_select(:search, :datetime))
     assert content =~ ~s(<select id="search_datetime_year" name="search[datetime][year]">)
     assert content =~ ~s(<select id="search_datetime_month" name="search[datetime][month]">)
     assert content =~ ~s(<select id="search_datetime_day" name="search[datetime][day]">)
 
-    {:safe, content} = date_select(:search, :datetime, value: {2020, 04, 17})
+    content = safe_to_string(date_select(:search, :datetime, value: {2020, 04, 17}))
     assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
     assert content =~ ~s(<option selected="selected" value="4">April</option>)
     assert content =~ ~s(<option selected="selected" value="17">17</option>)
 
-    {:safe, content} = date_select(:search, :datetime, value: %{year: 2020, month: 04, day: 07})
+    content = safe_to_string(date_select(:search, :datetime,
+                                               value: %{year: 2020, month: 04, day: 07}))
     assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
     assert content =~ ~s(<option selected="selected" value="4">April</option>)
     assert content =~ ~s(<option selected="selected" value="7">07</option>)
 
-    {:safe, content} = date_select(:search, :datetime, year: [prompt: "Year"],
-                                   month: [prompt: "Month"], day: [prompt: "Day"])
+    content = safe_to_string(date_select(:search, :datetime, year: [prompt: "Year"],
+                                               month: [prompt: "Month"], day: [prompt: "Day"]))
     assert content =~ ~s(<select id="search_datetime_year" name="search[datetime][year]">) <>
                       ~s(<option value="">Year</option>)
     assert content =~ ~s(<select id="search_datetime_month" name="search[datetime][month]">) <>
@@ -411,7 +412,7 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "date_select/4 with form" do
-    {:safe, content} = with_form(&date_select(&1, :datetime, default: {2020, 10, 13}))
+    content = safe_form(&date_select(&1, :datetime, default: {2020, 10, 13}))
     assert content =~ ~s(<select id="search_datetime_year" name="search[datetime][year]">)
     assert content =~ ~s(<select id="search_datetime_month" name="search[datetime][month]">)
     assert content =~ ~s(<select id="search_datetime_day" name="search[datetime][day]">)
@@ -420,12 +421,12 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option selected="selected" value="17">17</option>)
     assert content =~ ~s(<option value="1">January</option><option value="2">February</option>)
 
-    {:safe, content} = with_form(&date_select(&1, :unknown, default: {2020, 10, 13}))
+    content = safe_form(&date_select(&1, :unknown, default: {2020, 10, 13}))
     assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
     assert content =~ ~s(<option selected="selected" value="10">October</option>)
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
 
-    {:safe, content} = with_form(&date_select(&1, :datetime, value: {2020, 10, 13}))
+    content = safe_form(&date_select(&1, :datetime, value: {2020, 10, 13}))
     assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
     assert content =~ ~s(<option selected="selected" value="10">October</option>)
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
@@ -434,33 +435,34 @@ defmodule Phoenix.HTML.FormTest do
   # time_select/4
 
   test "time_select/4" do
-    {:safe, content} = time_select(:search, :datetime)
+    content = safe_to_string(time_select(:search, :datetime))
     assert content =~ ~s(<select id="search_datetime_hour" name="search[datetime][hour]">)
     assert content =~ ~s(<select id="search_datetime_min" name="search[datetime][min]">)
     refute content =~ ~s(<select id="search_datetime_sec" name="search[datetime][sec]">)
 
-    {:safe, content} = time_select(:search, :datetime, sec: [])
+    content = safe_to_string(time_select(:search, :datetime, sec: []))
     assert content =~ ~s(<select id="search_datetime_hour" name="search[datetime][hour]">)
     assert content =~ ~s(<select id="search_datetime_min" name="search[datetime][min]">)
     assert content =~ ~s(<select id="search_datetime_sec" name="search[datetime][sec]">)
 
-    {:safe, content} = time_select(:search, :datetime, value: {2, 11, 13}, sec: [])
+    content = safe_to_string(time_select(:search, :datetime, value: {2, 11, 13}, sec: []))
     assert content =~ ~s(<option selected="selected" value="2">02</option>)
     assert content =~ ~s(<option selected="selected" value="11">11</option>)
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
 
-    {:safe, content} = time_select(:search, :datetime, value: {2, 11, 13, 328904}, sec: [])
+    content = safe_to_string(time_select(:search, :datetime, value: {2, 11, 13, 328904}, sec: []))
     assert content =~ ~s(<option selected="selected" value="2">02</option>)
     assert content =~ ~s(<option selected="selected" value="11">11</option>)
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
 
-    {:safe, content} = time_select(:search, :datetime, value: %{hour: 2, min: 11, sec: 13}, sec: [])
+    content = safe_to_string(time_select(:search, :datetime,
+                                      value: %{hour: 2, min: 11, sec: 13}, sec: []))
     assert content =~ ~s(<option selected="selected" value="2">02</option>)
     assert content =~ ~s(<option selected="selected" value="11">11</option>)
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
 
-    {:safe, content} = time_select(:search, :datetime, hour: [prompt: "Hour"],
-                                   min: [prompt: "Minute"], sec: [prompt: "Second"])
+    content = safe_to_string(time_select(:search, :datetime, hour: [prompt: "Hour"],
+                                               min: [prompt: "Minute"], sec: [prompt: "Second"]))
     assert content =~ ~s(<select id="search_datetime_hour" name="search[datetime][hour]">) <>
                       ~s(<option value="">Hour</option>)
     assert content =~ ~s(<select id="search_datetime_min" name="search[datetime][min]">) <>
@@ -470,7 +472,7 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "time_select/4 with form" do
-    {:safe, content} = with_form(&time_select(&1, :datetime, default: {1, 2, 3}, sec: []))
+    content = safe_form(&time_select(&1, :datetime, default: {1, 2, 3}, sec: []))
     assert content =~ ~s(<select id="search_datetime_hour" name="search[datetime][hour]">)
     assert content =~ ~s(<select id="search_datetime_min" name="search[datetime][min]">)
     assert content =~ ~s(<select id="search_datetime_sec" name="search[datetime][sec]">)
@@ -479,12 +481,12 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
     assert content =~ ~s(<option value="1">01</option><option value="2">02</option>)
 
-    {:safe, content} = with_form(&time_select(&1, :unknown, default: {1, 2, 3}, sec: []))
+    content = safe_form(&time_select(&1, :unknown, default: {1, 2, 3}, sec: []))
     assert content =~ ~s(<option selected="selected" value="1">01</option>)
     assert content =~ ~s(<option selected="selected" value="2">02</option>)
     assert content =~ ~s(<option selected="selected" value="3">03</option>)
 
-    {:safe, content} = with_form(&time_select(&1, :datetime, value: {1, 2, 3}, sec: []))
+    content = safe_form(&time_select(&1, :datetime, value: {1, 2, 3}, sec: []))
     assert content =~ ~s(<option selected="selected" value="1">01</option>)
     assert content =~ ~s(<option selected="selected" value="2">02</option>)
     assert content =~ ~s(<option selected="selected" value="3">03</option>)
@@ -493,7 +495,7 @@ defmodule Phoenix.HTML.FormTest do
   # datetime_select/4
 
   test "datetime_select/4" do
-    {:safe, content} = datetime_select(:search, :datetime)
+    content = safe_to_string(datetime_select(:search, :datetime))
     assert content =~ ~s(<select id="search_datetime_year" name="search[datetime][year]">)
     assert content =~ ~s(<select id="search_datetime_month" name="search[datetime][month]">)
     assert content =~ ~s(<select id="search_datetime_day" name="search[datetime][day]">)
@@ -501,7 +503,7 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<select id="search_datetime_min" name="search[datetime][min]">)
     refute content =~ ~s(<select id="search_datetime_sec" name="search[datetime][sec]">)
 
-    {:safe, content} = datetime_select(:search, :datetime, sec: [])
+    content = safe_to_string(datetime_select(:search, :datetime, sec: []))
     assert content =~ ~s(<select id="search_datetime_year" name="search[datetime][year]">)
     assert content =~ ~s(<select id="search_datetime_month" name="search[datetime][month]">)
     assert content =~ ~s(<select id="search_datetime_day" name="search[datetime][day]">)
@@ -509,7 +511,8 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<select id="search_datetime_min" name="search[datetime][min]">)
     assert content =~ ~s(<select id="search_datetime_sec" name="search[datetime][sec]">)
 
-    {:safe, content} = datetime_select(:search, :datetime, value: {{2020, 04, 17}, {2, 11, 13}}, sec: [])
+    content = safe_to_string(datetime_select(:search, :datetime,
+                                          value: {{2020, 04, 17}, {2, 11, 13}}, sec: []))
     assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
     assert content =~ ~s(<option selected="selected" value="4">April</option>)
     assert content =~ ~s(<option selected="selected" value="17">17</option>)
@@ -517,7 +520,8 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option selected="selected" value="11">11</option>)
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
 
-    {:safe, content} = datetime_select(:search, :datetime, value: {{2020, 04, 17}, {2, 11, 13, 328904}}, sec: [])
+    content = safe_to_string(datetime_select(:search, :datetime,
+                                          value: {{2020, 04, 17}, {2, 11, 13, 328904}}, sec: []))
     assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
     assert content =~ ~s(<option selected="selected" value="4">April</option>)
     assert content =~ ~s(<option selected="selected" value="17">17</option>)
@@ -527,7 +531,7 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "datetime_select/4 with form" do
-    {:safe, content} = with_form(&datetime_select(&1, :datetime, default: {{2020, 10, 13}, {1, 2, 3}}, sec: []))
+    content = safe_form(&datetime_select(&1, :datetime, default: {{2020, 10, 13}, {1, 2, 3}}, sec: []))
     assert content =~ ~s(<select id="search_datetime_year" name="search[datetime][year]">)
     assert content =~ ~s(<select id="search_datetime_month" name="search[datetime][month]">)
     assert content =~ ~s(<select id="search_datetime_day" name="search[datetime][day]">)
@@ -542,7 +546,7 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option selected="selected" value="11">11</option>)
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
 
-    {:safe, content} = with_form(&datetime_select(&1, :unknown, default: {{2020, 10, 13}, {1, 2, 3}}, sec: []))
+    content = safe_form(&datetime_select(&1, :unknown, default: {{2020, 10, 13}, {1, 2, 3}}, sec: []))
     assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
     assert content =~ ~s(<option selected="selected" value="10">October</option>)
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
@@ -550,7 +554,7 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option selected="selected" value="2">02</option>)
     assert content =~ ~s(<option selected="selected" value="3">03</option>)
 
-    {:safe, content} = with_form(&datetime_select(&1, :datetime, value: {{2020, 10, 13}, {1, 2, 3}}, sec: []))
+    content = safe_form(&datetime_select(&1, :datetime, value: {{2020, 10, 13}, {1, 2, 3}}, sec: []))
     assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
     assert content =~ ~s(<option selected="selected" value="10">October</option>)
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
@@ -561,7 +565,7 @@ defmodule Phoenix.HTML.FormTest do
 
   test "datetime_select/4 with builder" do
     builder = fn b ->
-      safe_concat ["Year: ",  b.(:year, class: "year"),
+      html_escape ["Year: ",  b.(:year, class: "year"),
                    "Month: ", b.(:month, class: "month"),
                    "Day: ",   b.(:day, class: "day"),
                    "Hour: ",  b.(:hour, class: "hour"),
@@ -569,10 +573,10 @@ defmodule Phoenix.HTML.FormTest do
                    "Sec: ",   b.(:sec, class: "sec")]
     end
 
-    {:safe, content} = datetime_select(:search, :datetime, builder: builder,
-                                       year: [id: "year"], month: [id: "month"],
-                                       day: [id: "day"], hour: [id: "hour"],
-                                       min: [id: "min"], sec: [id: "sec"])
+    content = safe_to_string(datetime_select(:search, :datetime, builder: builder,
+                                             year: [id: "year"], month: [id: "month"],
+                                             day: [id: "day"], hour: [id: "hour"],
+                                             min: [id: "min"], sec: [id: "sec"]))
 
     assert content =~ ~s(Year: <select class="year" id="year" name="search[datetime][year]">)
     assert content =~ ~s(Month: <select class="month" id="month" name="search[datetime][month]">)

@@ -39,14 +39,14 @@ defmodule Phoenix.HTML.Tag do
   Creates an HTML tag with given name, content, and attributes.
 
       iex> content_tag(:p, "Hello")
-      {:safe, "<p>Hello</p>"}
+      {:safe, ["<p>", "Hello", "</p>"]}
       iex> content_tag(:p, "<Hello>", class: "test")
-      {:safe, "<p class=\"test\">&lt;Hello&gt;</p>"}
+      {:safe, ["<p class=\"test\">", "&lt;Hello&gt;", "</p>"]}
 
       iex> content_tag :p, class: "test" do
       ...>   "Hello"
       ...> end
-      {:safe, "<p class=\"test\">Hello</p>"}
+      {:safe, ["<p class=\"test\">", "Hello", "</p>"]}
   """
   def content_tag(name, content) when is_atom(name) do
     content_tag(name, content, [])
@@ -57,9 +57,7 @@ defmodule Phoenix.HTML.Tag do
   end
 
   def content_tag(name, content, attrs) when is_atom(name) and is_list(attrs) do
-    tag(name, attrs)
-    |> safe_concat(content)
-    |> safe_concat({:safe, "</#{name}>"})
+    html_escape [tag(name, attrs), content, {:safe, "</#{name}>"}]
   end
 
   defp tag_attrs([]), do: ""
@@ -189,7 +187,7 @@ defmodule Phoenix.HTML.Tag do
         {true, opts}  -> Keyword.put(opts, :enctype, "multipart/form-data")
       end
 
-    safe_concat tag(:form, [action: action] ++ opts), safe(extra)
+    html_escape [tag(:form, [action: action] ++ opts), raw(extra)]
   end
 
   @doc """
@@ -204,7 +202,7 @@ defmodule Phoenix.HTML.Tag do
 
   """
   def form_tag(action, options, do: block) do
-    safe_concat [form_tag(action, options), block, safe("</form>")]
+    html_escape [form_tag(action, options), block, raw("</form>")]
   end
 
   defp csrf_token_tag(opts, extra) do

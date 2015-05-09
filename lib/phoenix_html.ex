@@ -29,9 +29,9 @@ defmodule Phoenix.HTML do
 
   User data or data coming from the database is almost never
   considered safe. However, in some cases, you may want to tag
-  it as safe and show its original contents:
+  it as safe and show its "raw" contents:
 
-      <%= safe "<hello>" %>
+      <%= raw "<hello>" %>
 
   Keep in mind most helpers will automatically escape your data
   and return safe content:
@@ -98,50 +98,29 @@ defmodule Phoenix.HTML do
                          "Remove the interpolation or use ~E instead"
   end
 
-  @doc """
-  Marks the given value as safe.
+  ## Deprecated
 
-      iex> Phoenix.HTML.safe("<hello>")
-      {:safe, "<hello>"}
-      iex> Phoenix.HTML.safe({:safe, "<hello>"})
-      {:safe, "<hello>"}
-
-  """
+  @doc false
   @spec safe(iodata | safe) :: safe
-  def safe({:safe, value}), do: {:safe, value}
-  def safe(value) when is_binary(value) or is_list(value), do: {:safe, value}
+  def safe({:safe, value}) do
+    IO.write :stderr, "Phoenix.HTML.safe/1 is deprecated, please use raw/1 instead\n" <>
+                      Exception.format_stacktrace()
+    {:safe, value}
+  end
 
-  @doc """
-  Concatenates data in the given list safely.
+  def safe(value) when is_binary(value) or is_list(value) do
+    IO.write :stderr, "Phoenix.HTML.safe/1 is deprecated, please use raw/1 instead\n" <>
+                      Exception.format_stacktrace()
+    {:safe, value}
+  end
 
-      iex> safe_concat(["<hello>", "safe", "<world>"])
-      {:safe, "&lt;hello&gt;safe&lt;world&gt;"}
-
-  """
+  @doc false
   @spec safe_concat([iodata | safe]) :: safe
   def safe_concat(list) when is_list(list) do
     Enum.reduce(list, {:safe, ""}, &safe_concat(&2, &1))
   end
 
-  @doc """
-  Concatenates data safely.
-
-      iex> safe_concat("<hello>", "<world>")
-      {:safe, "&lt;hello&gt;&lt;world&gt;"}
-
-      iex> safe_concat({:safe, "<hello>"}, "<world>")
-      {:safe, "<hello>&lt;world&gt;"}
-
-      iex> safe_concat("<hello>", {:safe, "<world>"})
-      {:safe, "&lt;hello&gt;<world>"}
-
-      iex> safe_concat({:safe, "<hello>"}, {:safe, "<world>"})
-      {:safe, "<hello><world>"}
-
-      iex> safe_concat({:safe, "<hello>"}, {:safe, '<world>'})
-      {:safe, ["<hello>"|'<world>']}
-
-  """
+  @doc false
   @spec safe_concat(iodata | safe, iodata | safe) :: safe
   def safe_concat({:safe, data1}, {:safe, data2}), do: {:safe, io_concat(data1, data2)}
   def safe_concat({:safe, data1}, data2), do: {:safe, io_concat(data1, io_escape(data2))}
@@ -153,10 +132,35 @@ defmodule Phoenix.HTML do
   defp io_escape(data) when is_list(data),
     do: Phoenix.HTML.Safe.List.to_iodata(data)
 
-  defp io_concat(d1, d2) when is_binary(d1) and is_binary(d2), do:
+  defp io_concat(d1, d2) when is_binary(d1) and is_binary(d2) do
+    IO.write :stderr, "Phoenix.HTML.safe_concat/2 is deprecated, please use html_escape/1 instead\n" <>
+                      Exception.format_stacktrace()
     d1 <> d2
-  defp io_concat(d1, d2), do:
+  end
+
+  defp io_concat(d1, d2) do
+    IO.write :stderr, "Phoenix.HTML.safe_concat/2 is deprecated, please use html_escape/1 instead\n" <>
+                      Exception.format_stacktrace()
     [d1|d2]
+  end
+
+  ## Deprecated
+
+  @doc """
+  Marks the given content as raw.
+
+  This means any HTML code inside the given
+  string won't be escaped.
+
+      iex> raw("<hello>")
+      {:safe, "<hello>"}
+      iex> raw({:safe, "<hello>"})
+      {:safe, "<hello>"}
+
+  """
+  @spec raw(iodata | safe) :: safe
+  def raw({:safe, value}), do: {:safe, value}
+  def raw(value) when is_binary(value) or is_list(value), do: {:safe, value}
 
   @doc """
   Escapes the HTML entities in the given term, returning iodata.
@@ -178,8 +182,21 @@ defmodule Phoenix.HTML do
     do: safe
   def html_escape(nil),
     do: {:safe, ""}
-  def html_escape(other) when is_binary(other),
-    do: {:safe, Plug.HTML.html_escape(other)}
+  def html_escape(bin) when is_binary(bin),
+    do: {:safe, Plug.HTML.html_escape(bin)}
+  def html_escape(list) when is_list(list),
+    do: {:safe, Phoenix.HTML.Safe.List.to_iodata(list)}
   def html_escape(other),
     do: {:safe, Phoenix.HTML.Safe.to_iodata(other)}
+
+  @doc """
+  Converts a safe result into a string.
+
+  Fails if the result is not safe. In such cases, you can
+  invoke `html_escape/1` or `raw/1` accordingly before.
+  """
+  @spec safe_to_string(safe) :: String.t
+  def safe_to_string({:safe, iodata}) do
+    IO.iodata_to_binary(iodata)
+  end
 end

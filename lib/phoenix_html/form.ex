@@ -178,7 +178,7 @@ defmodule Phoenix.HTML.Form do
                  Keyword.t, (t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
   def form_for(form_data, action, options \\ [], fun) when is_function(fun, 1) do
     form = Phoenix.HTML.FormData.to_form(form_data, options)
-    safe_concat [form_tag(action, form.options), fun.(form), safe("</form>")]
+    html_escape [form_tag(action, form.options), fun.(form), raw("</form>")]
   end
 
   ## Form helpers
@@ -321,7 +321,7 @@ defmodule Phoenix.HTML.Form do
       |> Keyword.put_new(:name, name_from(form, field))
 
     {value, opts} = Keyword.pop(opts, :value, value_from(form, field) || "")
-    content_tag(:textarea, safe_concat("\n", value), opts)
+    content_tag(:textarea, html_escape(["\n", value]), opts)
   end
 
   @doc """
@@ -452,8 +452,8 @@ defmodule Phoenix.HTML.Form do
       opts = Keyword.put_new(opts, :checked, true)
     end
 
-    safe_concat tag(:input, name: Keyword.get(opts, :name), type: "hidden", value: unchecked_value),
-                tag(:input, [value: checked_value] ++ opts)
+    html_escape [tag(:input, name: Keyword.get(opts, :name), type: "hidden", value: unchecked_value),
+                 tag(:input, [value: checked_value] ++ opts)]
   end
 
   @doc """
@@ -504,7 +504,7 @@ defmodule Phoenix.HTML.Form do
     {value, opts}   = Keyword.pop(opts, :value, value_from(form, field) || default)
 
     {options, opts} = case Keyword.pop(opts, :prompt) do
-      {nil, opts}    -> {safe(""), opts}
+      {nil, opts}    -> {raw(""), opts}
       {prompt, opts} -> {content_tag(:option, prompt, value: ""), opts}
     end
 
@@ -531,7 +531,7 @@ defmodule Phoenix.HTML.Form do
 
   defp option(option_key, option_value, value, acc) do
     opts = [value: option_value, selected: value == option_value]
-    safe_concat acc, content_tag(:option, option_key, opts)
+    html_escape [acc|content_tag(:option, option_key, opts)]
   end
 
   ## Datetime
@@ -635,7 +635,7 @@ defmodule Phoenix.HTML.Form do
       Keyword.get(opts, :builder) || fn b ->
         date = date_builder(b, opts)
         time = time_builder(b, opts)
-        safe_concat [date, safe(" &mdash; "), time]
+        html_escape [date, raw(" &mdash; "), time]
       end
 
     builder.(datetime_builder(form, field, date_value(value), time_value(value), opts))
@@ -653,7 +653,7 @@ defmodule Phoenix.HTML.Form do
   end
 
   defp date_builder(b, _opts) do
-    safe_concat [b.(:year, []), safe(" / "), b.(:month, []), safe(" / "), b.(:day, [])]
+    html_escape [b.(:year, []), raw(" / "), b.(:month, []), raw(" / "), b.(:day, [])]
   end
 
   defp date_value(%{"year" => year, "month" => month, "day" => day}),
@@ -683,10 +683,10 @@ defmodule Phoenix.HTML.Form do
   end
 
   defp time_builder(b, opts) do
-    time = safe_concat [b.(:hour, []), safe(" : "), b.(:min, [])]
+    time = html_escape [b.(:hour, []), raw(" : "), b.(:min, [])]
 
     if Keyword.get(opts, :sec) do
-      safe_concat [time, safe(" : "), b.(:sec, [])]
+      html_escape [time, raw(" : "), b.(:sec, [])]
     else
       time
     end

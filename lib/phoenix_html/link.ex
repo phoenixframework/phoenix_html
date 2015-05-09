@@ -10,14 +10,14 @@ defmodule Phoenix.HTML.Link do
 
   ## Examples
 
-      iex> link("hello", to: "/world")
-      {:safe, ~s(<a href="/world">hello</a>)}
+      link("hello", to: "/world")
+      #=> <a href="/world">hello</a>
 
-      iex> link("<hello>", to: "/world")
-      {:safe, ~s(<a href="/world">&lt;hello&gt;</a>)}
+      link("<hello>", to: "/world")
+      #=> <a href="/world">&lt;hello&gt;</a>
 
-      iex> link("<hello>", to: "/world", class: "btn")
-      {:safe, ~s(<a class="btn" href="/world">&lt;hello&gt;</a>)}
+      link("<hello>", to: "/world", class: "btn")
+      #=> <a class="btn" href="/world">&lt;hello&gt;</a>
 
   ## Options
 
