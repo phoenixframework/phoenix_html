@@ -22,8 +22,8 @@ defmodule Phoenix.HTML.Engine do
     expr   = expr(expr)
     buffer = unwrap(buffer)
     {:safe, quote do
-      buff = unquote(buffer)
-      [buff|unquote(to_safe(expr, line))]
+      tmp1 = unquote(buffer)
+      [tmp1|unquote(to_safe(expr, line))]
      end}
   end
 
@@ -33,9 +33,9 @@ defmodule Phoenix.HTML.Engine do
     buffer = unwrap(buffer)
 
     quote do
-      buff = unquote(buffer)
+      tmp2 = unquote(buffer)
       unquote(expr)
-      buff
+      tmp2
     end
   end
 
