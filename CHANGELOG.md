@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.0.1
+
+* Bug fixes
+  * Avoid variable clash in Phoenix.HTML engine buffers
+
 ## v1.0.0
 
 * Enhancements
