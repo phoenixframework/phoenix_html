@@ -25,6 +25,19 @@ defmodule Phoenix.HTML.LinkTest do
            ~s[</form>]
   end
 
+  test "link with :do contents" do
+    assert ~s[<a href="/hello"><p>world</p></a>] == safe_to_string(link to: "/hello" do
+      Phoenix.HTML.Tag.content_tag :p, "world"
+    end)
+
+    assert safe_to_string(link(to: "/hello", do: "world")) == ~s[<a href="/hello">world</a>]
+
+    msg = "link/2 requires some contents in the :do block"
+    assert_raise ArgumentError, msg, fn ->
+      link(to: "/hello-world")
+    end
+  end
+
   test "button with post (default)" do
     csrf_token = Plug.CSRFProtection.get_csrf_token()
 
