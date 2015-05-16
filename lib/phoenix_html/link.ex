@@ -19,6 +19,11 @@ defmodule Phoenix.HTML.Link do
       link("<hello>", to: "/world", class: "btn")
       #=> <a class="btn" href="/world">&lt;hello&gt;</a>
 
+      # You can use a `do ... end` block too:
+      link to: "/hello" do
+        "world"
+      end
+
   ## Options
 
     * `:to` - the page to link to. This option is required
