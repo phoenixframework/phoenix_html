@@ -19,6 +19,11 @@ defmodule Phoenix.HTML.Link do
       link("<hello>", to: "/world", class: "btn")
       #=> <a class="btn" href="/world">&lt;hello&gt;</a>
 
+      # You can use a `do ... end` block too:
+      link to: "/hello" do
+        "world"
+      end
+
   ## Options
 
     * `:to` - the page to link to. This option is required
@@ -33,6 +38,12 @@ defmodule Phoenix.HTML.Link do
 
   All other options are forwarded to the underlying `<a>` tag.
   """
+  def link(text, opts)
+
+  def link(opts, do: contents) when is_list(opts) do
+    link(contents, opts)
+  end
+
   def link(text, opts) do
     {to, opts} = Keyword.pop(opts, :to)
     {method, opts} = Keyword.pop(opts, :method, :get)
@@ -49,6 +60,20 @@ defmodule Phoenix.HTML.Link do
         content_tag(:a, text, [href: "#", onclick: "this.parentNode.submit(); return false;"] ++ opts)
       end
     end
+  end
+
+  @doc false
+  # No docs since this function is only called when a `do` block is passed as
+  # `do:` instead of `do...end` (and that case is documented in `link/2`). No
+  # need to confuse users.
+  def link(opts) do
+    {contents, opts} = Keyword.pop(opts, :do)
+
+    unless contents do
+      raise ArgumentError, "link/2 requires some contents in the :do block"
+    end
+
+    link(contents, opts)
   end
 
   @doc """
