@@ -64,13 +64,12 @@ defmodule Phoenix.HTML.Link do
 
   @doc false
   # No docs since this function is only called when a `do` block is passed as
-  # `do:` instead of `do...end` (and that case is documented in `link/2`). No
-  # need to confuse users.
-  def link(opts) do
+  # `do:` instead of `do...end` (and that case is documented in `link/2`).
+  def link(opts) when is_list(opts) do
     {contents, opts} = Keyword.pop(opts, :do)
 
     unless contents do
-      raise ArgumentError, "link/2 requires some contents in the :do block"
+      raise ArgumentError, "link/2 requires a text as first agument or contents in the :do block"
     end
 
     link(contents, opts)

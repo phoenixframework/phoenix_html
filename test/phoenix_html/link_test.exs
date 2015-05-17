@@ -32,7 +32,7 @@ defmodule Phoenix.HTML.LinkTest do
 
     assert safe_to_string(link(to: "/hello", do: "world")) == ~s[<a href="/hello">world</a>]
 
-    msg = "link/2 requires some contents in the :do block"
+    msg = "link/2 requires a text as first agument or contents in the :do block"
     assert_raise ArgumentError, msg, fn ->
       link(to: "/hello-world")
     end
