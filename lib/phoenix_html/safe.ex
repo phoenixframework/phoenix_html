@@ -50,6 +50,12 @@ defimpl Phoenix.HTML.Safe, for: List do
   def to_iodata({:safe, data}) do
     data
   end
+
+  def to_iodata(other) do
+    raise ArgumentError,
+      "lists in Phoenix.HTML and templates may only contain integers, binaries or other lists, " <>
+      "got invalid entry: #{inspect other}"
+  end
 end
 
 defimpl Phoenix.HTML.Safe, for: Integer do
