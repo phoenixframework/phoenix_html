@@ -47,7 +47,7 @@ defmodule Phoenix.HTML.Link do
   def link(text, opts) do
     {to, opts} = Keyword.pop(opts, :to)
   rescue
-    _ -> raise ArgumentError, "option :to is required in link/2"
+    _ -> raise ArgumentError, "link/2 requires a keyword list as second argument"
   else
     {nil, _opts} ->
       raise ArgumentError, "option :to is required in link/2"
@@ -71,7 +71,7 @@ defmodule Phoenix.HTML.Link do
     {contents, opts} = Keyword.pop(opts, :do)
 
     unless contents do
-      raise ArgumentError, "link/2 requires a text as first agument or contents in the :do block"
+      raise ArgumentError, "link/2 requires a text as first argument or contents in the :do block"
     end
 
     link(contents, opts)
