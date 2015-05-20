@@ -7,19 +7,7 @@ defmodule Phoenix.HTML.Engine do
   use EEx.Engine
 
   @doc false
-  def handle_body(body) do
-    Macro.postwalk(body, &postwalk_body/1)
-  end
-  defp postwalk_body({{:., [line: line], [{:__aliases__, _, [:Dict]}, :get]}, _,
-                      [{:var!, [_, context: EEx.Engine, import: Kernel],
-                        [{:assigns, _, EEx.Engine}]}, assign]}) do
-
-    {{:., [line: line], [{:__aliases__, [line: line, alias: false], [:Dict]}, :fetch!]},
-      [line: line],
-      [{:var!, [line: line, context: EEx.Engine, import: Kernel],
-        [{:assigns, [line: line], EEx.Engine}]}, assign]}
-  end
-  defp postwalk_body(segment), do: segment
+  def handle_body(body), do: body
 
   @doc false
   def handle_text(buffer, text) do
@@ -81,7 +69,24 @@ defmodule Phoenix.HTML.Engine do
   end
 
   defp expr(expr) do
-    Macro.prewalk(expr, &EEx.Engine.handle_assign/1)
+    Macro.prewalk(expr, &handle_assign/1)
+  end
+  defp handle_assign({:@, meta, [{name, _, atom}]}) when is_atom(name) and is_atom(atom) do
+    quote line: meta[:line] || 0 do
+      Phoenix.HTML.Engine.fetch_assign(var!(assigns), unquote(name))
+    end
+  end
+  defp handle_assign(arg), do: arg
+
+  @doc false
+  def fetch_assign(assigns, key) do
+    case Dict.fetch(assigns, key) do
+      :error ->
+        raise ArgumentError, message: """
+        assign @#{key} not available in eex template assigns: #{inspect Dict.keys(assigns)}
+        """
+      {:ok, val} -> val
+    end
   end
 
   defp unwrap({:safe, value}), do: value
