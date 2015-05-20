@@ -46,20 +46,22 @@ defmodule Phoenix.HTML.Link do
 
   def link(text, opts) do
     {to, opts} = Keyword.pop(opts, :to)
-    {method, opts} = Keyword.pop(opts, :method, :get)
-
-    unless to do
+  rescue
+    _ -> raise ArgumentError, "option :to is required in link/2"
+  else
+    {nil, _opts} ->
       raise ArgumentError, "option :to is required in link/2"
-    end
+    {to, opts}   ->
+      {method, opts} = Keyword.pop(opts, :method, :get)
 
-    if method == :get do
-      content_tag(:a, text, [href: to] ++ opts)
-    else
-      {form, opts} = form_options(opts, method, "link")
-      form_tag(to, form) do
-        content_tag(:a, text, [href: "#", onclick: "this.parentNode.submit(); return false;"] ++ opts)
+      if method == :get do
+        content_tag(:a, text, [href: to] ++ opts)
+      else
+        {form, opts} = form_options(opts, method, "link")
+        form_tag(to, form) do
+          content_tag(:a, text, [href: "#", onclick: "this.parentNode.submit(); return false;"] ++ opts)
+        end
       end
-    end
   end
 
   @doc false

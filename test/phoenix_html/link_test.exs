@@ -38,6 +38,17 @@ defmodule Phoenix.HTML.LinkTest do
     end
   end
 
+  test "link with invalid args" do
+    msg = "option :to is required in link/2"
+
+    assert_raise ArgumentError, msg, fn ->
+      link("foo", [])
+    end
+    assert_raise ArgumentError, msg, fn ->
+      link("foo", "/login")
+    end
+  end
+
   test "button with post (default)" do
     csrf_token = Plug.CSRFProtection.get_csrf_token()
 
