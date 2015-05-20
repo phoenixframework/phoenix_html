@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.0-dev
+
+* Enhancements
+  * Allow do/end syntax with `link/2`
+  * Raise on missing assigns
+
 ## v1.0.1
 
 * Bug fixes
