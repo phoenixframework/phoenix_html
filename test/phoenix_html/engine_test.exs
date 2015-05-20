@@ -1,21 +1,28 @@
 defmodule Phoenix.HTML.EngineTest do
   use ExUnit.Case, async: true
 
-  test "evaluates expressions with buffers" do
-    string = """
-    <%= 123 %>
-    <% if true do %>
-      <%= 456 %>
-    <% end %>
-    <%= 789 %>
-    """
+  @template """
+  <%= 123 %>
+  <%= if @foo do %>
+    <%= 456 %>
+  <% end %>
+  <%= 789 %>
+  """
 
-    assert eval(string) == "123\n\n789\n"
+  test "evaluates expressions with buffers" do
+    assert eval(@template, %{foo: true}) == "123\n\n  456\n\n789\n"
   end
 
-  defp eval(string) do
+  test "raises KeyError for missing assigns" do
+    assert_raise ArgumentError, ~r/assign @foo not available in eex template. Available assigns: \[:bar\]/, fn ->
+      eval(@template, %{bar: "baz"})
+    end
+  end
+
+  defp eval(string, assigns) do
     {:safe, io} =
-      EEx.eval_string(string, [], file: __ENV__.file, engine: Phoenix.HTML.Engine)
+      EEx.eval_string(string, [assigns: assigns],
+                      file: __ENV__.file, engine: Phoenix.HTML.Engine)
     IO.iodata_to_binary(io)
   end
 end
