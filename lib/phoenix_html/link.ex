@@ -45,23 +45,24 @@ defmodule Phoenix.HTML.Link do
   end
 
   def link(text, opts) do
-    {to, opts} = Keyword.pop(opts, :to)
-  rescue
-    _ -> raise ArgumentError, "link/2 requires a keyword list as second argument"
-  else
-    {nil, _opts} ->
-      raise ArgumentError, "option :to is required in link/2"
-    {to, opts}   ->
-      {method, opts} = Keyword.pop(opts, :method, :get)
+    cond do
+      not match?([{_key, _value}|_opts], opts) ->
+        raise ArgumentError, "link/2 requires a keyword list as second argument"
+      Keyword.get(opts, :to) ->
+        {to, opts} = Keyword.pop(opts, :to)
+        {method, opts} = Keyword.pop(opts, :method, :get)
 
-      if method == :get do
-        content_tag(:a, text, [href: to] ++ opts)
-      else
-        {form, opts} = form_options(opts, method, "link")
-        form_tag(to, form) do
-          content_tag(:a, text, [href: "#", onclick: "this.parentNode.submit(); return false;"] ++ opts)
+        if method == :get do
+          content_tag(:a, text, [href: to] ++ opts)
+        else
+          {form, opts} = form_options(opts, method, "link")
+          form_tag(to, form) do
+            content_tag(:a, text, [href: "#", onclick: "this.parentNode.submit(); return false;"] ++ opts)
+          end
         end
-      end
+      true ->
+        raise ArgumentError, "option :to is required in link/2"
+    end
   end
 
   @doc false

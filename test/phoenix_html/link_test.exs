@@ -36,7 +36,7 @@ defmodule Phoenix.HTML.LinkTest do
   test "link with invalid args" do
     msg = "option :to is required in link/2"
     assert_raise ArgumentError, msg, fn ->
-      link("foo", [])
+      link("foo", [bar: "baz"])
     end
 
     msg = "link/2 requires a keyword list as second argument"
