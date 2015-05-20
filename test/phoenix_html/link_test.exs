@@ -31,8 +31,20 @@ defmodule Phoenix.HTML.LinkTest do
     end)
 
     assert safe_to_string(link(to: "/hello", do: "world")) == ~s[<a href="/hello">world</a>]
+  end
 
-    msg = "link/2 requires a text as first agument or contents in the :do block"
+  test "link with invalid args" do
+    msg = "option :to is required in link/2"
+    assert_raise ArgumentError, msg, fn ->
+      link("foo", [bar: "baz"])
+    end
+
+    msg = "link/2 requires a keyword list as second argument"
+    assert_raise ArgumentError, msg, fn ->
+      link("foo", "/login")
+    end
+
+    msg = "link/2 requires a text as first argument or contents in the :do block"
     assert_raise ArgumentError, msg, fn ->
       link(to: "/hello-world")
     end
