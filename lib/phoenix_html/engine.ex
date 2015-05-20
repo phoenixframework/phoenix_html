@@ -83,7 +83,7 @@ defmodule Phoenix.HTML.Engine do
     case Dict.fetch(assigns, key) do
       :error ->
         raise ArgumentError, message: """
-        assign @#{key} not available in eex template assigns: #{inspect Dict.keys(assigns)}
+        assign @#{key} not available in eex template. Available assigns: #{inspect Dict.keys(assigns)}
         """
       {:ok, val} -> val
     end

@@ -14,7 +14,7 @@ defmodule Phoenix.HTML.EngineTest do
   end
 
   test "raises KeyError for missing assigns" do
-    assert_raise ArgumentError, ~r/assign @foo not available in eex template assigns: \[:bar\]/, fn ->
+    assert_raise ArgumentError, ~r/assign @foo not available in eex template. Available assigns: \[:bar\]/, fn ->
       eval(@template, %{bar: "baz"})
     end
   end
