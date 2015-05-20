@@ -7,7 +7,19 @@ defmodule Phoenix.HTML.Engine do
   use EEx.Engine
 
   @doc false
-  def handle_body(body), do: body
+  def handle_body(body) do
+    Macro.postwalk(body, &postwalk_body/1)
+  end
+  defp postwalk_body({{:., [line: line], [{:__aliases__, _, [:Dict]}, :get]}, _,
+                      [{:var!, [_, context: EEx.Engine, import: Kernel],
+                        [{:assigns, _, EEx.Engine}]}, assign]}) do
+
+    {{:., [line: line], [{:__aliases__, [line: line, alias: false], [:Dict]}, :fetch!]},
+      [line: line],
+      [{:var!, [line: line, context: EEx.Engine, import: Kernel],
+        [{:assigns, [line: line], EEx.Engine}]}, assign]}
+  end
+  defp postwalk_body(segment), do: segment
 
   @doc false
   def handle_text(buffer, text) do
