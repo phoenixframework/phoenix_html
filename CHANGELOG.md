@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.1.0-dev
+## v1.1.0 (2015-05-20)
 
 * Enhancements
   * Allow do/end syntax with `link/2`
