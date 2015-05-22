@@ -60,6 +60,10 @@ defmodule Phoenix.HTML.Tag do
     html_escape [tag(name, attrs), content, {:safe, "</#{name}>"}]
   end
 
+  def merge_tags(contents) do
+    {:safe, Enum.map(contents, fn ({:safe, content}) -> content end)}
+  end
+
   defp tag_attrs([]), do: ""
   defp tag_attrs(attrs) do
     for {k, v} <- attrs, into: "" do

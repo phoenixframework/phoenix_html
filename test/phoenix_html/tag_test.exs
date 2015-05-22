@@ -72,6 +72,13 @@ defmodule Phoenix.HTML.TagTest do
     assert safe_to_string(content) ==
            ~s(<form action="/users" data-remote="true">) <>
            ~s(<input name="user[name]"></form>)
+
+    content = content_tag :li, class: "foo" do
+      [content_tag(:i, ""), content_tag(:span, "text")]
+      |> merge_tags
+    end
+
+    assert safe_to_string(content) == ~s(<li class="foo"><i></i><span>text</span></li>)
   end
 
   test "form_tag for get" do
