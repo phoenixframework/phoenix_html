@@ -60,7 +60,21 @@ defmodule Phoenix.HTML.Tag do
     html_escape [tag(name, attrs), content, {:safe, "</#{name}>"}]
   end
 
-  def merge_tags(contents) do
+  @doc """
+  Outputs tags alongside each other.
+
+  This is useful in cases where you do not want to have nested tags.
+
+  ## Examples
+
+      content_tag :li, class: "foo" do
+        [content_tag(:i, ""), content_tag(:span, "text")]
+        |> merge_tags
+      end
+      <li class="foo"><i></i><span>text</span></li>
+
+  """
+  def merge_tags(contents) when is_list(contents) do
     {:safe, Enum.map(contents, fn ({:safe, content}) -> content end)}
   end
 
@@ -150,7 +164,7 @@ defmodule Phoenix.HTML.Tag do
 
   ## Enforce UTF-8
 
-  Alhought forms provide the `accept-charset` attribute, which we set
+  Alhough forms provide the `accept-charset` attribute, which we set
   to UTF-8, Internet Explorer 5 up to 8 may ignore the value of this
   attribute if the user chooses their browser to do so. This ends up
   triggering the browser to send data in a format that is not
