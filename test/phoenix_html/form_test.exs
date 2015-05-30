@@ -585,4 +585,22 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(Min: <select class="min" id="min" name="search[datetime][min]">)
     assert content =~ ~s(Sec: <select class="sec" id="sec" name="search[datetime][sec]">)
   end
+
+  ## label/4
+
+  test "label/4" do
+    assert safe_to_string(label(:search, :key, "Search")) ==
+          ~s(<label for="search_key">Search</label>)
+
+    assert safe_to_string(label(:search, :key, "Search", for: "test_key")) ==
+          ~s(<label for="test_key">Search</label>)
+  end
+
+  test "label/4 with form" do
+    assert safe_form(&label(&1, :key, "Search")) ==
+          ~s(<label for="search_key">Search</label>)
+
+    assert safe_form(&label(&1, :key, "Search", for: "test_key")) ==
+          ~s(<label for="test_key">Search</label>)
+  end
 end
