@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.2.0 (2015-05-30)
+
+* Enhancements
+  * Add `label/3` for generating a label tag within a form
+
 ## v1.1.0 (2015-05-20)
 
 * Enhancements
