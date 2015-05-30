@@ -775,6 +775,30 @@ defmodule Phoenix.HTML.Form do
       |> Keyword.put_new(:value, Map.get(datetime, type))}
   end
 
+  @doc """
+  Generates a label tag.
+
+  The form should either be a `Phoenix.HTML.Form` emitted
+  by `form_for` or an atom.
+
+  All given options are forwarded to the underlying tag.
+  A default value is provided for `for` attribute but can
+  be overriden if you pass a value to the `for` option.
+
+  ## Examples
+
+      # Assuming form contains a User model
+      label(form, :name, "Name")
+      #=> <label for="user_name">Name</label>
+
+      label(:user, :email, "Email")
+      #=> <label for="user_email">Email</label>
+  """
+  def label(form, field, text, opts \\ []) do
+    opts = Keyword.put_new(opts, :for, id_from(form, field))
+    content_tag(:label, text, opts)
+  end
+
   ## Helpers
 
   defp value_from(%{model: model, params: params}, field),
