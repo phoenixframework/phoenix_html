@@ -7,6 +7,7 @@ defmodule Phoenix.HTML.FormTest do
 
   @conn Plug.Test.conn(:get, "/foo", %{"search" => %{
     "key" => "value",
+    "alt_key" => nil,
     "datetime" => %{"year" => "2020", "month" => "4", "day" => "17",
                     "hour" => "2",   "min" => "11", "sec" => "13"}
   }})
@@ -71,6 +72,9 @@ defmodule Phoenix.HTML.FormTest do
   test "text_input/3 with form" do
     assert safe_form(&text_input(&1, :key)) ==
            ~s(<input id="search_key" name="search[key]" type="text" value="value">)
+
+    assert safe_form(&text_input(&1, :alt_key)) ==
+           ~s(<input id="search_alt_key" name="search[alt_key]" type="text">)
 
     assert safe_form(&text_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
            ~s(<input id="key" name="search[key][]" type="text" value="foo">)
