@@ -802,7 +802,7 @@ defmodule Phoenix.HTML.Form do
   ## Helpers
 
   defp value_from(%{model: model, params: params}, field),
-    do: Map.get(params, Atom.to_string(field)) || Map.get(model, field)
+    do: Map.get(params, Atom.to_string(field), Map.get(model, field))
   defp value_from(name, _field) when is_atom(name),
     do: nil
 
