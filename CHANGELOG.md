@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.2.1 (2015-06-02)
+
+* Bug fix
+  * Ensure nil parameters are not discarded when rendering input
+
 ## v1.2.0 (2015-05-30)
 
 * Enhancements
