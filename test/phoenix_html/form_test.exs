@@ -73,11 +73,19 @@ defmodule Phoenix.HTML.FormTest do
     assert safe_form(&text_input(&1, :key)) ==
            ~s(<input id="search_key" name="search[key]" type="text" value="value">)
 
-    assert safe_form(&text_input(&1, :alt_key)) ==
-           ~s(<input id="search_alt_key" name="search[alt_key]" type="text">)
-
     assert safe_form(&text_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
            ~s(<input id="key" name="search[key][]" type="text" value="foo">)
+  end
+
+  test "text_input/3 with form and model data" do
+    assert safe_form(&text_input(put_in(&1.model[:key], "original"), :key)) ==
+           ~s(<input id="search_key" name="search[key]" type="text" value="value">)
+
+    assert safe_form(&text_input(put_in(&1.model[:no_key], "original"), :no_key)) ==
+           ~s(<input id="search_no_key" name="search[no_key]" type="text" value="original">)
+
+    assert safe_form(&text_input(put_in(&1.model[:alt_key], "original"), :alt_key)) ==
+           ~s(<input id="search_alt_key" name="search[alt_key]" type="text">)
   end
 
   ## textarea/3
