@@ -328,7 +328,7 @@ defmodule Phoenix.HTML.Form do
   Generates a file input.
 
   It requires the given form to be configured with `multipart: true`
-  when invokig `form_for/4`, otherwise it fails with `ArgumentError`.
+  when invoking `form_for/4`, otherwise it fails with `ArgumentError`.
 
   See `text_input/3` for example and docs.
   """
