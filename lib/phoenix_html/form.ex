@@ -367,6 +367,29 @@ defmodule Phoenix.HTML.Form do
   end
 
   @doc """
+  Generates a reset input to reset all the form fields to
+  their original state.
+
+  All options are forwarded to the underlying input tag.
+
+  ## Examples
+
+      reset "Reset"
+      #=> <input type="reset" value="Reset">
+
+      reset "Reset", class: "btn"
+      #=> <input type="reset" value="Reset" class="btn">
+
+  """
+  def reset(value, opts \\ []) do
+    opts =
+      opts
+      |> Keyword.put_new(:type, "reset")
+      |> Keyword.put_new(:value, value)
+    tag(:input, opts)
+  end
+
+  @doc """
   Generates a radio button.
 
   Invoke this function for each possible value you to be

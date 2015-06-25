@@ -282,6 +282,16 @@ defmodule Phoenix.HTML.FormTest do
           ~s(<input class="btn" type="submit" value="Submit">)
   end
 
+  ## reset/2
+
+  test "reset/2" do
+    assert safe_to_string(reset("Reset")) ==
+          ~s(<input type="reset" value="Reset">)
+
+    assert safe_to_string(reset("Reset", class: "btn")) ==
+          ~s(<input class="btn" type="reset" value="Reset">)
+  end
+
   ## radio_button/4
 
   test "radio_button/4" do
