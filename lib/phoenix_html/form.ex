@@ -784,6 +784,7 @@ defmodule Phoenix.HTML.Form do
   All given options are forwarded to the underlying tag.
   A default value is provided for `for` attribute but can
   be overriden if you pass a value to the `for` option.
+  Text content would be inferred from `field` if not specified.
 
   ## Examples
 
@@ -793,10 +794,23 @@ defmodule Phoenix.HTML.Form do
 
       label(:user, :email, "Email")
       #=> <label for="user_email">Email</label>
+
+      label(:user, :email)
+      #=> <label for="user_email">Email</label>
+
+      label(:user, :email, class="control-label")
+      #=> <label for="user_email" class="control-label">Email</label>
   """
-  def label(form, field, text, opts \\ []) do
+  def label(form, field, text_or_opts \\ nil, opts \\ [])
+  def label(form, field, text_or_opts, opts) when is_nil(text_or_opts) do
+    label(form, field, humanize(field), opts)
+  end
+  def label(form, field, text_or_opts, _opts) when is_list(text_or_opts) do
+    label(form, field, humanize(field), text_or_opts)
+  end
+  def label(form, field, text_or_opts, opts) do
     opts = Keyword.put_new(opts, :for, id_from(form, field))
-    content_tag(:label, text, opts)
+    content_tag(:label, text_or_opts, opts)
   end
 
   ## Helpers
