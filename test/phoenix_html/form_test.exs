@@ -615,4 +615,20 @@ defmodule Phoenix.HTML.FormTest do
     assert safe_form(&label(&1, :key, "Search", for: "test_key")) ==
           ~s(<label for="test_key">Search</label>)
   end
+
+  test "label/4 with default value" do
+    assert safe_to_string(label(:search, :key)) ==
+          ~s(<label for="search_key">Key</label>)
+
+    assert safe_to_string(label(:search, :key, for: "test_key")) ==
+          ~s(<label for="test_key">Key</label>)
+  end
+
+  test "label/4 with form and default value" do
+    assert safe_form(&label(&1, :key)) ==
+          ~s(<label for="search_key">Key</label>)
+
+    assert safe_form(&label(&1, :key, for: "test_key")) ==
+          ~s(<label for="test_key">Key</label>)
+  end
 end
