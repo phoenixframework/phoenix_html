@@ -404,6 +404,59 @@ defmodule Phoenix.HTML.FormTest do
            ~s(</select>)
   end
 
+  # multiple_select/4
+
+  test "multiple_select/4" do
+    assert safe_to_string(multiple_select(:search, :key, ~w(foo bar))) ==
+         ~s(<select id="search_key" multiple="" name="search[key][]">) <>
+         ~s(<option value="foo">foo</option>) <>
+         ~s(<option value="bar">bar</option>) <>
+         ~s(</select>)
+
+    assert safe_to_string(multiple_select(:search, :key, [{"foo", 1}, {"bar", 2}])) ==
+           ~s(<select id="search_key" multiple="" name="search[key][]">) <>
+           ~s(<option value="1">foo</option>) <>
+           ~s(<option value="2">bar</option>) <>
+           ~s(</select>)
+
+    assert safe_to_string(multiple_select(:search, :key, ~w(foo bar), value: ["foo"])) =~
+           ~s(<option selected="selected" value="foo">foo</option>)
+
+    assert safe_to_string(multiple_select(:search, :key, [{"foo", 1}, {"bar", 2}], value: [1])) =~
+           ~s(<option selected="selected" value="1">foo</option>)
+
+    assert safe_to_string(multiple_select(:search, :key, [{"foo", 1}, {"bar", 2}], default: [1])) =~
+           ~s(<option selected="selected" value="1">foo</option>)
+
+  end
+
+  test "multiple_select/4 with form" do
+    assert safe_form(&multiple_select(&1, :key, [{"foo", 1}, {"bar", 2}], value: [1], default: [2])) ==
+           ~s(<select id="search_key" multiple="" name="search[key][]">) <>
+           ~s(<option selected="selected" value="1">foo</option>) <>
+           ~s(<option value="2">bar</option>) <>
+           ~s(</select>)
+
+    assert safe_form(&multiple_select(&1, :other, [{"foo", 1}, {"bar", 2}], default: [2])) ==
+           ~s(<select id="search_other" multiple="" name="search[other][]">) <>
+           ~s(<option value="1">foo</option>) <>
+           ~s(<option selected="selected" value="2">bar</option>) <>
+           ~s(</select>)
+
+    assert safe_form(&multiple_select(&1, :key, [{"foo", 1}, {"bar", 2}], value: [2])) ==
+           ~s(<select id="search_key" multiple="" name="search[key][]">) <>
+           ~s(<option value="1">foo</option>) <>
+           ~s(<option selected="selected" value="2">bar</option>) <>
+           ~s(</select>)
+
+    assert safe_form(&multiple_select(&1, :key, ~w(value novalue), value: ["novalue"])) ==
+           ~s(<select id="search_key" multiple="" name="search[key][]">) <>
+           ~s(<option value="value">value</option>) <>
+           ~s(<option selected="selected" value="novalue">novalue</option>) <>
+           ~s(</select>)
+
+  end
+
   # date_select/4
 
   test "date_select/4" do

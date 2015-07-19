@@ -552,9 +552,64 @@ defmodule Phoenix.HTML.Form do
     end
   end
 
+  defp option(option_key, option_value, value_list, acc) when is_list(value_list) do
+    opts = [value: option_value, selected: option_value in value_list]
+    html_escape [acc|content_tag(:option, option_key, opts)]
+  end
+
   defp option(option_key, option_value, value, acc) do
     opts = [value: option_value, selected: value == option_value]
     html_escape [acc|content_tag(:option, option_key, opts)]
+  end
+
+  @doc """
+  Generates a select tag with the given `values`.
+
+  Values are expected to be an Enumerable containing two-item tuples
+  (like maps and keyword lists) or any Enumerable where the element
+  will be used both as key and value for the generated select.
+
+  ## Examples
+
+      # Assuming form contains a User model
+      multiple_select(form, :roles, ["Admin": 1, "Power User": 2])
+      #=> <select id="user_roles" name="user[roles][]">
+          <option value="1">Admin</option>
+          <option value="2">Power User</option>
+          </select>
+
+
+      multiple_select(form, :role, ["Admin": 1, "Power User": 2], values: [1])
+      #=> <select id="user_role" name="user[role]">
+          <option value="1" selected="selected" >Admin</option>
+          <option value="2">Power User</option>
+          </select>
+
+  ## Options
+
+    * `:value` - an Enum of values used to select given options.
+
+    * `:default` - the default value to use when none was given in
+      `:values` and none was available in the model
+
+  All other options are forwarded to the underlying HTML tag.
+  """
+
+  def multiple_select(form, field, values, opts \\ []) do
+    {default, opts} = Keyword.pop(opts, :default)
+    {value_list, opts}  = case Keyword.pop(opts, :value, default) do
+      {nil, opts} -> {[], opts}
+      {value_list, opts} -> {Enum.map(value_list, &html_escape(&1)), opts}
+    end
+
+    opts =
+      opts 
+      |> Keyword.put_new(:id, id_from(form, field))
+      |> Keyword.put_new(:name, name_from(form, field) <> "[]")
+      |> Keyword.put_new(:multiple, "")
+
+    options = options_for_select(values, "", value_list)
+    content_tag(:select, options, opts)
   end
 
   ## Datetime
