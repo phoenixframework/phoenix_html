@@ -876,7 +876,7 @@ defmodule Phoenix.HTML.Form do
       label(:user, :email)
       #=> <label for="user_email">Email</label>
 
-      label(:user, :email, class="control-label")
+      label(:user, :email, class: "control-label")
       #=> <label for="user_email" class="control-label">Email</label>
   """
   def label(form, field, text_or_opts \\ nil, opts \\ [])
