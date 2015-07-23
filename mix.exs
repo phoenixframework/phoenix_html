@@ -11,7 +11,7 @@ defmodule PhoenixHtml.Mixfile do
 
      name: "Phoenix.HTML",
      description: "Phoenix.HTML functions for working with HTML strings and templates",
-     docs: [source_ref: "v#{@version}",
+     docs: [source_ref: "v#{@version}", main: "Phoenix.HTML",
             source_url: "https://github.com/phoenixframework/phoenix_html"]]
   end
 
