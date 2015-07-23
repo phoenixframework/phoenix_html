@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.3.0-dev
+## v1.3.0 (2015-07-23)
 
 * Enhancements
   * Add `Phoenix.HTML.Form.inputs_for/4` support

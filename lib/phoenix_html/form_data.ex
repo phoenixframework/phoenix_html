@@ -63,19 +63,16 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
 
       # cardinality: many
       is_list(default) ->
-        prepend = Enum.map(prepend, &{&1, %{}})
-        append  = Enum.map(append, &{&1, %{}})
-
-        middle =
+        entries =
           if params do
             params
             |> Enum.sort_by(&elem(&1, 0))
             |> Enum.map(&{nil, elem(&1, 1)})
           else
-            Enum.map(default, &{&1, %{}})
+            Enum.map(prepend ++ default ++ append, &{&1, %{}})
           end
 
-        for {{model, params}, index} <- Enum.with_index(prepend ++ middle ++ append) do
+        for {{model, params}, index} <- Enum.with_index(entries) do
           index = Integer.to_string(index)
           %Phoenix.HTML.Form{
             source: conn,

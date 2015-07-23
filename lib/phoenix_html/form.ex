@@ -242,9 +242,13 @@ defmodule Phoenix.HTML.Form do
 
     * `:default` - the value to use if none is available
 
-    * `:prepend` - the values to prepend when the field returns a list
+    * `:prepend` - the values to prepend when rendering. This only
+      applies if the field value is a list and no parameters were
+      sent through the form.
 
-    * `:append` - the values to append when the field returns a list
+    * `:prepend` - the values to append when rendering. This only
+      applies if the field value is a list and no parameters were
+      sent through the form.
   """
   @spec inputs_for(t, atom, Keyword.t, (t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
   def inputs_for(form, field, options \\ [], fun) do

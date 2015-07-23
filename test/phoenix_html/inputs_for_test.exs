@@ -136,9 +136,7 @@ defmodule Phoenix.HTML.InputsForTest do
       end)
 
     assert contents ==
-           ~s(<input id="search_dates_0_year" name="search[dates][0][year]" type="text" value="2008">) <>
-           ~s(<input id="search_dates_1_year" name="search[dates][1][year]" type="text" value="2010">) <>
-           ~s(<input id="search_dates_2_year" name="search[dates][2][year]" type="text" value="2020">) <>
-           ~s(<input id="search_dates_3_year" name="search[dates][3][year]" type="text" value="2022">)
+           ~s(<input id="search_dates_0_year" name="search[dates][0][year]" type="text" value="2010">) <>
+           ~s(<input id="search_dates_1_year" name="search[dates][1][year]" type="text" value="2020">)
   end
 end
