@@ -32,7 +32,7 @@ defmodule Phoenix.HTML.Form do
 
   where `User.changeset/2` is defined as follows:
 
-      def changeset(user, params \\ nil) do
+      def changeset(user, params \\ :empty) do
         cast(user, params)
       end
 
@@ -83,6 +83,51 @@ defmodule Phoenix.HTML.Form do
 
       <%= text_input :user, :name, value: "This is a prepopulated value" %>
 
+  ## Nested inputs
+
+  If your model layer supports embedding or nested associations,
+  you can use `inputs_for` to attach nested data to the form.
+
+  Imagine the modesl:
+
+      defmodule User do
+        use Ecto.Model
+
+        schema "users" do
+          field :name
+          embeds_one :permalink, Permalink
+        end
+      end
+
+      defmodule Permalink do
+        use Ecto.Model
+
+        embedded_schema do
+          field :url
+        end
+      end
+
+  In the form, you now can:
+
+      <%= form_for @changeset, user_path(@conn, :create), fn f -> %>
+        <%= text_input f, :name %>
+
+        <%= inputs_for f, :permalink, fn fp -> %>
+          <%= text_input f, :url %>
+        <% end %>
+      <% end %>
+
+  The default option can be given to populate the fields if none
+  is given:
+
+      <%= inputs_for f, :permalink, [default: %Permalink{title: "default"}], fn fp -> %>
+        <%= text_input f, :url %>
+      <% end %>
+
+  `inputs_for/4` can be used to work with single entities or
+  collections. When working with collections, `:prepend` and
+  `:append` can be used to add entries to the collection
+  stored in the changeset.
   """
 
   alias Phoenix.HTML.Form
@@ -97,6 +142,8 @@ defmodule Phoenix.HTML.Form do
     * `:source` - the data structure given to `form_for/4` that
       implements the form data protocol
 
+    * `:id` - the id to be used when generating input fields
+
     * `:name` - the name to be used when generating input fields
 
     * `:model` - the model used to lookup field data
@@ -105,8 +152,7 @@ defmodule Phoenix.HTML.Form do
       they were sent as part of a previous request
 
     * `:hidden` - a keyword list of fields that are required for
-      submitting the form behind the scenes as hidden inputs. This
-      information will be used by upcoming nested forms
+      submitting the form behind the scenes as hidden inputs
 
     * `:options` - a copy of the options given when creating the
       form via `form_for/4` without any form data specific key
@@ -117,10 +163,10 @@ defmodule Phoenix.HTML.Form do
     * `:validations` - a keyword list of validations for the given
       inputs
   """
-  defstruct source: nil, name: nil, model: %{}, hidden: [], params: %{},
+  defstruct source: nil, id: nil, name: nil, model: %{}, hidden: [], params: %{},
             errors: [], validations: [], options: []
 
-  @type t :: %Form{source: term, name: String.t, model: %{atom => term},
+  @type t :: %Form{source: Phoenix.HTML.FormData.t, name: String.t, model: %{atom => term},
                    params: %{binary => term}, hidden: Keyword.t, options: Keyword.t,
                    errors: Keyword.t, validations: Keyword.t}
 
@@ -179,6 +225,34 @@ defmodule Phoenix.HTML.Form do
   def form_for(form_data, action, options \\ [], fun) when is_function(fun, 1) do
     form = Phoenix.HTML.FormData.to_form(form_data, options)
     html_escape [form_tag(action, form.options), fun.(form), raw("</form>")]
+  end
+
+  @doc """
+  Generate a new form builder for the given parameter in form.
+
+  See the module documentation for examples of using this function.
+
+  ## Options
+
+    * `:id` - the id to be used in the form, defaults to the
+      concatenation of the given `field` to the parent form id
+
+    * `:name` - the name to be used in the form, defaults to the
+      concatenation of the given `field` to the parent form name
+
+    * `:default` - the value to use if none is available
+
+    * `:prepend` - the values to prepend when the field returns a list
+
+    * `:append` - the values to append when the field returns a list
+  """
+  @spec inputs_for(t, atom, Keyword.t, (t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
+  def inputs_for(form, field, options \\ [], fun) do
+    forms = Phoenix.HTML.FormData.to_form(form.source, form, field, options)
+    html_escape Enum.map(forms, fn form ->
+      hidden = Enum.map(form.hidden, fn {k, v} -> hidden_input(form, k, value: v) end)
+      [hidden, fun.(form)]
+    end)
   end
 
   ## Form helpers
@@ -603,7 +677,7 @@ defmodule Phoenix.HTML.Form do
     end
 
     opts =
-      opts 
+      opts
       |> Keyword.put_new(:id, id_from(form, field))
       |> Keyword.put_new(:name, name_from(form, field) <> "[]")
       |> Keyword.put_new(:multiple, "")
@@ -903,8 +977,8 @@ defmodule Phoenix.HTML.Form do
   defp value_from(name, _field) when is_atom(name),
     do: nil
 
-  defp id_from(%{name: name}, field),
-    do: "#{name}_#{field}"
+  defp id_from(%{id: id}, field),
+    do: "#{id}_#{field}"
   defp id_from(name, field) when is_atom(name),
     do: "#{name}_#{field}"
 
