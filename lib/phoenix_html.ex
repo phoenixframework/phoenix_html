@@ -98,54 +98,6 @@ defmodule Phoenix.HTML do
                          "Remove the interpolation or use ~E instead"
   end
 
-  ## Deprecated
-
-  @doc false
-  @spec safe(iodata | safe) :: safe
-  def safe({:safe, value}) do
-    IO.write :stderr, "Phoenix.HTML.safe/1 is deprecated, please use raw/1 instead\n" <>
-                      Exception.format_stacktrace()
-    {:safe, value}
-  end
-
-  def safe(value) when is_binary(value) or is_list(value) do
-    IO.write :stderr, "Phoenix.HTML.safe/1 is deprecated, please use raw/1 instead\n" <>
-                      Exception.format_stacktrace()
-    {:safe, value}
-  end
-
-  @doc false
-  @spec safe_concat([iodata | safe]) :: safe
-  def safe_concat(list) when is_list(list) do
-    Enum.reduce(list, {:safe, ""}, &safe_concat(&2, &1))
-  end
-
-  @doc false
-  @spec safe_concat(iodata | safe, iodata | safe) :: safe
-  def safe_concat({:safe, data1}, {:safe, data2}), do: {:safe, io_concat(data1, data2)}
-  def safe_concat({:safe, data1}, data2), do: {:safe, io_concat(data1, io_escape(data2))}
-  def safe_concat(data1, {:safe, data2}), do: {:safe, io_concat(io_escape(data1), data2)}
-  def safe_concat(data1, data2), do: {:safe, io_concat(io_escape(data1), io_escape(data2))}
-
-  defp io_escape(data) when is_binary(data),
-    do: Plug.HTML.html_escape(data)
-  defp io_escape(data) when is_list(data),
-    do: Phoenix.HTML.Safe.List.to_iodata(data)
-
-  defp io_concat(d1, d2) when is_binary(d1) and is_binary(d2) do
-    IO.write :stderr, "Phoenix.HTML.safe_concat/2 is deprecated, please use html_escape/1 instead\n" <>
-                      Exception.format_stacktrace()
-    d1 <> d2
-  end
-
-  defp io_concat(d1, d2) do
-    IO.write :stderr, "Phoenix.HTML.safe_concat/2 is deprecated, please use html_escape/1 instead\n" <>
-                      Exception.format_stacktrace()
-    [d1|d2]
-  end
-
-  ## Deprecated
-
   @doc """
   Marks the given content as raw.
 
