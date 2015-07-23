@@ -88,7 +88,7 @@ defmodule Phoenix.HTML.Form do
   If your model layer supports embedding or nested associations,
   you can use `inputs_for` to attach nested data to the form.
 
-  Imagine the modesl:
+  Imagine the models:
 
       defmodule User do
         use Ecto.Model
