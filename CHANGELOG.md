@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.3.0-dev
+
+* Enhancements
+  * Add `Phoenix.HTML.Form.inputs_for/4` support
+  * Add multiple select support
+  * Add reset input
+  * Infer default text context for labels
+
 ## v1.2.1 (2015-06-02)
 
 * Bug fix
