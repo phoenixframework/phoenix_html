@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.4.0 (2015-07-26)
+
+* Enhancements
+  * Support `input_type/2` and `input_validations/2` as reflection mechanisms
+
 ## v1.3.0 (2015-07-23)
 
 * Enhancements
