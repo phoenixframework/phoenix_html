@@ -11,6 +11,7 @@ defprotocol Phoenix.HTML.FormData do
   and it must be stored in the underlying struct, with any
   custom field removed.
   """
+  @spec to_form(t, Keyword.t) :: Phoenix.HTML.Form.t
   def to_form(data, options)
 
   @doc """
@@ -22,7 +23,22 @@ defprotocol Phoenix.HTML.FormData do
   and it must be stored in the underlying struct, with any
   custom field removed.
   """
+  @spec to_form(t, Phoenix.HTML.Form.t, atom, Keyword.t) :: Phoenix.HTML.Form.t
   def to_form(data, form, field, options)
+
+  @doc """
+  Returns the HTML5 validations that would apply to
+  the given field.
+  """
+  @spec input_validations(t, atom) :: Keyword.t
+  def input_validations(data, field)
+
+  @doc """
+  Receives the given field and returns its input type (:text_input,
+  :select, etc). Returns `nil` if the type is unknown.
+  """
+  @spec input_type(t, atom) :: atom | nil
+  def input_type(data, field)
 end
 
 defimpl Phoenix.HTML.FormData, for: Plug.Conn do
@@ -32,6 +48,7 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
 
     %Phoenix.HTML.Form{
       source: conn,
+      impl: __MODULE__,
       id: name,
       name: name,
       params: Map.get(conn.params, name) || %{},
@@ -55,6 +72,7 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
       is_map(default) ->
         [%Phoenix.HTML.Form{
           source: conn,
+          impl: __MODULE__,
           id: id,
           name: name,
           model: default,
@@ -76,6 +94,7 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
           index = Integer.to_string(index)
           %Phoenix.HTML.Form{
             source: conn,
+            impl: __MODULE__,
             id: id <> "_" <> index,
             name: name <> "[" <> index <> "]",
             model: model,
@@ -84,6 +103,9 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
         end
     end
   end
+
+  def input_type(_data, _field), do: :text_input
+  def input_validations(_data, _field), do: []
 
   defp no_name_error! do
     raise ArgumentError, "form_for/4 expects [name: NAME] to be given as option " <>

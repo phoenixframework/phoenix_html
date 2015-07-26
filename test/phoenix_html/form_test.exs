@@ -32,6 +32,7 @@ defmodule Phoenix.HTML.FormTest do
 
   test "form_for/4 with connection" do
     form = safe_to_string form_for(@conn, "/", [name: :search], fn f ->
+      assert f.impl == Phoenix.HTML.FormData.Plug.Conn
       assert f.name == "search"
       assert f.source == @conn
       assert f.params["key"] == "value"
@@ -57,6 +58,21 @@ defmodule Phoenix.HTML.FormTest do
   test "form_for/4 is html safe" do
     form = safe_to_string form_for(@conn, "/", [name: :search], fn _ -> "<>" end)
     assert form =~ ~s(&lt;&gt;</form>)
+  end
+
+  test "form_for/4 with type and validations"  do
+    form = safe_to_string form_for(@conn, "/", [name: :search], fn f ->
+      assert input_type(f, :hello) == :text_input
+      assert input_type(f, :email) == :email_input
+      assert input_type(f, :search) == :search_input
+      assert input_type(f, :password) == :password_input
+      assert input_type(f, :special_url) == :url_input
+      assert input_type(f, :number, %{"number" => :number_input}) == :number_input
+      assert input_validations(f, :hello) == []
+      ""
+    end)
+
+    assert form =~ "<form"
   end
 
   ## text_input/3

@@ -142,6 +142,9 @@ defmodule Phoenix.HTML.Form do
     * `:source` - the data structure given to `form_for/4` that
       implements the form data protocol
 
+    * `:impl` - the module with the form data protocol implementation.
+      This is used to avoid multiple protocol dispatches.
+
     * `:id` - the id to be used when generating input fields
 
     * `:name` - the name to be used when generating input fields
@@ -159,16 +162,13 @@ defmodule Phoenix.HTML.Form do
 
     * `:errors` - a keyword list of errors that associated with
       the form
-
-    * `:validations` - a keyword list of validations for the given
-      inputs
   """
-  defstruct source: nil, id: nil, name: nil, model: %{}, hidden: [], params: %{},
-            errors: [], validations: [], options: []
+  defstruct source: nil, impl: nil, id: nil, name: nil, model: %{},
+            hidden: [], params: %{}, errors: [], options: []
 
   @type t :: %Form{source: Phoenix.HTML.FormData.t, name: String.t, model: %{atom => term},
                    params: %{binary => term}, hidden: Keyword.t, options: Keyword.t,
-                   errors: Keyword.t, validations: Keyword.t}
+                   errors: Keyword.t, impl: module}
 
   @doc """
   Converts an attribute/form field into its humanize version.
@@ -252,11 +252,55 @@ defmodule Phoenix.HTML.Form do
   """
   @spec inputs_for(t, atom, Keyword.t, (t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
   def inputs_for(form, field, options \\ [], fun) do
-    forms = Phoenix.HTML.FormData.to_form(form.source, form, field, options)
+    forms = form.impl.to_form(form.source, form, field, options)
     html_escape Enum.map(forms, fn form ->
       hidden = Enum.map(form.hidden, fn {k, v} -> hidden_input(form, k, value: v) end)
       [hidden, fun.(form)]
     end)
+  end
+
+  @doc """
+  Returns the HTML5 validations that would apply to
+  the given field.
+  """
+  @spec input_validations(t, atom) :: boolean
+  def input_validations(form, field) do
+    form.impl.input_validations(form.source, field)
+  end
+
+  @mapping %{
+    "url"      => :url_input,
+    "email"    => :email_input,
+    "search"   => :search_input,
+    "password" => :password_input
+  }
+
+  @doc """
+  Gets the input type for a given field.
+
+  If the underlying input type is a `:text_field`,
+  a mapping could be given to further inflect
+  the input type based solely on the field name.
+  The default mapping is:
+
+      %{"url"      => :url_input,
+        "email"    => :email_input,
+        "search"   => :search_input,
+        "password" => :password_input}
+
+  """
+  @spec input_type(t, atom) :: atom
+  def input_type(form, field, mapping \\ @mapping) do
+    type = form.impl.input_type(form.source, field)
+
+    if type == :text_input do
+      field = Atom.to_string(field)
+      Enum.find_value(mapping, type, fn {k, v} ->
+        String.contains?(field, k) && v
+      end)
+    else
+      type
+    end
   end
 
   ## Form helpers
