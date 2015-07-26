@@ -716,7 +716,6 @@ defmodule Phoenix.HTML.Form do
 
   All other options are forwarded to the underlying HTML tag.
   """
-
   def multiple_select(form, field, values, opts \\ []) do
     {default, opts} = Keyword.pop(opts, :default)
     {value_list, opts}  = case Keyword.pop(opts, :value, default) do
@@ -1001,16 +1000,26 @@ defmodule Phoenix.HTML.Form do
       label(:user, :email, class: "control-label")
       #=> <label for="user_email" class="control-label">Email</label>
   """
-  def label(form, field, text_or_opts \\ nil, opts \\ [])
-  def label(form, field, text_or_opts, opts) when is_nil(text_or_opts) do
+  def label(form, field) do
+    label(form, field, humanize(field), [])
+  end
+
+  @doc """
+  See `label/2`.
+  """
+  def label(form, field, text) when is_binary(text) do
+    label(form, field, text, [])
+  end
+  def label(form, field, opts) when is_list(opts) do
     label(form, field, humanize(field), opts)
   end
-  def label(form, field, text_or_opts, _opts) when is_list(text_or_opts) do
-    label(form, field, humanize(field), text_or_opts)
-  end
-  def label(form, field, text_or_opts, opts) do
+
+  @doc """
+  See `label/2`.
+  """
+  def label(form, field, text, opts) when is_binary(text) and is_list(opts) do
     opts = Keyword.put_new(opts, :for, id_from(form, field))
-    content_tag(:label, text_or_opts, opts)
+    content_tag(:label, text, opts)
   end
 
   ## Helpers
