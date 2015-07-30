@@ -20,7 +20,7 @@ defmodule PhoenixHtml.Mixfile do
   end
 
   defp deps do
-    [{:plug, ">= 0.13 and < 2.0.0"},
+    [{:plug, "~> 0.13 or ~> 1.0"},
 
      # Docs dependencies
      {:earmark, "~> 0.1", only: :docs},
