@@ -8,6 +8,14 @@ application.
 
 See the [docs](https://hexdocs.pm/phoenix_html/) for more information.
 
+### Building phoenix_html.js
+
+```bash
+$ npm install
+$ npm install -g brunch
+$ brunch watch
+```
+
 ## License
 
 Copyright (c) 2014 Chris McCord

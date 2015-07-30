@@ -1,7 +1,7 @@
 defmodule PhoenixHtml.Mixfile do
   use Mix.Project
 
-  @version "1.4.0"
+  @version "2.0.0-dev"
 
   def project do
     [app: :phoenix_html,
@@ -20,7 +20,7 @@ defmodule PhoenixHtml.Mixfile do
   end
 
   defp deps do
-    [{:plug, ">= 0.12.2 and < 2.0.0"},
+    [{:plug, ">= 0.13 and < 2.0.0"},
 
      # Docs dependencies
      {:earmark, "~> 0.1", only: :docs},

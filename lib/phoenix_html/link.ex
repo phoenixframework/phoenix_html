@@ -37,6 +37,25 @@ defmodule Phoenix.HTML.Link do
       is not `:get`
 
   All other options are forwarded to the underlying `<a>` tag.
+
+  ## Data attributes
+
+  The following data attributes are supported/generated:
+
+    * `data-submit=parent` - used when the `:method` is not
+      `:get`, this module attribute says the underlying link
+      should submit the parent node whenever there is a click
+
+    * `data-confirm` - shows a confirmation prompt before
+      submitting the parent when `:method` is not `:get`
+
+  ## JavaScript dependency
+
+  In order to support the data attributes above, `Phoenix.HTML`
+  relies on JavaScript. You can either load the ES5 version from
+  `priv/static/phoenix_html.js` or depend on the one at
+  `web/static/js/phoenix_html.js` written in ES6 directly from
+  your build tool.
   """
   def link(text, opts)
 
@@ -61,7 +80,7 @@ defmodule Phoenix.HTML.Link do
     else
       {form, opts} = form_options(opts, method, "link")
       form_tag(to, form) do
-        content_tag(:a, text, [href: "#", onclick: "this.parentNode.submit(); return false;"] ++ opts)
+        content_tag(:a, text, [href: "#", data: [submit: "parent"]] ++ opts)
       end
     end
   end
