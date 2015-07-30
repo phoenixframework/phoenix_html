@@ -5,13 +5,6 @@ defmodule Phoenix.HTML.FormTest do
   import Phoenix.HTML.Form
   doctest Phoenix.HTML.Form
 
-  @conn Plug.Test.conn(:get, "/foo", %{"search" => %{
-    "key" => "value",
-    "alt_key" => nil,
-    "datetime" => %{"year" => "2020", "month" => "4", "day" => "17",
-                    "hour" => "2",   "min" => "11", "sec" => "13"}
-  }})
-
   @doc """
   A function that executes `form_for/4` and
   extracts its inner contents for assertion.
@@ -20,7 +13,7 @@ defmodule Phoenix.HTML.FormTest do
     mark = "--PLACEHOLDER--"
 
     contents =
-      safe_to_string form_for(@conn, "/", [name: :search] ++ opts, fn f ->
+      safe_to_string form_for(conn(), "/", [name: :search] ++ opts, fn f ->
         html_escape [mark, fun.(f), mark]
       end)
 
@@ -28,13 +21,24 @@ defmodule Phoenix.HTML.FormTest do
     inner
   end
 
+  defp conn do
+    Plug.Test.conn(:get, "/foo", %{"search" => %{
+      "key" => "value",
+      "alt_key" => nil,
+      "datetime" => %{"year" => "2020", "month" => "4", "day" => "17",
+                      "hour" => "2",   "min" => "11", "sec" => "13"}
+    }})
+  end
+
   ## form_for/4
 
   test "form_for/4 with connection" do
-    form = safe_to_string form_for(@conn, "/", [name: :search], fn f ->
+    conn = conn()
+
+    form = safe_to_string form_for(conn, "/", [name: :search], fn f ->
       assert f.impl == Phoenix.HTML.FormData.Plug.Conn
       assert f.name == "search"
-      assert f.source == @conn
+      assert f.source == conn
       assert f.params["key"] == "value"
       ""
     end)
@@ -44,7 +48,7 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "form_for/4 with custom options" do
-    form = safe_to_string form_for(@conn, "/", [name: :search, method: :put, multipart: true], fn f ->
+    form = safe_to_string form_for(conn(), "/", [name: :search, method: :put, multipart: true], fn f ->
       refute f.options[:name]
       assert f.options[:multipart] == true
       assert f.options[:method] == :put
@@ -56,12 +60,12 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "form_for/4 is html safe" do
-    form = safe_to_string form_for(@conn, "/", [name: :search], fn _ -> "<>" end)
+    form = safe_to_string form_for(conn(), "/", [name: :search], fn _ -> "<>" end)
     assert form =~ ~s(&lt;&gt;</form>)
   end
 
   test "form_for/4 with type and validations"  do
-    form = safe_to_string form_for(@conn, "/", [name: :search], fn f ->
+    form = safe_to_string form_for(conn(), "/", [name: :search], fn f ->
       assert input_type(f, :hello) == :text_input
       assert input_type(f, :email) == :email_input
       assert input_type(f, :search) == :search_input

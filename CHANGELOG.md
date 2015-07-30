@@ -1,5 +1,17 @@
 # Changelog
 
+## v2.0.0 (2015-07-30)
+
+* Enhancements
+  * No longer generate onclick attributes.
+
+    The main motivation for this is to provide support
+    for Content Security Policy, which recommends
+    disabling all inline scripts in a page.
+
+    We took the opportunity to also add support for
+    data-confirm in `link/2`.
+
 ## v1.4.0 (2015-07-26)
 
 * Enhancements

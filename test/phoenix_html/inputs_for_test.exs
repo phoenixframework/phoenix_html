@@ -4,12 +4,6 @@ defmodule Phoenix.HTML.InputsForTest do
   import Phoenix.HTML
   import Phoenix.HTML.Form
 
-  @conn Plug.Test.conn(:get, "/foo", %{"search" => %{
-    "date" => %{"year" => "2020", "month" => "4", "day" => "17"},
-    "dates" => %{"0" => %{"year" => "2010", "month" => "4", "day" => "17"},
-                 "1" => %{"year" => "2020", "month" => "4", "day" => "17"}}
-  }})
-
   @doc """
   A function that executes `inputs_for/4` and
   extracts its inner contents for assertion.
@@ -17,8 +11,15 @@ defmodule Phoenix.HTML.InputsForTest do
   def safe_inputs_for(field, opts \\ [], fun) do
     mark = "--PLACEHOLDER--"
 
+    conn =
+      Plug.Test.conn(:get, "/foo", %{"search" => %{
+        "date" => %{"year" => "2020", "month" => "4", "day" => "17"},
+        "dates" => %{"0" => %{"year" => "2010", "month" => "4", "day" => "17"},
+                     "1" => %{"year" => "2020", "month" => "4", "day" => "17"}}
+      }})
+
     contents =
-      safe_to_string form_for(@conn, "/", [name: :search], fn f ->
+      safe_to_string form_for(conn, "/", [name: :search], fn f ->
         html_escape [mark, inputs_for(f, field, opts, fun), mark]
       end)
 
