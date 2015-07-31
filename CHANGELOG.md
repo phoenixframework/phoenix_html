@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.0.1 (2015-07-31)
+
+* Bug fix
+  * Include web directory in Hex package
+
 ## v2.0.0 (2015-07-30)
 
 * Enhancements
