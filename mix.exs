@@ -1,7 +1,7 @@
 defmodule PhoenixHtml.Mixfile do
   use Mix.Project
 
-  @version "2.0.0"
+  @version "2.0.1"
 
   def project do
     [app: :phoenix_html,
@@ -11,6 +11,7 @@ defmodule PhoenixHtml.Mixfile do
 
      name: "Phoenix.HTML",
      description: "Phoenix.HTML functions for working with HTML strings and templates",
+     package: package,
      docs: [source_ref: "v#{@version}", main: "Phoenix.HTML",
             source_url: "https://github.com/phoenixframework/phoenix_html"]]
   end
@@ -25,5 +26,13 @@ defmodule PhoenixHtml.Mixfile do
      # Docs dependencies
      {:earmark, "~> 0.1", only: :docs},
      {:ex_doc, "~> 0.7.1", only: :docs}]
+  end
+
+  defp package do
+    [contributors: ["Chris McCord", "José Valim"],
+     licenses: ["MIT"],
+     links: %{github: "https://github.com/phoenixframework/phoenix_html"},
+     files: ~w(lib priv web) ++
+            ~w(brunch-config.js CHANGELOG.md LICENSE mix.exs package.json README.md)]
   end
 end
