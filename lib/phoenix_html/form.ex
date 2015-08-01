@@ -246,7 +246,7 @@ defmodule Phoenix.HTML.Form do
       applies if the field value is a list and no parameters were
       sent through the form.
 
-    * `:prepend` - the values to append when rendering. This only
+    * `:append` - the values to append when rendering. This only
       applies if the field value is a list and no parameters were
       sent through the form.
   """
