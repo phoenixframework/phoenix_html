@@ -32,11 +32,19 @@ defmodule Phoenix.HTML.InputsForTest do
   test "one: inputs_for/4 without default and field is not present" do
     contents =
       safe_inputs_for(:unknown, fn f ->
+        refute f.index
         text_input f, :year
       end)
 
     assert contents ==
            ~s(<input id="search_unknown_year" name="search[unknown][year]" type="text">)
+  end
+
+  test "one: inputs_for/4 does not generate index" do
+    safe_inputs_for(:unknown, fn f ->
+      refute f.index
+      "ok"
+    end)
   end
 
   test "one: inputs_for/4 without default and field is present" do
@@ -84,12 +92,25 @@ defmodule Phoenix.HTML.InputsForTest do
   test "many: inputs_for/4 with default and field is not present" do
     contents =
       safe_inputs_for(:unknown, [default: [%{year: 2012}, %{year: 2018}]], fn f ->
+        assert f.index in [0, 1]
         text_input f, :year
       end)
 
     assert contents ==
            ~s(<input id="search_unknown_0_year" name="search[unknown][0][year]" type="text" value="2012">) <>
            ~s(<input id="search_unknown_1_year" name="search[unknown][1][year]" type="text" value="2018">)
+  end
+
+  test "many: inputs_for/4 generates indexes" do
+    safe_inputs_for(:unknown, [default: [%{year: 2012}]], fn f ->
+      assert f.index == 0
+      "ok"
+    end)
+
+    safe_inputs_for(:unknown, [default: [%{year: 2012}, %{year: 2018}]], fn f ->
+      assert f.index in [0, 1]
+      "ok"
+    end)
   end
 
   test "many: inputs_for/4 with default and field is present" do

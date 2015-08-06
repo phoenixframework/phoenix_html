@@ -164,11 +164,11 @@ defmodule Phoenix.HTML.Form do
       the form
   """
   defstruct source: nil, impl: nil, id: nil, name: nil, model: %{},
-            hidden: [], params: %{}, errors: [], options: []
+            hidden: [], params: %{}, errors: [], options: [], index: nil
 
   @type t :: %Form{source: Phoenix.HTML.FormData.t, name: String.t, model: %{atom => term},
                    params: %{binary => term}, hidden: Keyword.t, options: Keyword.t,
-                   errors: Keyword.t, impl: module}
+                   errors: Keyword.t, impl: module, id: String.t, index: nil | non_neg_integer}
 
   @doc """
   Converts an attribute/form field into its humanize version.

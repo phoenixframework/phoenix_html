@@ -91,12 +91,13 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
           end
 
         for {{model, params}, index} <- Enum.with_index(entries) do
-          index = Integer.to_string(index)
+          index_string = Integer.to_string(index)
           %Phoenix.HTML.Form{
             source: conn,
             impl: __MODULE__,
-            id: id <> "_" <> index,
-            name: name <> "[" <> index <> "]",
+            index: index,
+            id: id <> "_" <> index_string,
+            name: name <> "[" <> index_string <> "]",
             model: model,
             params: params,
             options: opts}

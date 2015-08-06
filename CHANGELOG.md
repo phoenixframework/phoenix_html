@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.1.0-dev
+
+* Enhancements
+  * Add an index field to forms to be used by `inputs_for/4` collections
+
 ## v2.0.1 (2015-07-31)
 
 * Bug fix
