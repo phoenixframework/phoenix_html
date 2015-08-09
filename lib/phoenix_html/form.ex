@@ -113,7 +113,7 @@ defmodule Phoenix.HTML.Form do
         <%= text_input f, :name %>
 
         <%= inputs_for f, :permalink, fn fp -> %>
-          <%= text_input f, :url %>
+          <%= text_input fp, :url %>
         <% end %>
       <% end %>
 
@@ -121,7 +121,7 @@ defmodule Phoenix.HTML.Form do
   is given:
 
       <%= inputs_for f, :permalink, [default: %Permalink{title: "default"}], fn fp -> %>
-        <%= text_input f, :url %>
+        <%= text_input fp, :url %>
       <% end %>
 
   `inputs_for/4` can be used to work with single entities or
