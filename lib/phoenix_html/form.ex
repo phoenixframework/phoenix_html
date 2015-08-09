@@ -999,6 +999,16 @@ defmodule Phoenix.HTML.Form do
 
       label(:user, :email, class: "control-label")
       #=> <label for="user_email" class="control-label">Email</label>
+
+      label :user, :email do
+        "E-mail Address"
+      end
+      #=> <label for="user_email">E-mail Address</label>
+
+      label :user, :email, class: "control-label" do
+        "E-mail Address"
+      end
+      #=> <label class="control-label" for="user_email">E-mail Address</label>
   """
   def label(form, field) do
     label(form, field, humanize(field), [])
@@ -1010,6 +1020,9 @@ defmodule Phoenix.HTML.Form do
   def label(form, field, text) when is_binary(text) do
     label(form, field, text, [])
   end
+  def label(form, field, [do: block]) do
+    label(form, field, [], do: block)
+  end
   def label(form, field, opts) when is_list(opts) do
     label(form, field, humanize(field), opts)
   end
@@ -1020,6 +1033,10 @@ defmodule Phoenix.HTML.Form do
   def label(form, field, text, opts) when is_binary(text) and is_list(opts) do
     opts = Keyword.put_new(opts, :for, id_from(form, field))
     content_tag(:label, text, opts)
+  end
+  def label(form, field, opts, [do: block]) do
+    opts = Keyword.put_new(opts, :for, id_from(form, field))
+    content_tag(:label, opts, do: block)
   end
 
   ## Helpers
