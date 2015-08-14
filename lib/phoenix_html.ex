@@ -108,10 +108,13 @@ defmodule Phoenix.HTML do
       {:safe, "<hello>"}
       iex> raw({:safe, "<hello>"})
       {:safe, "<hello>"}
+      iex> raw(nil)
+      {:safe, ""}
 
   """
   @spec raw(iodata | safe) :: safe
   def raw({:safe, value}), do: {:safe, value}
+  def raw(nil), do: {:safe, ""}
   def raw(value) when is_binary(value) or is_list(value), do: {:safe, value}
 
   @doc """
