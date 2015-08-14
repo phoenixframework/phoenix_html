@@ -249,6 +249,10 @@ defmodule Phoenix.HTML.Form do
     * `:append` - the values to append when rendering. This only
       applies if the field value is a list and no parameters were
       sent through the form.
+
+    * `:skip_deleted` - do now show inputs for changesets that
+      have been deleted (supported only when working with changesets)
+
   """
   @spec inputs_for(t, atom, Keyword.t, (t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
   def inputs_for(form, field, options \\ [], fun) do
