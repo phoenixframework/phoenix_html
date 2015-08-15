@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.1.1 (2015-08-15)
+
+* Enhancements
+  * Allow nil in `raw/1`
+  * Allow block options in `label/3`
+  * Introduce `:skip_deleted` in `inputs_for/4`
+
 ## v2.1.0 (2015-08-06)
 
 * Enhancements
