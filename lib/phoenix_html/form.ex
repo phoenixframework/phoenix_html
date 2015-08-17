@@ -250,7 +250,7 @@ defmodule Phoenix.HTML.Form do
       applies if the field value is a list and no parameters were
       sent through the form.
 
-    * `:skip_deleted` - do now show inputs for changesets that
+    * `:skip_deleted` - do not show inputs for changesets that
       have been deleted (supported only when working with changesets)
 
   """
