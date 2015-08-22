@@ -195,7 +195,7 @@ defmodule Phoenix.HTML.FormTest do
 
   test "password_input/3 with form" do
     assert safe_form(&password_input(&1, :key)) ==
-           ~s(<input id="search_key" name="search[key]" type="password" value="value">)
+           ~s(<input id="search_key" name="search[key]" type="password">)
 
     assert safe_form(&password_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
            ~s(<input id="key" name="search[key][]" type="password" value="foo">)

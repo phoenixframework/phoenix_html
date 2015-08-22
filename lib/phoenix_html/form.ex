@@ -363,10 +363,19 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Generates a password input.
 
+  For security reasons, the model and parameter values
+  are never re-used in `password_input/3`. Pass the value
+  explicitly if you would like to set one.
+
   See `text_input/3` for example and docs.
   """
   def password_input(form, field, opts \\ []) do
-    generic_input(:password, form, field, opts)
+    opts =
+      opts
+      |> Keyword.put_new(:type, "password")
+      |> Keyword.put_new(:id, id_from(form, field))
+      |> Keyword.put_new(:name, name_from(form, field))
+    tag(:input, opts)
   end
 
   @doc """
