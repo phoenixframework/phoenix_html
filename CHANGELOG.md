@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.1.2 (2015-08-22)
+
+* Bug fix
+  * Do not include values in `password_input/3`
+
 ## v2.1.1 (2015-08-15)
 
 * Enhancements
