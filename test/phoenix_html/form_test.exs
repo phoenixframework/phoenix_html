@@ -47,6 +47,43 @@ defmodule Phoenix.HTML.FormTest do
     assert form =~ ~s(<input name="_utf8" type="hidden" value="✓">)
   end
 
+  test "form_for/4 with changeset and an error on :name" do
+    name = "name"
+
+    form = %Phoenix.HTML.Form{
+      id: name,
+      name: name,
+      errors: [name: "Error"],
+      params: %{},
+      options: %{}
+    }
+
+    assert safe_to_string(text_input(form, :name, class: "username")) == 
+      "<input class=\"username field_with_errors\" id=\"name_name\" name=\"name[name]\" type=\"text\">"
+
+    assert safe_to_string(text_input(form, :name)) == 
+      "<input class=\"field_with_errors\" id=\"name_name\" name=\"name[name]\" type=\"text\">"
+  end
+
+
+  test "form_for/4 with changeset and no errors" do
+    name = "name"
+
+    form = %Phoenix.HTML.Form{
+      id: name,
+      name: name,
+      errors: [],
+      params: %{},
+      options: %{}
+    }
+
+    assert safe_to_string(text_input(form, :name, class: "username")) == 
+      "<input class=\"username\" id=\"name_name\" name=\"name[name]\" type=\"text\">"
+
+    assert safe_to_string(text_input(form, :name)) == 
+      "<input id=\"name_name\" name=\"name[name]\" type=\"text\">"
+  end  
+
   test "form_for/4 with custom options" do
     form = safe_to_string form_for(conn(), "/", [as: :search, method: :put, multipart: true], fn f ->
       refute f.options[:name]

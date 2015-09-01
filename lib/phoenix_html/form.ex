@@ -413,14 +413,35 @@ defmodule Phoenix.HTML.Form do
   def range_input(form, field, opts \\ []) do
     generic_input(:range, form, field, opts)
   end
+   
+  defp maybe_put_error(opts, %Form{errors: errors}, field) do
+    classes = Keyword.get(opts, :class, "")
+
+    error_message = case List.keyfind(errors, field, 0) do
+      {field, message} -> "field_with_errors"
+      _not_found -> ""
+    end
+
+    class_with_maybe_error = "#{classes} #{error_message}" |> String.strip
+
+    opts
+    |> Keyword.put(:class, class_with_maybe_error)
+    |> Keyword.delete(:class, nil)
+    |> Keyword.delete(:class, "")
+  end
+  defp maybe_put_error(opts, form, field) do
+    opts
+  end
 
   defp generic_input(type, form, field, opts) when is_atom(field) and is_list(opts) do
     opts =
       opts
+      |> maybe_put_error(form, field)
       |> Keyword.put_new(:type, type)
       |> Keyword.put_new(:id, id_from(form, field))
       |> Keyword.put_new(:name, name_from(form, field))
       |> Keyword.put_new(:value, value_from(form, field))
+
     tag(:input, opts)
   end
 
