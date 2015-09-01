@@ -19,7 +19,7 @@ defmodule Phoenix.HTML.InputsForTest do
       }})
 
     contents =
-      safe_to_string form_for(conn, "/", [name: :search], fn f ->
+      safe_to_string form_for(conn, "/", [as: :search], fn f ->
         html_escape [mark, inputs_for(f, field, opts, fun), mark]
       end)
 
@@ -79,7 +79,7 @@ defmodule Phoenix.HTML.InputsForTest do
 
   test "one: inputs_for/4 with custom name and id" do
     contents =
-      safe_inputs_for(:date, [name: :foo, id: :bar], fn f ->
+      safe_inputs_for(:date, [as: :foo, id: :bar], fn f ->
         text_input f, :year
       end)
 
@@ -126,7 +126,7 @@ defmodule Phoenix.HTML.InputsForTest do
 
   test "many: inputs_for/4 with name and id" do
     contents =
-      safe_inputs_for(:dates, [default: [%{year: 2012}, %{year: 2018}], name: :foo, id: :bar], fn f ->
+      safe_inputs_for(:dates, [default: [%{year: 2012}, %{year: 2018}], as: :foo, id: :bar], fn f ->
         text_input f, :year
       end)
 

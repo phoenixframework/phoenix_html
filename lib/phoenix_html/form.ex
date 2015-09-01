@@ -201,7 +201,7 @@ defmodule Phoenix.HTML.Form do
 
   ## Options
 
-    * `:name` - the name to be used in the form. May be inflected
+    * `:as` - the name to be used in the form. May be inflected
       if a model is available
 
     * `:method` - the HTTP method. If the method is not "get" nor "post",
@@ -237,7 +237,7 @@ defmodule Phoenix.HTML.Form do
     * `:id` - the id to be used in the form, defaults to the
       concatenation of the given `field` to the parent form id
 
-    * `:name` - the name to be used in the form, defaults to the
+    * `:as` - the name to be used in the form, defaults to the
       concatenation of the given `field` to the parent form name
 
     * `:default` - the value to use if none is available

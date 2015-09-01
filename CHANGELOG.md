@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.2.0
+
+* Bug fix
+  * Allow the `:name` to be given in forms. For this, using `:name` to configure the underlying input name prefix has been deprecated in favor of `:as`
+
 ## v2.1.2 (2015-08-22)
 
 * Bug fix

@@ -43,8 +43,8 @@ end
 
 defimpl Phoenix.HTML.FormData, for: Plug.Conn do
   def to_form(conn, opts) do
-    {name, opts} = Keyword.pop(opts, :name)
-    name = to_string(name || no_name_error!)
+    {name, opts} = Keyword.pop(opts, :as)
+    name = to_string(name || warn_name(opts) || no_name_error!)
 
     %Phoenix.HTML.Form{
       source: conn,
@@ -60,11 +60,11 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
     {default, opts} = Keyword.pop(opts, :default, %{})
     {prepend, opts} = Keyword.pop(opts, :prepend, [])
     {append, opts}  = Keyword.pop(opts, :append, [])
-    {name, opts}    = Keyword.pop(opts, :name)
+    {name, opts}    = Keyword.pop(opts, :as)
     {id, opts}      = Keyword.pop(opts, :id)
 
     id     = to_string(id || form.id <> "_#{field}")
-    name   = to_string(name || form.name <> "[#{field}]")
+    name   = to_string(name || warn_name(opts) || form.name <> "[#{field}]")
     params = Map.get(form.params, Atom.to_string(field))
 
     cond do
@@ -109,7 +109,15 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
   def input_validations(_data, _field), do: []
 
   defp no_name_error! do
-    raise ArgumentError, "form_for/4 expects [name: NAME] to be given as option " <>
+    raise ArgumentError, "form_for/4 expects [as: NAME] to be given as option " <>
                          "when used with @conn"
+  end
+
+  defp warn_name(opts) do
+    if name = Keyword.get(opts, :name) do
+      IO.write :stderr, "the :name option in form_for/inputs_for is deprecated, " <>
+                        "please use :as instead\n" <> Exception.format_stacktrace()
+      name
+    end
   end
 end

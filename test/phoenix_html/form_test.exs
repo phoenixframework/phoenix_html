@@ -13,7 +13,7 @@ defmodule Phoenix.HTML.FormTest do
     mark = "--PLACEHOLDER--"
 
     contents =
-      safe_to_string form_for(conn(), "/", [name: :search] ++ opts, fn f ->
+      safe_to_string form_for(conn(), "/", [as: :search] ++ opts, fn f ->
         html_escape [mark, fun.(f), mark]
       end)
 
@@ -35,7 +35,7 @@ defmodule Phoenix.HTML.FormTest do
   test "form_for/4 with connection" do
     conn = conn()
 
-    form = safe_to_string form_for(conn, "/", [name: :search], fn f ->
+    form = safe_to_string form_for(conn, "/", [as: :search], fn f ->
       assert f.impl == Phoenix.HTML.FormData.Plug.Conn
       assert f.name == "search"
       assert f.source == conn
@@ -48,7 +48,7 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "form_for/4 with custom options" do
-    form = safe_to_string form_for(conn(), "/", [name: :search, method: :put, multipart: true], fn f ->
+    form = safe_to_string form_for(conn(), "/", [as: :search, method: :put, multipart: true], fn f ->
       refute f.options[:name]
       assert f.options[:multipart] == true
       assert f.options[:method] == :put
@@ -60,12 +60,12 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "form_for/4 is html safe" do
-    form = safe_to_string form_for(conn(), "/", [name: :search], fn _ -> "<>" end)
+    form = safe_to_string form_for(conn(), "/", [as: :search], fn _ -> "<>" end)
     assert form =~ ~s(&lt;&gt;</form>)
   end
 
   test "form_for/4 with type and validations"  do
-    form = safe_to_string form_for(conn(), "/", [name: :search], fn f ->
+    form = safe_to_string form_for(conn(), "/", [as: :search], fn f ->
       assert input_type(f, :hello) == :text_input
       assert input_type(f, :email) == :email_input
       assert input_type(f, :search) == :search_input
