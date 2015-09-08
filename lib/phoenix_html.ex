@@ -95,7 +95,8 @@ defmodule Phoenix.HTML do
 
   defp handle_sigil(_, _, _) do
     raise ArgumentError, "interpolation not allowed in ~e sigil. " <>
-                         "Remove the interpolation or use ~E instead"
+                         "Remove the interpolation, use <%= %> to insert values, " <>
+                         "or use ~E to show the interpolation literally"
   end
 
   @doc """
