@@ -72,6 +72,18 @@ defmodule Phoenix.HTML.TagTest do
     assert safe_to_string(content) ==
            ~s(<form action="/users" data-remote="true">) <>
            ~s(<input name="user[name]"></form>)
+
+    assert content_tag(:p, do: "Hello") ==
+            {:safe, ["<p>", "Hello", "</p>"]}
+
+    content = content_tag :ul do
+                content_tag :li do
+                  "Hello"
+                end
+              end
+    assert content == {:safe, ["<ul>", ["<li>", "Hello", "</li>"], "</ul>"]}
+
+    assert content_tag(:p, ["hello", ?\s, "world"]) == {:safe, ["<p>", ["hello", 32, "world"], "</p>"]}
   end
 
   test "form_tag for get" do

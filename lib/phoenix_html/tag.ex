@@ -48,6 +48,9 @@ defmodule Phoenix.HTML.Tag do
       ...> end
       {:safe, ["<p class=\"test\">", "Hello", "</p>"]}
   """
+  def content_tag(name, [do: block]) when is_atom(name) do
+    content_tag(name, block, [])
+  end
   def content_tag(name, content) when is_atom(name) do
     content_tag(name, content, [])
   end
