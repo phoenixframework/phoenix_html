@@ -82,6 +82,8 @@ defmodule Phoenix.HTML.TagTest do
                 end
               end
     assert content == {:safe, ["<ul>", ["<li>", "Hello", "</li>"], "</ul>"]}
+
+    assert content_tag(:p, ["hello", ?\s, "world"]) == {:safe, ["<p>", ["hello", 32, "world"], "</p>"]}
   end
 
   test "form_tag for get" do
