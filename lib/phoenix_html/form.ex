@@ -618,7 +618,7 @@ defmodule Phoenix.HTML.Form do
   Generates a select tag with the given `values`.
 
   Values are expected to be an Enumerable containing two-item tuples
-  (like maps and keyword lists) or any Enumerable where the element
+  (like a regular list or a map) or any Enumerable where the element
   will be used both as key and value for the generated select.
 
   ## Examples
