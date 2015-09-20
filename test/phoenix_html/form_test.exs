@@ -442,7 +442,7 @@ defmodule Phoenix.HTML.FormTest do
     assert safe_to_string(multiple_select(:search, :key, ~w(foo bar), value: ["foo"])) =~
            ~s(<option selected="selected" value="foo">foo</option>)
 
-    assert safe_to_string(multiple_select(:search, :key, [{"foo", 1}, {"bar", 2}], value: [1])) =~
+    assert safe_to_string(multiple_select(:search, :key, [{"foo", "1"}, {"bar", "2"}], value: [1])) =~
            ~s(<option selected="selected" value="1">foo</option>)
 
     assert safe_to_string(multiple_select(:search, :key, [{"foo", 1}, {"bar", 2}], default: [1])) =~

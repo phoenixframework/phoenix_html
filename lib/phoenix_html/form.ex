@@ -687,8 +687,8 @@ defmodule Phoenix.HTML.Form do
     end
   end
 
-  defp option(option_key, option_value, value_list, acc) when is_list(value_list) do
-    opts = [value: option_value, selected: option_value in value_list]
+  defp option(option_key, option_value, values, acc) when is_list(values) do
+    opts = [value: option_value, selected: option_value in values]
     html_escape [acc|content_tag(:option, option_key, opts)]
   end
 
@@ -714,8 +714,8 @@ defmodule Phoenix.HTML.Form do
           </select>
 
 
-      multiple_select(form, :role, ["Admin": 1, "Power User": 2], values: [1])
-      #=> <select id="user_role" name="user[role]">
+      multiple_select(form, :roles, ["Admin": 1, "Power User": 2], values: [1])
+      #=> <select id="user_roles" name="user[roles]">
           <option value="1" selected="selected" >Admin</option>
           <option value="2">Power User</option>
           </select>
@@ -730,11 +730,8 @@ defmodule Phoenix.HTML.Form do
   All other options are forwarded to the underlying HTML tag.
   """
   def multiple_select(form, field, values, opts \\ []) do
-    {default, opts} = Keyword.pop(opts, :default)
-    {value_list, opts}  = case Keyword.pop(opts, :value, default) do
-      {nil, opts} -> {[], opts}
-      {value_list, opts} -> {Enum.map(value_list, &html_escape(&1)), opts}
-    end
+    {default, opts}  = Keyword.pop(opts, :default, [])
+    {multiple, opts} = Keyword.pop(opts, :value, default)
 
     opts =
       opts
@@ -742,7 +739,7 @@ defmodule Phoenix.HTML.Form do
       |> Keyword.put_new(:name, name_from(form, field) <> "[]")
       |> Keyword.put_new(:multiple, "")
 
-    options = options_for_select(values, "", value_list)
+    options = options_for_select(values, "", Enum.map(multiple, &html_escape/1))
     content_tag(:select, options, opts)
   end
 
