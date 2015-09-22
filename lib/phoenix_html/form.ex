@@ -406,6 +406,18 @@ defmodule Phoenix.HTML.Form do
   end
 
   @doc """
+  Generates a color input.
+
+  Warning: this feature isn't available in all browsers.
+  Check `http://caniuse.com/#feat=input-color` for further informations.
+
+  See `text_input/3` for example and docs.
+  """
+  def color_input(form, field, opts \\ []) do
+    generic_input(:color, form, field, opts)
+  end
+
+  @doc """
   Generates a range input.
 
   See `text_input/3` for example and docs.
