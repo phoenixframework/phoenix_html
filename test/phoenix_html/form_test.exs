@@ -256,6 +256,24 @@ defmodule Phoenix.HTML.FormTest do
           ~s(<input id="key" name="search[key][]" type="search" value="foo">)
   end
 
+  ## color_input/3
+
+  test "color_input/3" do
+    assert safe_to_string(color_input(:search, :key)) ==
+          ~s(<input id="search_key" name="search[key]" type="color">)
+
+    assert safe_to_string(color_input(:search, :key, value: "#123456", id: "key", name: "search[key][]")) ==
+          ~s(<input id="key" name="search[key][]" type="color" value="#123456">)
+  end
+
+  test "color_input/3 with form" do
+    assert safe_form(&color_input(&1, :key)) ==
+          ~s(<input id="search_key" name="search[key]" type="color" value="value">)
+
+    assert safe_form(&color_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+          ~s(<input id="key" name="search[key][]" type="color" value="foo">)
+  end
+
   ## telephone_input/3
 
   test "telephone_input/3" do
