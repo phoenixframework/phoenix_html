@@ -72,7 +72,7 @@ defmodule Phoenix.HTML.Link do
     {method, opts} = Keyword.pop(opts, :method, :get)
 
     unless to do
-      raise ArgumentError, "option :to is required in link/2"
+      raise ArgumentError, "expected non-nil value for :to in link/2, got: #{inspect to}"
     end
 
     if method == :get do
