@@ -34,7 +34,7 @@ defmodule Phoenix.HTML.LinkTest do
   end
 
   test "link with invalid args" do
-    msg = "option :to is required in link/2"
+    msg = "expected non-nil value for :to in link/2, got: nil"
     assert_raise ArgumentError, msg, fn ->
       link("foo", [bar: "baz"])
     end
