@@ -158,17 +158,8 @@ defmodule Phoenix.HTML do
     IO.iodata_to_binary(iodata)
   end
 
-  @escape_javascript_map %{
-    "\\"    => "\\\\",
-    "</"    => "<\/",
-    "\r\n"  => "\n",
-    "\r"    => "\n",
-    "\""    => "\\\"",
-    "'"     => "\\'"
-  }
-
   @doc """
-  Escapes double and single quotes, double backslashes, carriage returns and other
+  Escapes quotes (double and single) and double backslashes
 
   This method is extremely helpful in JavaScript responses when there is a need
   to escape html rendered from other templates, like in the following:
@@ -176,11 +167,27 @@ defmodule Phoenix.HTML do
   $("#container").append("<%= escape_javascript(render("post.html", post: @post)) %>");
 
   """
-  @spec escape_javascript(safe) :: String.t
-  def escape_javascript(safe) do
-    Regex.replace(~r/(\\|<\/|\r\n|[\n\r"'])/u, safe_to_string(safe), fn match ->
-      @escape_javascript_map[match]
-    end)
+  @spec escape_for_javascript(binary | safe) :: String.t
+  def escape_for_javascript({:safe, data}) when is_list(data) do
+    data |> IO.chardata_to_string |> escape_for_javascript
   end
+
+  def escape_for_javascript(data) when is_binary(data) do
+    IO.iodata_to_binary(for <<c <- data>>, do: escape_char(c))
+  end
+
+  @compile {:inline, escape_char: 1}
+
+  @escapes_for_javascript [
+    {?", "\\\""},
+    {?', "\\\'"},
+    {?\\, "\\\\"}
+  ]
+
+  Enum.each @escapes_for_javascript, fn { match, insert } ->
+    defp escape_char(unquote(match)), do: unquote(insert)
+  end
+
+  defp escape_char(char), do: char
 
 end

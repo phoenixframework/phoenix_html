@@ -33,12 +33,9 @@ defmodule Phoenix.HTMLTest do
   end
 
   test "Phoenix.HTML.escape_javascript/1" do
-    assert escape_javascript({:safe, ""}) == ""
-    assert escape_javascript({:safe, "\\Double backslash"}) == "\\\\Double backslash"
-    assert escape_javascript({:safe, "</closing tag>"}) == "<\/closing tag>"
-    assert escape_javascript({:safe, "Windows line break \r\n"}) == "Windows line break \n"
-    assert escape_javascript({:safe, "Carriage return \r"}) == "Carriage return \n"
-    assert escape_javascript({:safe, "\"Double quote\""}) == "\\\"Double quote\\\""
-    assert escape_javascript({:safe, "'Single quote'"}) == "\\'Single quote\\'"
+    assert escape_for_javascript("") == ""
+    assert escape_for_javascript("\\Double backslash") == "\\\\Double backslash"
+    assert escape_for_javascript("\"Double quote\"") == "\\\"Double quote\\\""
+    assert escape_for_javascript("'Single quote'") == "\\'Single quote\\'"
   end
 end
