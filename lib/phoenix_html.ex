@@ -165,7 +165,6 @@ defmodule Phoenix.HTML do
   to escape html rendered from other templates, like in the following:
 
   $("#container").append("<%= escape_javascript(render("post.html", post: @post)) %>");
-
   """
   @spec escape_for_javascript(binary | safe) :: String.t
   def escape_for_javascript({:safe, data}) when is_list(data) do
