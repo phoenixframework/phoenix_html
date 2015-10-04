@@ -62,7 +62,7 @@ defmodule Phoenix.HTML do
 
   @doc """
   Provides `~e` sigil with HTML safe EEx syntax inside source files.
-  
+
   Raises on attempts to interpolate with `#{}`, so `~E` should be preferred.
 
       iex> ~e"\""
@@ -77,7 +77,7 @@ defmodule Phoenix.HTML do
 
   @doc """
   Provides `~E` sigil with HTML safe EEx syntax inside source files.
-  
+
   Does not raise on attempts to interpolate with `#{}`, but rather shows those
   characters literally, so it should be preferred over `~e`.
 
@@ -157,4 +157,36 @@ defmodule Phoenix.HTML do
   def safe_to_string({:safe, iodata}) do
     IO.iodata_to_binary(iodata)
   end
+
+  @doc """
+  Escapes quotes (double and single) and double backslashes
+
+  This method is extremely helpful in JavaScript responses when there is a need
+  to escape html rendered from other templates, like in the following:
+
+  $("#container").append("<%= escape_javascript(render("post.html", post: @post)) %>");
+  """
+  @spec escape_for_javascript(binary | safe) :: String.t
+  def escape_for_javascript({:safe, data}) when is_list(data) do
+    data |> IO.chardata_to_string |> escape_for_javascript
+  end
+
+  def escape_for_javascript(data) when is_binary(data) do
+    IO.iodata_to_binary(for <<c <- data>>, do: escape_char(c))
+  end
+
+  @compile {:inline, escape_char: 1}
+
+  @escapes_for_javascript [
+    {?", "\\\""},
+    {?', "\\\'"},
+    {?\\, "\\\\"}
+  ]
+
+  Enum.each @escapes_for_javascript, fn { match, insert } ->
+    defp escape_char(unquote(match)), do: unquote(insert)
+  end
+
+  defp escape_char(char), do: char
+
 end
