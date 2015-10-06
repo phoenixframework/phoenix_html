@@ -46,7 +46,7 @@ defmodule Phoenix.HTML.Tag do
   end
 
   @doc ~S"""
-  Creates an HTML tag with given name, content, and attributes.
+  Creates an HTML tag with given name, content and attributes.
 
       iex> content_tag(:p, "Hello")
       {:safe, ["<p>", "Hello", "</p>"]}
@@ -57,6 +57,9 @@ defmodule Phoenix.HTML.Tag do
       ...>   "Hello"
       ...> end
       {:safe, ["<p class=\"test\">", "Hello", "</p>"]}
+      
+  Please note that numeric content should be converted to
+  a string, otherwise it may not get rendered in the template.
   """
   def content_tag(name, [do: block]) when is_atom(name) do
     content_tag(name, block, [])
