@@ -32,11 +32,13 @@ defmodule Phoenix.HTMLTest do
     assert Safe.to_iodata({:safe, "<foo>"}) == "<foo>"
   end
 
-  test "Phoenix.HTML.escape_for_javascript/1" do
-    assert escape_for_javascript("") == ""
-    assert escape_for_javascript("\\Double backslash") == "\\\\Double backslash"
-    assert escape_for_javascript("\"Double quote\"") == "\\\"Double quote\\\""
-    assert escape_for_javascript("'Single quote'") == "\\'Single quote\\'"
-    assert escape_for_javascript("New line\n") == "New line\\n"
+  test "Phoenix.HTML.escape_javascript/1" do
+    assert escape_javascript("") == ""
+    assert escape_javascript("\\Double backslash") == "\\\\Double backslash"
+    assert escape_javascript("\"Double quote\"") == "\\\"Double quote\\\""
+    assert escape_javascript("'Single quote'") == "\\'Single quote\\'"
+    assert escape_javascript("New line\n") == "New line\\n"
+    assert escape_javascript({:safe, "'Single quote'"}) == {:safe, "\\'Single quote\\'"}
+    assert escape_javascript({:safe, ["'Single quote'"]}) == {:safe, "\\'Single quote\\'"}
   end
 end

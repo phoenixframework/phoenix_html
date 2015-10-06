@@ -164,14 +164,14 @@ defmodule Phoenix.HTML do
   This function is useful in JavaScript responses when there is a need
   to escape html rendered from other templates, like in the following:
 
-  $("#container").append("<%= escape_javascript(render("post.html", post: @post)) %>");
+      $("#container").append("<%= escape_javascript(render("post.html", post: @post)) %>");
   """
-  @spec escape_for_javascript(binary | safe) :: String.t
-  def escape_for_javascript({:safe, data}) when is_list(data) do
-    data |> IO.chardata_to_string |> escape_for_javascript
+  @spec escape_javascript(binary | safe) :: String.t
+  def escape_javascript({:safe, data}) do
+    {:safe, data |> IO.chardata_to_string |> escape_javascript}
   end
 
-  def escape_for_javascript(data) when is_binary(data) do
+  def escape_javascript(data) when is_binary(data) do
     IO.iodata_to_binary(for <<c <- data>>, do: escape_js_char(c))
   end
 
@@ -189,5 +189,4 @@ defmodule Phoenix.HTML do
   end
 
   defp escape_js_char(char), do: char
-
 end
