@@ -320,6 +320,19 @@ defmodule Phoenix.HTML.FormTest do
           ~s(<input class="btn" type="submit" value="Submit">)
   end
 
+  ## button/2
+  test "button/2" do
+    assert safe_to_string(button("Press")) ==
+           ~s(<button>Press</button>)
+
+    assert safe_to_string(button("Press", class: "btn")) ==
+           ~s(<button class="btn">Press</button>)
+
+    assert safe_to_string(button("Press", [class: "btn", type: :submit])) ==
+           ~s(<button class="btn" type="submit">Press</button>)
+
+  end
+
   ## reset/2
 
   test "reset/2" do
