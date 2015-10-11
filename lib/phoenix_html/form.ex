@@ -3,7 +3,7 @@ defmodule Phoenix.HTML.Form do
   Helpers related to producing HTML forms.
 
   The functions in this module can be used in three
-  distinct scenario:
+  distinct scenarios:
 
     * with model data - when information to populate
       the form comes from a model
@@ -73,6 +73,10 @@ defmodule Phoenix.HTML.Form do
         <%= text_input f, :for %>
         <%= submit "Search" %>
       <% end %>
+
+  `form_for/4` uses the `Plug.Conn` to set input values from the
+  request parameters. In this case, the input's value would be set
+  to `@conn.params["search"]["for"]`.
 
   ## Without form data
 
@@ -215,7 +219,11 @@ defmodule Phoenix.HTML.Form do
       include an input tag with name `_csrf_token`. When set to false, this
       is disabled
 
-    * `:enforce_utf8` - when false, does not enforce utf8
+    * `:enforce_utf8` - the form will have an `accept-charset` attribute set
+      to "UTF-8" and a hidden input named `_utf8` containing a unicode
+      character to force the browser to use UTF-8 as the charset. When set to
+      false, this is disabled.
+
 
   See `Phoenix.HTML.Tag.form_tag/2` for more information on the
   options above.
