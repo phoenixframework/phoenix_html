@@ -514,21 +514,6 @@ defmodule Phoenix.HTML.Form do
   end
 
   @doc """
-  Generates a button tag on the form.
-
-  All options are forwarded to the underlying content tag.
-
-  ## Examples
-
-      button "Press"
-      #=> <button>Press</button>
-
-  """
-  def button(value, opts \\ []) do
-    content_tag(:button, value, opts)
-  end
-
-  @doc """
   Generates a reset input to reset all the form fields to
   their original state.
 

@@ -76,4 +76,15 @@ defmodule Phoenix.HTML.LinkTest do
            ~s[<input id="btn" type="submit" value="hello">] <>
            ~s[</form>]
   end
+
+  test "button without only value creates form-less-button" do
+    assert safe_to_string(button("Press")) ==
+           ~s(<button>Press</button>)
+
+    assert safe_to_string(button("Press", class: "btn")) ==
+           ~s(<button class="btn">Press</button>)
+
+    assert safe_to_string(button("Press", [class: "btn", type: :submit])) ==
+           ~s(<button class="btn" type="submit">Press</button>)
+  end
 end
