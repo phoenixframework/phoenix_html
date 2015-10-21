@@ -493,6 +493,12 @@ defmodule Phoenix.HTML.FormTest do
            ~s(<option selected="selected" value="novalue">novalue</option>) <>
            ~s(</select>)
 
+    assert safe_form(&multiple_select(put_in(&1.params["key"], ["3"]), :key, [{"foo", 1}, {"bar", 2}, {"goo", 3}], default: [2])) ==
+          ~s(<select id="search_key" multiple="" name="search[key][]">) <>
+          ~s(<option value="1">foo</option>) <>
+          ~s(<option value="2">bar</option>) <>
+          ~s(<option selected="selected" value="3">goo</option>) <>
+          ~s(</select>)
   end
 
   # date_select/4
