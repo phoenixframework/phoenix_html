@@ -751,7 +751,7 @@ defmodule Phoenix.HTML.Form do
   """
   def multiple_select(form, field, values, opts \\ []) do
     {default, opts}  = Keyword.pop(opts, :default, [])
-    {multiple, opts} = Keyword.pop(opts, :value, default)
+    {multiple, opts} = Keyword.pop(opts, :value, value_from(form, field) || default)
 
     opts =
       opts
