@@ -586,7 +586,7 @@ defmodule Phoenix.HTML.Form do
       # Assuming form contains a User model
       checkbox(form, :famous)
       #=> <input name="user[famous]" type="hidden" value="false">
-          <input checked="checked" id="user_famous" name="user[famous]"> type="checkbox" value="true")
+          <input checked="checked" id="user_famous" name="user[famous]" type="checkbox" value="true">
 
   ## Options
 
