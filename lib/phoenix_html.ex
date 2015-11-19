@@ -12,6 +12,8 @@ defmodule Phoenix.HTML do
 
     * `Phoenix.HTML.Link` - functions for generating links and urls;
 
+    * `Phoenix.HTML.Format` - functions for formatting text;
+
   ## HTML Safe
 
   One of the main responsibilities of this module is to
