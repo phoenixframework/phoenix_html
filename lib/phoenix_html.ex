@@ -53,6 +53,7 @@ defmodule Phoenix.HTML do
       import Phoenix.HTML.Form
       import Phoenix.HTML.Link
       import Phoenix.HTML.Tag
+      import Phoenix.HTML.Format
     end
   end
 
