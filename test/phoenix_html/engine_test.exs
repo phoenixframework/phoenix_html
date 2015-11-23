@@ -13,9 +13,15 @@ defmodule Phoenix.HTML.EngineTest do
     assert eval(@template, %{foo: true}) == "123\n\n  456\n\n789\n"
   end
 
-  test "raises KeyError for missing assigns" do
+  test "raises ArgumentError for missing assigns" do
     assert_raise ArgumentError, ~r/assign @foo not available in eex template.*Available assigns: \[:bar\]/s, fn ->
       eval(@template, %{bar: "baz"})
+    end
+  end
+
+  test "raises ArgumentError for @inner assign" do
+    assert_raise ArgumentError, ~r/@inner has been removed/s, fn ->
+      eval("<%= @inner %>", %{})
     end
   end
 

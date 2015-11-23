@@ -80,8 +80,16 @@ defmodule Phoenix.HTML.Engine do
 
   @doc false
   def fetch_assign(assigns, key) do
-    case Dict.fetch(assigns, key) do
-      :error ->
+    case {key, Dict.fetch(assigns, key)} do
+      {:inner, :error} ->
+        raise ArgumentError, message: """
+        @inner has been removed in favor of explicit rendering with
+        @view_module and @view_template assigns. Update your
+        `<%= @inner %>` code to use `render/3`:
+
+            <%= render @view_module, @view_template, assigns %>
+        """
+      {_, :error} ->
         raise ArgumentError, message: """
         assign @#{key} not available in eex template.
 
@@ -91,7 +99,7 @@ defmodule Phoenix.HTML.Engine do
 
         Available assigns: #{inspect Dict.keys(assigns)}
         """
-      {:ok, val} -> val
+      {_, {:ok, val}} -> val
     end
   end
 
