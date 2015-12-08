@@ -33,7 +33,7 @@ defmodule Phoenix.HTML.Form do
   where `User.changeset/2` is defined as follows:
 
       def changeset(user, params \\ :empty) do
-        cast(user, params)
+        cast(user, params, ~w(name age), ~w())
       end
 
   Now a `@changeset` assign is available in views which we
