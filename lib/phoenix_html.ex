@@ -175,21 +175,23 @@ defmodule Phoenix.HTML do
   end
 
   def escape_javascript(data) when is_binary(data) do
-    IO.iodata_to_binary(for <<c <- data>>, do: escape_js_char(c))
+    escape_javascript(data, "")
   end
 
-  @compile {:inline, escape_js_char: 1}
-
-  @escapes_for_javascript [
-    {?", "\\\""},
-    {?', "\\\'"},
-    {?\\, "\\\\"},
-    {?\n, "\\n"}
-  ]
-
-  Enum.each @escapes_for_javascript, fn { match, insert } ->
-    defp escape_js_char(unquote(match)), do: unquote(insert)
-  end
-
-  defp escape_js_char(char), do: char
+  defp escape_javascript(<<0x2028::utf8, t::binary>>, acc),
+    do: escape_javascript(t, <<acc::binary, "&#x2028;">>)
+  defp escape_javascript(<<0x2029::utf8, t::binary>>, acc),
+    do: escape_javascript(t, <<acc::binary, "&#x2029;">>)
+  defp escape_javascript(<<"</", t::binary>>, acc),
+    do: escape_javascript(t, <<acc::binary, ?<, ?\\, ?/>>)
+  defp escape_javascript(<<"\r\n", t::binary>>, acc),
+    do: escape_javascript(t, <<acc::binary, ?\\, ?n>>)
+  defp escape_javascript(<<h, t::binary>>, acc) when h in [?", ?', ?\\],
+    do: escape_javascript(t, <<acc::binary, ?\\, h>>)
+  defp escape_javascript(<<h, t::binary>>, acc) when h in [?\r, ?\n],
+    do: escape_javascript(t, <<acc::binary, ?\\, ?n>>)
+  defp escape_javascript(<<h, t::binary>>, acc),
+    do: escape_javascript(t, <<acc::binary, h>>)
+  defp escape_javascript(<<>>, acc),
+    do: acc
 end
