@@ -29,7 +29,7 @@ defmodule PhoenixHtml.Mixfile do
   end
 
   defp package do
-    [contributors: ["Chris McCord", "José Valim"],
+    [maintainers: ["Chris McCord", "José Valim"],
      licenses: ["MIT"],
      links: %{github: "https://github.com/phoenixframework/phoenix_html"},
      files: ~w(lib priv web) ++
