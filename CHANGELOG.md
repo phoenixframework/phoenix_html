@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.3.0 (2015-12-16)
+
+* Enhancements
+  * Add `escape_javascript/1`
+  * Add helpful error message when using unknown `@inner` assign
+  * Add `Phoenix.HTML.Format.text_to_html/2`
+
 ## v2.2.0 (2015-09-01)
 
 * Bug fix
