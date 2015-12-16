@@ -95,7 +95,7 @@ defmodule Phoenix.HTML.Form do
   Imagine the models:
 
       defmodule User do
-        use Ecto.Model
+        use Ecto.Schema
 
         schema "users" do
           field :name
@@ -104,7 +104,7 @@ defmodule Phoenix.HTML.Form do
       end
 
       defmodule Permalink do
-        use Ecto.Model
+        use Ecto.Schema
 
         embedded_schema do
           field :url
