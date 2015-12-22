@@ -15,15 +15,15 @@ defmodule Phoenix.HTML.Tag do
       {:safe, "<br>"}
       iex> tag(:input, type: "text", name: "user_id")
       {:safe, "<input name=\"user_id\" type=\"text\">"}
-      
+
   ## Data attributes
-  
+
   In order to add custom data attributes you need to pass
   a tuple containing :data atom and a keyword list
   with data attributes' names and values as the first element
   in the tag's attributes keyword list:
-  
-      iex> tag(:input, [{:data, [foo: "bar"]}, id: "some_id"]) 
+
+      iex> tag(:input, [{:data, [foo: "bar"]}, id: "some_id"])
       {:safe, "<input data-foo=\"bar\" id=\"some_id\">"}
 
   ## Boolean values
