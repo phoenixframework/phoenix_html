@@ -33,6 +33,11 @@ defmodule Phoenix.HTML.TagTest do
     assert tag(:input, data: [toggle: [target: "#parent", attr: "blah"]]) ==
            {:safe, ~s(<input data-toggle-attr="blah" data-toggle-target="#parent">)}
 
+    assert tag(:input, value: []) == {:safe, ~s(<input>)}
+
+    list_val = ["foo", "bar"]
+    assert tag(:input, value: list_val) == {:safe, ~s(<input value="foo, bar">)}
+
     assert tag(:audio, autoplay: true) ==
            {:safe, ~s(<audio autoplay="autoplay">)}
 
