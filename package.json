@@ -1,10 +1,12 @@
 {
+  "name": "phoenix_html",
+  "version": "2.3.1",
+  "main": "./priv/static/phoenix_html.js",
   "repository": {
   },
-  "dependencies": {
-    "brunch": "^1.8.1",
-    "babel-brunch": "^5.1.1",
-    "javascript-brunch": ">= 1.0 < 1.8",
+  "devDependencies": {
+    "brunch": "^2.1.1",
+    "babel-brunch": "^6.0.0",
     "uglify-js-brunch": ">= 1.0 < 1.8"
   }
 }

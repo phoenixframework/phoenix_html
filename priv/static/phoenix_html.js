@@ -1,7 +1,7 @@
-// Although ^=parent is not technically correct,
-// we need to use it in order to get IE8 support.
 'use strict';
 
+// Although ^=parent is not technically correct,
+// we need to use it in order to get IE8 support.
 var elements = document.querySelectorAll('[data-submit^=parent]');
 var len = elements.length;
 
