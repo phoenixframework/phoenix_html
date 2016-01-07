@@ -22,4 +22,10 @@ defmodule Phoenix.HTML.SafeTest do
     assert Safe.to_iodata(1.0) == "1.0"
     assert Safe.to_iodata({:safe, "<foo>"}) == "<foo>"
   end
+
+  test "Phoenix.HTML.Safe given an invalid tuple" do
+    assert_raise Protocol.UndefinedError, fn ->
+      Safe.to_iodata({"needs %{count}", [count: 123]})
+    end
+  end
 end
