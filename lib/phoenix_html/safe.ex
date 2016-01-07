@@ -70,4 +70,9 @@ end
 
 defimpl Phoenix.HTML.Safe, for: Tuple do
   def to_iodata({:safe, data}), do: data
+  def to_iodata(value) do
+    raise Protocol.UndefinedError,
+      protocol: @protocol,
+      value: value
+  end
 end
