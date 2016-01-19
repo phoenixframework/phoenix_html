@@ -19,6 +19,9 @@ defmodule Phoenix.HTML.Link do
       link("<hello>", to: "/world", class: "btn")
       #=> <a class="btn" href="/world">&lt;hello&gt;</a>
 
+      link("delete", to: "/the_world", data: [confirm: "Really?"])
+      #=> <a data-confirm="Really?" href="/the_world">delete</a>
+
       # You can use a `do ... end` block too:
       link to: "/hello" do
         "world"
@@ -40,14 +43,15 @@ defmodule Phoenix.HTML.Link do
 
   ## Data attributes
 
-  The following data attributes are supported/generated:
+  Data attributes are added as a keyword list passed to the
+  `data` key. The following data attributes are supported:
 
-    * `data-submit=parent` - used when the `:method` is not
-      `:get`, this module attribute says the underlying link
-      should submit the parent node whenever there is a click
+    * `data-submit="parent"` - automatically used when the
+      `:method` is not `:get`, this module attribute says the
+      underlying link should submit the parent form on click
 
     * `data-confirm` - shows a confirmation prompt before
-      submitting the parent when `:method` is not `:get`
+      submitting the parent when `:method` is not `:get`.
 
   ## JavaScript dependency
 
