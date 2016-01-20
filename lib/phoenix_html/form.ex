@@ -674,11 +674,11 @@ defmodule Phoenix.HTML.Form do
 
   All other options are forwarded to the underlying HTML tag.
   """
-  def select(form, field, values, opts \\ []) do
+  def select(form, field, options, opts \\ []) do
     {default, opts} = Keyword.pop(opts, :default)
     {value, opts}   = Keyword.pop(opts, :value, value_from(form, field) || default)
 
-    {options, opts} = case Keyword.pop(opts, :prompt) do
+    {prefix, opts} = case Keyword.pop(opts, :prompt) do
       {nil, opts}    -> {raw(""), opts}
       {prompt, opts} -> {content_tag(:option, prompt, value: ""), opts}
     end
@@ -688,7 +688,7 @@ defmodule Phoenix.HTML.Form do
       |> Keyword.put_new(:id, id_from(form, field))
       |> Keyword.put_new(:name, name_from(form, field))
 
-    options = options_for_select(values, options, html_escape(value))
+    options = options_for_select(options, prefix, html_escape(value))
     content_tag(:select, options, opts)
   end
 
@@ -715,7 +715,7 @@ defmodule Phoenix.HTML.Form do
   end
 
   @doc """
-  Generates a select tag with the given `values`.
+  Generates a select tag with the given `options`.
 
   Values are expected to be an Enumerable containing two-item tuples
   (like maps and keyword lists) or any Enumerable where the element
@@ -730,23 +730,32 @@ defmodule Phoenix.HTML.Form do
           <option value="2">Power User</option>
           </select>
 
-
       multiple_select(form, :roles, ["Admin": 1, "Power User": 2], value: [1])
       #=> <select id="user_roles" name="user[roles]">
           <option value="1" selected="selected" >Admin</option>
           <option value="2">Power User</option>
           </select>
 
+  When working with structs, associations and embeds, you will need tell
+  Phoenix how to extract the value out of the collection. For example,
+  imagine `user.roles` is a list of `%Role{}` structs. You must call it as:
+  
+      multiple_select(form, :roles, ["Admin": 1, "Power User": 2],
+                      default: Enum.map(@user.roles, & &1.id))
+  
+  The `:default` option will mark the given IDs as selected unless the form
+  is being resubmitted. When resubmitted, it uses the form params as values.
+
   ## Options
 
     * `:value` - an Enum of values used to select given options.
 
     * `:default` - the default value to use when none was given in
-      `:values` and none was available in the model
+      `:value` and none was available in the model
 
   All other options are forwarded to the underlying HTML tag.
   """
-  def multiple_select(form, field, values, opts \\ []) do
+  def multiple_select(form, field, options, opts \\ []) do
     {default, opts}  = Keyword.pop(opts, :default, [])
     {multiple, opts} = Keyword.pop(opts, :value, value_from(form, field) || default)
 
@@ -756,7 +765,7 @@ defmodule Phoenix.HTML.Form do
       |> Keyword.put_new(:name, name_from(form, field) <> "[]")
       |> Keyword.put_new(:multiple, "")
 
-    options = options_for_select(values, "", Enum.map(multiple, &html_escape/1))
+    options = options_for_select(options, "", Enum.map(multiple, &html_escape/1))
     content_tag(:select, options, opts)
   end
 
