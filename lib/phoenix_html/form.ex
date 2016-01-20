@@ -632,7 +632,7 @@ defmodule Phoenix.HTML.Form do
   end
 
   @doc """
-  Generates a select tag with the given `values`.
+  Generates a select tag with the given `options`.
 
   Values are expected to be an Enumerable containing two-item tuples
   (like a regular list or a map) or any Enumerable where the element
@@ -669,14 +669,14 @@ defmodule Phoenix.HTML.Form do
     * `:value` - the value used to select a given option.
       The default value is extracted from the model if a model is available
 
-    * `:default` - the default value to use when none was given in
-      `:value` and none was available in the model
+    * `:selected` - the default value to use when none was given in
+      `:value` and none was sent as parameter
 
   All other options are forwarded to the underlying HTML tag.
   """
   def select(form, field, options, opts \\ []) do
-    {default, opts} = Keyword.pop(opts, :default)
-    {value, opts}   = Keyword.pop(opts, :value, value_from(form, field) || default)
+    {selected, opts} = Keyword.pop(opts, :selected)
+    {value, opts}    = Keyword.pop(opts, :value, select_from(form, field, selected))
 
     {prefix, opts} = case Keyword.pop(opts, :prompt) do
       {nil, opts}    -> {raw(""), opts}
@@ -739,25 +739,25 @@ defmodule Phoenix.HTML.Form do
   When working with structs, associations and embeds, you will need tell
   Phoenix how to extract the value out of the collection. For example,
   imagine `user.roles` is a list of `%Role{}` structs. You must call it as:
-  
+
       multiple_select(form, :roles, ["Admin": 1, "Power User": 2],
-                      default: Enum.map(@user.roles, & &1.id))
-  
-  The `:default` option will mark the given IDs as selected unless the form
+                      selected: Enum.map(@user.roles, & &1.id))
+
+  The `:selected` option will mark the given IDs as selected unless the form
   is being resubmitted. When resubmitted, it uses the form params as values.
 
   ## Options
 
     * `:value` - an Enum of values used to select given options.
 
-    * `:default` - the default value to use when none was given in
-      `:value` and none was available in the model
+    * `:selected` - the default value to use when none was given in
+      `:value` and none was sent as parameter
 
   All other options are forwarded to the underlying HTML tag.
   """
   def multiple_select(form, field, options, opts \\ []) do
-    {default, opts}  = Keyword.pop(opts, :default, [])
-    {multiple, opts} = Keyword.pop(opts, :value, value_from(form, field) || default)
+    {selected, opts} = Keyword.pop(opts, :selected)
+    {multiple, opts} = Keyword.pop(opts, :value, select_from(form, field, selected) || [])
 
     opts =
       opts
@@ -1076,6 +1076,16 @@ defmodule Phoenix.HTML.Form do
   end
 
   ## Helpers
+
+  defp select_from(%{model: model, params: params}, field, selected) do
+    case Map.fetch(params, Atom.to_string(field)) do
+      {:ok, value} -> value
+      :error -> selected || Map.get(model, field)
+    end
+  end
+
+  defp select_from(name, _field, selected) when is_atom(name),
+    do: selected
 
   defp value_from(%{model: model, params: params}, field) do
     case Map.fetch(params, Atom.to_string(field)) do

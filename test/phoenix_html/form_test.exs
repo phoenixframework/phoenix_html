@@ -418,18 +418,24 @@ defmodule Phoenix.HTML.FormTest do
     assert safe_to_string(select(:search, :key, ~w(foo bar), value: "foo")) =~
            ~s(<option selected="selected" value="foo">foo</option>)
 
-    assert safe_to_string(select(:search, :key, ~w(foo bar), default: "foo")) =~
+    assert safe_to_string(select(:search, :key, ~w(foo bar), selected: "foo")) =~
            ~s(<option selected="selected" value="foo">foo</option>)
   end
 
   test "select/4 with form" do
-    assert safe_form(&select(&1, :key, ~w(value novalue), default: "novalue")) ==
+    assert safe_form(&select(&1, :key, ~w(value novalue), selected: "novalue")) ==
            ~s(<select id="search_key" name="search[key]">) <>
            ~s(<option selected="selected" value="value">value</option>) <>
            ~s(<option value="novalue">novalue</option>) <>
            ~s(</select>)
 
-    assert safe_form(&select(&1, :other, ~w(value novalue), default: "novalue")) ==
+    assert safe_form(&select(&1, :other, ~w(value novalue), selected: "novalue")) ==
+           ~s(<select id="search_other" name="search[other]">) <>
+           ~s(<option value="value">value</option>) <>
+           ~s(<option selected="selected" value="novalue">novalue</option>) <>
+           ~s(</select>)
+
+    assert safe_form(&select(put_in(&1.model[:other], "value"), :other, ~w(value novalue), selected: "novalue")) ==
            ~s(<select id="search_other" name="search[other]">) <>
            ~s(<option value="value">value</option>) <>
            ~s(<option selected="selected" value="novalue">novalue</option>) <>
@@ -463,19 +469,19 @@ defmodule Phoenix.HTML.FormTest do
     assert safe_to_string(multiple_select(:search, :key, [{"foo", "1"}, {"bar", "2"}], value: [1])) =~
            ~s(<option selected="selected" value="1">foo</option>)
 
-    assert safe_to_string(multiple_select(:search, :key, [{"foo", 1}, {"bar", 2}], default: [1])) =~
+    assert safe_to_string(multiple_select(:search, :key, [{"foo", 1}, {"bar", 2}], selected: [1])) =~
            ~s(<option selected="selected" value="1">foo</option>)
 
   end
 
   test "multiple_select/4 with form" do
-    assert safe_form(&multiple_select(&1, :key, [{"foo", 1}, {"bar", 2}], value: [1], default: [2])) ==
+    assert safe_form(&multiple_select(&1, :key, [{"foo", 1}, {"bar", 2}], value: [1], selected: [2])) ==
            ~s(<select id="search_key" multiple="" name="search[key][]">) <>
            ~s(<option selected="selected" value="1">foo</option>) <>
            ~s(<option value="2">bar</option>) <>
            ~s(</select>)
 
-    assert safe_form(&multiple_select(&1, :other, [{"foo", 1}, {"bar", 2}], default: [2])) ==
+    assert safe_form(&multiple_select(&1, :other, [{"foo", 1}, {"bar", 2}], selected: [2])) ==
            ~s(<select id="search_other" multiple="" name="search[other][]">) <>
            ~s(<option value="1">foo</option>) <>
            ~s(<option selected="selected" value="2">bar</option>) <>
@@ -493,7 +499,7 @@ defmodule Phoenix.HTML.FormTest do
            ~s(<option selected="selected" value="novalue">novalue</option>) <>
            ~s(</select>)
 
-    assert safe_form(&multiple_select(put_in(&1.params["key"], ["3"]), :key, [{"foo", 1}, {"bar", 2}, {"goo", 3}], default: [2])) ==
+    assert safe_form(&multiple_select(put_in(&1.params["key"], ["3"]), :key, [{"foo", 1}, {"bar", 2}, {"goo", 3}], selected: [2])) ==
           ~s(<select id="search_key" multiple="" name="search[key][]">) <>
           ~s(<option value="1">foo</option>) <>
           ~s(<option value="2">bar</option>) <>
