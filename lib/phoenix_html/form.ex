@@ -1083,7 +1083,6 @@ defmodule Phoenix.HTML.Form do
       :error -> selected || Map.get(model, field)
     end
   end
-
   defp select_from(name, _field, selected) when is_atom(name),
     do: selected
 
@@ -1093,7 +1092,6 @@ defmodule Phoenix.HTML.Form do
       :error -> Map.get(model, field)
     end
   end
-
   defp value_from(name, _field) when is_atom(name),
     do: nil
 
