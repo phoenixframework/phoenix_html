@@ -171,7 +171,7 @@ defmodule Phoenix.HTML do
   """
   @spec escape_javascript(binary | safe) :: String.t
   def escape_javascript({:safe, data}) do
-    {:safe, data |> IO.chardata_to_string |> escape_javascript}
+    {:safe, data |> IO.iodata_to_binary |> escape_javascript}
   end
 
   def escape_javascript(data) when is_binary(data) do
