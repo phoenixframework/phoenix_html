@@ -1,7 +1,7 @@
 defmodule PhoenixHtml.Mixfile do
   use Mix.Project
 
-  @version "2.4.0-dev"
+  @version "2.4.0"
 
   def project do
     [app: :phoenix_html,
