@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.4.0 (2016-01-21)
+
+* Enhancements
+  * Add `rel=nofollow` auto generation for non-get links
+  * Introduce `:selected` option for `select`  and `multiple_select`
+
+* Bug fixes
+  * Fix safe engine incorrectly marking safe code as unsafe when last expression is `<% ... %>`
+
 ## v2.3.0 (2015-12-16)
 
 * Enhancements
