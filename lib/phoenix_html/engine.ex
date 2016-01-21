@@ -7,36 +7,45 @@ defmodule Phoenix.HTML.Engine do
   use EEx.Engine
 
   @doc false
+  def init(_opts), do: {:safe, ""}
+
+  @doc false
   def handle_body(body), do: body
 
   @doc false
-  def handle_text(buffer, text) do
+  def handle_text("", text) do # Required for Elixir < v1.3
+    handle_text({:safe, ""}, text)
+  end
+
+  def handle_text({:safe, buffer}, text) do
     quote do
-      {:safe, [unquote(unwrap(buffer))|unquote(text)]}
+      {:safe, [unquote(buffer)|unquote(text)]}
     end
   end
 
   @doc false
-  def handle_expr(buffer, "=", expr) do
+  def handle_expr("", marker, expr) do # Required for Elixir < v1.3
+    handle_expr({:safe, ""}, marker, expr)
+  end
+
+  def handle_expr({:safe, buffer}, "=", expr) do
     line   = line_from_expr(expr)
     expr   = expr(expr)
-    buffer = unwrap(buffer)
+
     {:safe, quote do
       tmp1 = unquote(buffer)
       [tmp1|unquote(to_safe(expr, line))]
      end}
   end
 
-  @doc false
-  def handle_expr(buffer, "", expr) do
-    expr   = expr(expr)
-    buffer = unwrap(buffer)
+  def handle_expr({:safe, buffer}, "", expr) do
+    expr = expr(expr)
 
-    quote do
+    {:safe, quote do
       tmp2 = unquote(buffer)
       unquote(expr)
       tmp2
-    end
+    end}
   end
 
   defp line_from_expr({_, meta, _}) when is_list(meta), do: Keyword.get(meta, :line)
@@ -102,7 +111,4 @@ defmodule Phoenix.HTML.Engine do
       {_, {:ok, val}} -> val
     end
   end
-
-  defp unwrap({:safe, value}), do: value
-  defp unwrap(value), do: value
 end
