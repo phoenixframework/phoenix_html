@@ -1077,36 +1077,31 @@ defmodule Phoenix.HTML.Form do
 
   @doc """
   Returns a value of a corresponding form field.
-  Can be used to create custom controls.
 
-  The form should either be a `Phoenix.HTML.Form` emitted
+  The `form` should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
 
-  If the form contains both initial `model` data and `params` sent
-  with a request then, for a given field a value from `params`
-  will take precedence over a value from `model`.
+  When a form is given, the value will be first looked up in
+  `params`, then fallback to the optional `default` argument.
+  If none are available, it will try to fetch the value from the
+  model.
 
-  Optional argument `selected` may be provided as the default value
-  to use when none was given in model and none was sent as parameter
-
-  Always returns `selected` or `nil` if a given form is an atom.
-
+  Always returns `selected` if a given form is an atom.
   """
-  def field_value(form, field, selected \\ nil),
-    do: field_value_impl(form, field, selected)
+  def field_value(form, field, selected \\ nil)
 
-  defp field_value_impl(%{model: model, params: params}, field, selected) do
+  def field_value(%{model: model, params: params}, field, selected) do
     case Map.fetch(params, Atom.to_string(field)) do
       {:ok, value} -> value
       :error -> selected || Map.get(model, field)
     end
   end
-  defp field_value_impl(name, _field, selected) when is_atom(name),
+
+  def field_value(name, _field, selected) when is_atom(name),
     do: selected
 
   @doc """
   Returns an id of a corresponding form field.
-  Can be used to create custom controls.
 
   The form should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
@@ -1118,7 +1113,6 @@ defmodule Phoenix.HTML.Form do
 
   @doc """
   Returns a name of a corresponding form field.
-  Can be used to create custom controls.
 
   The form should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
