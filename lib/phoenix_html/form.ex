@@ -378,8 +378,8 @@ defmodule Phoenix.HTML.Form do
     opts =
       opts
       |> Keyword.put_new(:type, "password")
-      |> Keyword.put_new(:id, id_from(form, field))
-      |> Keyword.put_new(:name, name_from(form, field))
+      |> Keyword.put_new(:id, field_id(form, field))
+      |> Keyword.put_new(:name, field_name(form, field))
     tag(:input, opts)
   end
 
@@ -435,9 +435,9 @@ defmodule Phoenix.HTML.Form do
     opts =
       opts
       |> Keyword.put_new(:type, type)
-      |> Keyword.put_new(:id, id_from(form, field))
-      |> Keyword.put_new(:name, name_from(form, field))
-      |> Keyword.put_new(:value, value_from(form, field))
+      |> Keyword.put_new(:id, field_id(form, field))
+      |> Keyword.put_new(:name, field_name(form, field))
+      |> Keyword.put_new(:value, field_value(form, field))
     tag(:input, opts)
   end
 
@@ -469,10 +469,10 @@ defmodule Phoenix.HTML.Form do
   def textarea(form, field, opts \\ []) do
     opts =
       opts
-      |> Keyword.put_new(:id, id_from(form, field))
-      |> Keyword.put_new(:name, name_from(form, field))
+      |> Keyword.put_new(:id, field_id(form, field))
+      |> Keyword.put_new(:name, field_name(form, field))
 
-    {value, opts} = Keyword.pop(opts, :value, value_from(form, field) || "")
+    {value, opts} = Keyword.pop(opts, :value, field_value(form, field) || "")
     content_tag(:textarea, html_escape(["\n", value]), opts)
   end
 
@@ -493,8 +493,8 @@ defmodule Phoenix.HTML.Form do
     opts =
       opts
       |> Keyword.put_new(:type, :file)
-      |> Keyword.put_new(:id, id_from(form, field))
-      |> Keyword.put_new(:name, name_from(form, field))
+      |> Keyword.put_new(:id, field_id(form, field))
+      |> Keyword.put_new(:name, field_name(form, field))
 
     tag(:input, opts)
   end
@@ -563,10 +563,10 @@ defmodule Phoenix.HTML.Form do
     opts =
       opts
       |> Keyword.put_new(:type, "radio")
-      |> Keyword.put_new(:id, id_from(form, field) <> "_" <> elem(value, 1))
-      |> Keyword.put_new(:name, name_from(form, field))
+      |> Keyword.put_new(:id, field_id(form, field) <> "_" <> elem(value, 1))
+      |> Keyword.put_new(:name, field_name(form, field))
 
-    if value == html_escape(value_from(form, field)) do
+    if value == html_escape(field_value(form, field)) do
       opts = Keyword.put_new(opts, :checked, true)
     end
 
@@ -609,10 +609,10 @@ defmodule Phoenix.HTML.Form do
     opts =
       opts
       |> Keyword.put_new(:type, "checkbox")
-      |> Keyword.put_new(:id, id_from(form, field))
-      |> Keyword.put_new(:name, name_from(form, field))
+      |> Keyword.put_new(:id, field_id(form, field))
+      |> Keyword.put_new(:name, field_name(form, field))
 
-    {value, opts}           = Keyword.pop(opts, :value, value_from(form, field))
+    {value, opts}           = Keyword.pop(opts, :value, field_value(form, field))
     {checked_value, opts}   = Keyword.pop(opts, :checked_value, true)
     {unchecked_value, opts} = Keyword.pop(opts, :unchecked_value, false)
 
@@ -676,7 +676,7 @@ defmodule Phoenix.HTML.Form do
   """
   def select(form, field, options, opts \\ []) do
     {selected, opts} = Keyword.pop(opts, :selected)
-    {value, opts}    = Keyword.pop(opts, :value, select_from(form, field, selected))
+    {value, opts}    = Keyword.pop(opts, :value, field_value(form, field, selected))
 
     {prefix, opts} = case Keyword.pop(opts, :prompt) do
       {nil, opts}    -> {raw(""), opts}
@@ -685,8 +685,8 @@ defmodule Phoenix.HTML.Form do
 
     opts =
       opts
-      |> Keyword.put_new(:id, id_from(form, field))
-      |> Keyword.put_new(:name, name_from(form, field))
+      |> Keyword.put_new(:id, field_id(form, field))
+      |> Keyword.put_new(:name, field_name(form, field))
 
     options = options_for_select(options, prefix, html_escape(value))
     content_tag(:select, options, opts)
@@ -757,12 +757,12 @@ defmodule Phoenix.HTML.Form do
   """
   def multiple_select(form, field, options, opts \\ []) do
     {selected, opts} = Keyword.pop(opts, :selected)
-    {multiple, opts} = Keyword.pop(opts, :value, select_from(form, field, selected) || [])
+    {multiple, opts} = Keyword.pop(opts, :value, field_value(form, field, selected) || [])
 
     opts =
       opts
-      |> Keyword.put_new(:id, id_from(form, field))
-      |> Keyword.put_new(:name, name_from(form, field) <> "[]")
+      |> Keyword.put_new(:id, field_id(form, field))
+      |> Keyword.put_new(:name, field_name(form, field) <> "[]")
       |> Keyword.put_new(:multiple, "")
 
     options = options_for_select(options, "", Enum.map(multiple, &html_escape/1))
@@ -864,7 +864,7 @@ defmodule Phoenix.HTML.Form do
 
   """
   def datetime_select(form, field, opts \\ []) do
-    value = Keyword.get(opts, :value, value_from(form, field) || Keyword.get(opts, :default))
+    value = Keyword.get(opts, :value, field_value(form, field) || Keyword.get(opts, :default))
 
     builder =
       Keyword.get(opts, :builder) || fn b ->
@@ -882,7 +882,7 @@ defmodule Phoenix.HTML.Form do
   Check `datetime_select/3` for more information on options and supported values.
   """
   def date_select(form, field, opts \\ []) do
-    value   = Keyword.get(opts, :value, value_from(form, field) || Keyword.get(opts, :default))
+    value   = Keyword.get(opts, :value, field_value(form, field) || Keyword.get(opts, :default))
     builder = Keyword.get(opts, :builder) || &date_builder(&1, opts)
     builder.(datetime_builder(form, field, date_value(value), nil, opts))
   end
@@ -912,7 +912,7 @@ defmodule Phoenix.HTML.Form do
   Check `datetime_select/3` for more information on options and supported values.
   """
   def time_select(form, field, opts \\ []) do
-    value   = Keyword.get(opts, :value, value_from(form, field) || Keyword.get(opts, :default))
+    value   = Keyword.get(opts, :value, field_value(form, field) || Keyword.get(opts, :default))
     builder = Keyword.get(opts, :builder) || &time_builder(&1, opts)
     builder.(datetime_builder(form, field, nil, time_value(value), opts))
   end
@@ -971,8 +971,8 @@ defmodule Phoenix.HTML.Form do
   @minsec map.(0..59)
 
   defp datetime_builder(form, field, date, time, parent) do
-    id   = Keyword.get(parent, :id, id_from(form, field))
-    name = Keyword.get(parent, :name, name_from(form, field))
+    id   = Keyword.get(parent, :id, field_id(form, field))
+    name = Keyword.get(parent, :name, field_name(form, field))
 
     fn
       :year, opts when date != nil ->
@@ -1067,41 +1067,65 @@ defmodule Phoenix.HTML.Form do
   See `label/2`.
   """
   def label(form, field, text, opts) when is_binary(text) and is_list(opts) do
-    opts = Keyword.put_new(opts, :for, id_from(form, field))
+    opts = Keyword.put_new(opts, :for, field_id(form, field))
     content_tag(:label, text, opts)
   end
   def label(form, field, opts, [do: block]) do
-    opts = Keyword.put_new(opts, :for, id_from(form, field))
+    opts = Keyword.put_new(opts, :for, field_id(form, field))
     content_tag(:label, opts, do: block)
   end
 
-  ## Helpers
+  @doc """
+  Returns a value of a corresponding form field.
+  Can be used to create custom controls.
 
-  defp select_from(%{model: model, params: params}, field, selected) do
+  The form should either be a `Phoenix.HTML.Form` emitted
+  by `form_for` or an atom.
+
+  If the form contains both initial `model` data and `params` sent
+  with a request then, for a given field a value from `params`
+  will take precedence over a value from `model`.
+
+  Optional argument `selected` may be provided as the default value
+  to use when none was given in model and none was sent as parameter
+
+  Always returns `selected` or `nil` if a given form is an atom.
+
+  """
+  def field_value(form, field, selected \\ nil),
+    do: field_value_impl(form, field, selected)
+
+  defp field_value_impl(%{model: model, params: params}, field, selected) do
     case Map.fetch(params, Atom.to_string(field)) do
       {:ok, value} -> value
       :error -> selected || Map.get(model, field)
     end
   end
-  defp select_from(name, _field, selected) when is_atom(name),
+  defp field_value_impl(name, _field, selected) when is_atom(name),
     do: selected
 
-  defp value_from(%{model: model, params: params}, field) do
-    case Map.fetch(params, Atom.to_string(field)) do
-      {:ok, value} -> value
-      :error -> Map.get(model, field)
-    end
-  end
-  defp value_from(name, _field) when is_atom(name),
-    do: nil
+  @doc """
+  Returns an id of a corresponding form field.
+  Can be used to create custom controls.
 
-  defp id_from(%{id: id}, field),
+  The form should either be a `Phoenix.HTML.Form` emitted
+  by `form_for` or an atom.
+  """
+  def field_id(%{id: id}, field),
     do: "#{id}_#{field}"
-  defp id_from(name, field) when is_atom(name),
+  def field_id(name, field) when is_atom(name),
     do: "#{name}_#{field}"
 
-  defp name_from(%{name: name}, field),
+  @doc """
+  Returns a name of a corresponding form field.
+  Can be used to create custom controls.
+
+  The form should either be a `Phoenix.HTML.Form` emitted
+  by `form_for` or an atom.
+  """
+  def field_name(%{name: name}, field),
     do: "#{name}[#{field}]"
-  defp name_from(name, field) when is_atom(name),
+  def field_name(name, field) when is_atom(name),
     do: "#{name}[#{field}]"
+
 end
