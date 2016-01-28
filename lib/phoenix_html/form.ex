@@ -5,8 +5,8 @@ defmodule Phoenix.HTML.Form do
   The functions in this module can be used in three
   distinct scenarios:
 
-    * with model data - when information to populate
-      the form comes from a model
+    * with changeset data - when information to populate
+      the form comes from a changeset
 
     * with connection data - when a form is created based
       on the information in the connection (aka `Plug.Conn`)
@@ -16,7 +16,7 @@ defmodule Phoenix.HTML.Form do
 
   We will explore all three scenarios below.
 
-  ## With model data
+  ## With changeset data
 
   The entry point for defining forms in Phoenix is with
   the `form_for/4` function. For this example, we will
@@ -67,7 +67,7 @@ defmodule Phoenix.HTML.Form do
   to create forms based only on connection information.
 
   This is useful when you are creating forms that are not backed
-  by any kind of model data, like a search form.
+  by any kind of data from the model layer, like a search form.
 
       <%= form_for @conn, search_path(@conn, :new), [name: :search], fn f -> %>
         <%= text_input f, :for %>
@@ -92,7 +92,7 @@ defmodule Phoenix.HTML.Form do
   If your model layer supports embedding or nested associations,
   you can use `inputs_for` to attach nested data to the form.
 
-  Imagine the models:
+  Imagine the following Ecto schemas:
 
       defmodule User do
         use Ecto.Schema
@@ -153,7 +153,7 @@ defmodule Phoenix.HTML.Form do
 
     * `:name` - the name to be used when generating input fields
 
-    * `:model` - the model used to lookup field data
+    * `:data` - the field used to store lookup data
 
     * `:params` - the parameters associated to this form in case
       they were sent as part of a previous request
@@ -167,10 +167,10 @@ defmodule Phoenix.HTML.Form do
     * `:errors` - a keyword list of errors that associated with
       the form
   """
-  defstruct source: nil, impl: nil, id: nil, name: nil, model: %{},
+  defstruct source: nil, impl: nil, id: nil, name: nil, data: nil, model: nil,
             hidden: [], params: %{}, errors: [], options: [], index: nil
 
-  @type t :: %Form{source: Phoenix.HTML.FormData.t, name: String.t, model: %{atom => term},
+  @type t :: %Form{source: Phoenix.HTML.FormData.t, name: String.t, data: %{atom => term},
                    params: %{binary => term}, hidden: Keyword.t, options: Keyword.t,
                    errors: Keyword.t, impl: module, id: String.t, index: nil | non_neg_integer}
 
@@ -205,8 +205,8 @@ defmodule Phoenix.HTML.Form do
 
   ## Options
 
-    * `:as` - the name to be used in the form. May be inflected
-      if a model is available
+    * `:as` - the name to be used in the form. Automatically inflected
+      when a changeset is given
 
     * `:method` - the HTTP method. If the method is not "get" nor "post",
       an input tag with name `_method` is generated along-side the form tag.
@@ -231,8 +231,14 @@ defmodule Phoenix.HTML.Form do
   @spec form_for(Phoenix.HTML.FormData.t, String.t,
                  Keyword.t, (t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
   def form_for(form_data, action, options \\ [], fun) when is_function(fun, 1) do
-    form = Phoenix.HTML.FormData.to_form(form_data, options)
+    form = Phoenix.HTML.FormData.to_form(form_data, options) |> normalize_form
     html_escape [form_tag(action, form.options), fun.(form), raw("</form>")]
+  end
+
+  # TODO: Remove model
+  defp normalize_form(%{data: data, model: model} = form) do
+    data = data || model || %{}
+    %{form | data: data, model: data}
   end
 
   @doc """
@@ -263,6 +269,7 @@ defmodule Phoenix.HTML.Form do
   def inputs_for(form, field, options \\ [], fun) do
     forms = form.impl.to_form(form.source, form, field, options)
     html_escape Enum.map(forms, fn form ->
+      form = normalize_form(form)
       hidden = Enum.map(form.hidden, fn {k, v} -> hidden_input(form, k, value: v) end)
       [hidden, fun.(form)]
     end)
@@ -326,7 +333,7 @@ defmodule Phoenix.HTML.Form do
 
   ## Examples
 
-      # Assuming form contains a User model
+      # Assuming form contains a User schema
       text_input(form, :name)
       #=> <input id="user_name" name="user[name]" type="text" value="">
 
@@ -368,7 +375,7 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Generates a password input.
 
-  For security reasons, the model and parameter values
+  For security reasons, the form data and parameter values
   are never re-used in `password_input/3`. Pass the value
   explicitly if you would like to set one.
 
@@ -450,7 +457,7 @@ defmodule Phoenix.HTML.Form do
 
   ## Examples
 
-      # Assuming form contains a User model
+      # Assuming form contains a User schema
       textarea(form, :description)
       #=> <textarea id="user_description" name="user[description]"></textarea>
 
@@ -549,7 +556,7 @@ defmodule Phoenix.HTML.Form do
 
   ## Examples
 
-      # Assuming form contains a User model
+      # Assuming form contains a User schema
       radio_button(form, :role, "admin")
       #=> <input id="user_role_admin" name="user[role]" type="radio" value="admin">
 
@@ -580,7 +587,7 @@ defmodule Phoenix.HTML.Form do
 
   ## Examples
 
-      # Assuming form contains a User model
+      # Assuming form contains a User schema
       checkbox(form, :famous)
       #=> <input name="user[famous]" type="hidden" value="false">
           <input checked="checked" id="user_famous" name="user[famous]" type="checkbox" value="true">
@@ -594,7 +601,7 @@ defmodule Phoenix.HTML.Form do
       Defaults to "false"
 
     * `:value` - the value used to check if a checkbox is checked or unchecked.
-      The default value is extracted from the model if a model is available
+      The default value is extracted from the form data if available
 
   All other options are forwarded to the underlying HTML tag.
 
@@ -617,7 +624,7 @@ defmodule Phoenix.HTML.Form do
     {unchecked_value, opts} = Keyword.pop(opts, :unchecked_value, false)
 
     # We html escape all values to be sure we are comparing
-    # apples to apples. After all we may have true in the model
+    # apples to apples. After all we may have true in the data
     # but "true" in the params and both need to match.
     value           = html_escape(value)
     checked_value   = html_escape(checked_value)
@@ -640,7 +647,7 @@ defmodule Phoenix.HTML.Form do
 
   ## Examples
 
-      # Assuming form contains a User model
+      # Assuming form contains a User schema
       select(form, :age, 0..120)
       #=> <select id="user_age" name="user[age]">
           <option value="0">0</option>
@@ -667,7 +674,7 @@ defmodule Phoenix.HTML.Form do
       the given prompt text
 
     * `:value` - the value used to select a given option.
-      The default value is extracted from the model if a model is available
+      The default value is extracted from the form data if available
 
     * `:selected` - the default value to use when none was given in
       `:value` and none was sent as parameter
@@ -723,7 +730,7 @@ defmodule Phoenix.HTML.Form do
 
   ## Examples
 
-      # Assuming form contains a User model
+      # Assuming form contains a User schema
       multiple_select(form, :roles, ["Admin": 1, "Power User": 2])
       #=> <select id="user_roles" name="user[roles][]">
           <option value="1">Admin</option>
@@ -776,7 +783,7 @@ defmodule Phoenix.HTML.Form do
 
   ## Examples
 
-      # Assuming form contains a User model
+      # Assuming form contains a User schema
       datetime_select form, :born_at
       #=> <select id="user_born_at_year" name="user[born_at][year]">...</select> /
           <select id="user_born_at_month" name="user[born_at][month]">...</select> /
@@ -786,12 +793,12 @@ defmodule Phoenix.HTML.Form do
 
   If you want to include the seconds field (hidden by default), pass `sec: []`:
 
-      # Assuming form contains a User model
+      # Assuming form contains a User schema
       datetime_select form, :born_at, sec: []
 
   If you want to configure the years range:
 
-      # Assuming form contains a User model
+      # Assuming form contains a User schema
       datetime_select form, :born_at, year: [options: 1900..2100]
 
   You are also able to configure `:month`, `:day`, `:hour`, `:min` and
@@ -801,10 +808,10 @@ defmodule Phoenix.HTML.Form do
   ## Options
 
     * `:value` - the value used to select a given option.
-      The default value is extracted from the model if a model is available
+      The default value is extracted from the form data if available
 
     * `:default` - the default value to use when none was given in
-      `:value` and none was available in the model
+      `:value` and none is available in the form data
 
     * `:year`, `:month`, `:day`, `:hour`, `:min`, `:sec` - options passed
       to the underlying select. See `select/4` for more information.
@@ -1023,7 +1030,7 @@ defmodule Phoenix.HTML.Form do
 
   ## Examples
 
-      # Assuming form contains a User model
+      # Assuming form contains a User schema
       label(form, :name, "Name")
       #=> <label for="user_name">Name</label>
 
@@ -1084,16 +1091,16 @@ defmodule Phoenix.HTML.Form do
   When a form is given, the value will be first looked up in
   `params`, then fallback to the optional `default` argument.
   If none are available, it will try to fetch the value from the
-  model.
+  form data.
 
   Always returns `selected` if a given form is an atom.
   """
   def field_value(form, field, selected \\ nil)
 
-  def field_value(%{model: model, params: params}, field, selected) do
+  def field_value(%{data: data, params: params}, field, selected) do
     case Map.fetch(params, Atom.to_string(field)) do
       {:ok, value} -> value
-      :error -> selected || Map.get(model, field)
+      :error -> selected || Map.get(data, field)
     end
   end
 

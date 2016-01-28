@@ -97,14 +97,14 @@ defmodule Phoenix.HTML.FormTest do
            ~s(<input id="key" name="search[key][]" type="text" value="foo">)
   end
 
-  test "text_input/3 with form and model data" do
-    assert safe_form(&text_input(put_in(&1.model[:key], "original"), :key)) ==
+  test "text_input/3 with form and data" do
+    assert safe_form(&text_input(put_in(&1.data[:key], "original"), :key)) ==
            ~s(<input id="search_key" name="search[key]" type="text" value="value">)
 
-    assert safe_form(&text_input(put_in(&1.model[:no_key], "original"), :no_key)) ==
+    assert safe_form(&text_input(put_in(&1.data[:no_key], "original"), :no_key)) ==
            ~s(<input id="search_no_key" name="search[no_key]" type="text" value="original">)
 
-    assert safe_form(&text_input(put_in(&1.model[:alt_key], "original"), :alt_key)) ==
+    assert safe_form(&text_input(put_in(&1.data[:alt_key], "original"), :alt_key)) ==
            ~s(<input id="search_alt_key" name="search[alt_key]" type="text">)
   end
 
@@ -435,7 +435,7 @@ defmodule Phoenix.HTML.FormTest do
            ~s(<option selected="selected" value="novalue">novalue</option>) <>
            ~s(</select>)
 
-    assert safe_form(&select(put_in(&1.model[:other], "value"), :other, ~w(value novalue), selected: "novalue")) ==
+    assert safe_form(&select(put_in(&1.data[:other], "value"), :other, ~w(value novalue), selected: "novalue")) ==
            ~s(<select id="search_other" name="search[other]">) <>
            ~s(<option value="value">value</option>) <>
            ~s(<option selected="selected" value="novalue">novalue</option>) <>
@@ -765,11 +765,11 @@ defmodule Phoenix.HTML.FormTest do
     assert safe_form(&field_value(&1, :key)) == "value"
   end
 
-  test "field_value/2 with form and model data" do
-    assert safe_form(&field_value(put_in(&1.model[:key], "original"), :key)) == "value"
-    assert safe_form(&field_value(put_in(&1.model[:no_key], "original"), :no_key)) == "original"
+  test "field_value/2 with form and data" do
+    assert safe_form(&field_value(put_in(&1.data[:key], "original"), :key)) == "value"
+    assert safe_form(&field_value(put_in(&1.data[:no_key], "original"), :no_key)) == "original"
     safe_form(fn f ->
-        assert field_value(put_in(f.model[:alt_key], "original"), :alt_key) == nil
+        assert field_value(put_in(f.data[:alt_key], "original"), :alt_key) == nil
         ""
     end)
   end
