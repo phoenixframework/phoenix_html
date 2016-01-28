@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.5.0 (2016-01-28)
+
+* Enhancements
+  * Introduce `form.data` field instead of `form.model`. Currently those values are kept in sync then the form is built but `form.model` will be deprecated in the long term
+
 ## v2.4.0 (2016-01-21)
 
 * Enhancements
