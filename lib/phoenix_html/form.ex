@@ -69,7 +69,7 @@ defmodule Phoenix.HTML.Form do
   This is useful when you are creating forms that are not backed
   by any kind of data from the model layer, like a search form.
 
-      <%= form_for @conn, search_path(@conn, :new), [name: :search], fn f -> %>
+      <%= form_for @conn, search_path(@conn, :new), [as: :search], fn f -> %>
         <%= text_input f, :for %>
         <%= submit "Search" %>
       <% end %>
