@@ -573,9 +573,12 @@ defmodule Phoenix.HTML.Form do
       |> Keyword.put_new(:id, field_id(form, field) <> "_" <> elem(value, 1))
       |> Keyword.put_new(:name, field_name(form, field))
 
-    if value == html_escape(field_value(form, field)) do
-      opts = Keyword.put_new(opts, :checked, true)
-    end
+    opts =
+      if value == html_escape(field_value(form, field)) do
+        Keyword.put_new(opts, :checked, true)
+      else
+        opts
+      end
 
     tag(:input, [value: value] ++ opts)
   end
@@ -630,9 +633,12 @@ defmodule Phoenix.HTML.Form do
     checked_value   = html_escape(checked_value)
     unchecked_value = html_escape(unchecked_value)
 
-    if value == checked_value do
-      opts = Keyword.put_new(opts, :checked, true)
-    end
+    opts =
+      if value == checked_value do
+        Keyword.put_new(opts, :checked, true)
+      else
+        opts
+      end
 
     html_escape [tag(:input, name: Keyword.get(opts, :name), type: "hidden", value: unchecked_value),
                  tag(:input, [value: checked_value] ++ opts)]
