@@ -8,7 +8,7 @@ defmodule Phoenix.HTML.InputsForTest do
   A function that executes `inputs_for/4` and
   extracts its inner contents for assertion.
   """
-  def safe_inputs_for(field, opts \\ [multipart: false], fun) do
+  def safe_inputs_for(field, opts \\ [], fun) do
     mark = "--PLACEHOLDER--"
     {multipart, opts} = Keyword.pop(opts, :multipart, false)
     conn =
