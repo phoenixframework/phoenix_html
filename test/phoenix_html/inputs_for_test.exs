@@ -8,9 +8,9 @@ defmodule Phoenix.HTML.InputsForTest do
   A function that executes `inputs_for/4` and
   extracts its inner contents for assertion.
   """
-  def safe_inputs_for(field, opts \\ [], fun) do
+  def safe_inputs_for(field, opts \\ [multipart: false], fun) do
     mark = "--PLACEHOLDER--"
-
+    {multipart, opts} = Keyword.pop(opts, :multipart, false)
     conn =
       Plug.Test.conn(:get, "/foo", %{"search" => %{
         "date" => %{"year" => "2020", "month" => "4", "day" => "17"},
@@ -19,13 +19,14 @@ defmodule Phoenix.HTML.InputsForTest do
       }})
 
     contents =
-      safe_to_string form_for(conn, "/", [as: :search], fn f ->
+      safe_to_string form_for(conn, "/", [as: :search, multipart: multipart], fn f ->
         html_escape [mark, inputs_for(f, field, opts, fun), mark]
       end)
 
     [_, inner, _] = String.split(contents, mark)
     inner
   end
+
 
   ## Cardinality one
 
@@ -88,6 +89,19 @@ defmodule Phoenix.HTML.InputsForTest do
   end
 
   ## Cardinality many
+
+  test "many: inputs_for/4 with file field generates file input" do
+    contents =
+      safe_inputs_for(:unknown, [default: [%{}, %{}], multipart: true], fn f ->
+        assert f.index in [0, 1]
+        file_input f, :file
+      end)
+
+    assert contents ==
+           ~s(<input id="search_unknown_0_file" name="search[unknown][0][file]" type="text">) <>
+           ~s(<input id="search_unknown_1_file" name="search[unknown][1][file]" type="text">)
+  end
+
 
   test "many: inputs_for/4 with default and field is not present" do
     contents =
