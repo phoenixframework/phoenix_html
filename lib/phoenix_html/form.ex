@@ -267,7 +267,13 @@ defmodule Phoenix.HTML.Form do
   """
   @spec inputs_for(t, atom, Keyword.t, (t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
   def inputs_for(form, field, options \\ [], fun) do
+    options =
+      form.options
+      |> Keyword.take([:multipart])
+      |> Keyword.merge(options)
+
     forms = form.impl.to_form(form.source, form, field, options)
+
     html_escape Enum.map(forms, fn form ->
       form = normalize_form(form)
       hidden = Enum.map(form.hidden, fn {k, v} -> hidden_input(form, k, value: v) end)

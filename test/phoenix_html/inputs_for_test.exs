@@ -27,7 +27,6 @@ defmodule Phoenix.HTML.InputsForTest do
     inner
   end
 
-
   ## Cardinality one
 
   test "one: inputs_for/4 without default and field is not present" do
@@ -98,10 +97,9 @@ defmodule Phoenix.HTML.InputsForTest do
       end)
 
     assert contents ==
-           ~s(<input id="search_unknown_0_file" name="search[unknown][0][file]" type="text">) <>
-           ~s(<input id="search_unknown_1_file" name="search[unknown][1][file]" type="text">)
+           ~s(<input id="search_unknown_0_file" name="search[unknown][0][file]" type="file">) <>
+           ~s(<input id="search_unknown_1_file" name="search[unknown][1][file]" type="file">)
   end
-
 
   test "many: inputs_for/4 with default and field is not present" do
     contents =
