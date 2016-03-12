@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.5.1 (2016-03-12)
+
+* Bug fixes
+  * Ensure multipart files work with inputs_for
+
 ## v2.5.0 (2016-01-28)
 
 * Enhancements
