@@ -839,7 +839,7 @@ defmodule Phoenix.HTML.Form do
   builder option. Here is an example from EEx:
 
       <%= datetime_select form, :born_at, builder: fn b -> %>
-        Date: <%= b.(:day, []) %> / <%= b.(:month, []) %> / <%= b.(:hour, []) %>
+        Date: <%= b.(:day, []) %> / <%= b.(:month, []) %> / <%= b.(:year, []) %>
         Time: <%= b.(:hour, []) %> : <%= b.(:min, []) %>
       <% end %>
 
@@ -853,7 +853,7 @@ defmodule Phoenix.HTML.Form do
       def my_datetime_select(form, field, opts \\ []) do
         builder = fn b ->
           ~e"\""
-          Date: <%= b.(:day, []) %> / <%= b.(:month, []) %> / <%= b.(:hour, []) %>
+          Date: <%= b.(:day, []) %> / <%= b.(:month, []) %> / <%= b.(:year, []) %>
           Time: <%= b.(:hour, []) %> : <%= b.(:min, []) %>
           "\""
         end
