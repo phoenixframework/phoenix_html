@@ -61,19 +61,21 @@ defmodule Phoenix.HTML.Engine do
     quote line: line, do: Phoenix.HTML.Safe.to_iodata(unquote(literal))
   end
 
-  # We need to check at runtime and we do so by
-  # optimizing common cases.
+  # We need to check at runtime
   defp to_safe(expr, line) do
-    # Keep stacktraces for protocol dispatch...
-    fallback = quote line: line, do: Phoenix.HTML.Safe.to_iodata(other)
-
-    # However ignore them for the generated clauses to avoid warnings
-    quote line: -1 do
-      case unquote(expr) do
-        {:safe, data} -> data
-        bin when is_binary(bin) -> Plug.HTML.html_escape(bin)
-        other -> unquote(fallback)
-      end
+    case expr do
+      {:safe, data} ->
+        quote do
+          unquote(data)
+        end
+      bin when is_binary(bin) ->
+        quote do
+          Plug.HTML.html_escape(unquote(bin))
+        end
+      other ->
+        quote do
+          Phoenix.HTML.Safe.to_iodata(unquote(other))
+        end
     end
   end
 
