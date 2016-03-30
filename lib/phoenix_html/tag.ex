@@ -211,7 +211,7 @@ defmodule Phoenix.HTML.Tag do
       form_tag("/hello", method: "get") do
         "Hello"
       end
-      <form action="/hello" method="post">...Hello...</form>
+      <form action="/hello" method="get">...Hello...</form>
 
   """
   def form_tag(action, options, do: block) do
