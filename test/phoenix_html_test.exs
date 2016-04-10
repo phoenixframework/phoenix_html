@@ -24,4 +24,12 @@ defmodule Phoenix.HTMLTest do
     assert escape_javascript({:safe, "'Single quote'"}) == {:safe, "\\'Single quote\\'"}
     assert escape_javascript({:safe, ["'Single quote'"]}) == {:safe, "\\'Single quote\\'"}
   end
+
+  test "only accepts valid iodata" do
+    assert Phoenix.HTML.Safe.to_iodata("foo") == "foo"
+    assert Phoenix.HTML.Safe.to_iodata('foo') == 'foo'
+    assert_raise ArgumentError, ~r/templates only support iodata/, fn ->
+      assert Phoenix.HTML.Safe.to_iodata('foo🐥') == 'foo'
+    end
+  end
 end
