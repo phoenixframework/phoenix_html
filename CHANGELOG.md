@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.5.2-dev
+
+* Enhancements
+  * Raise helpful error when using invalid iodata.
+
 ## v2.5.1 (2016-03-12)
 
 * Bug fixes

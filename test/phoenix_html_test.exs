@@ -29,7 +29,7 @@ defmodule Phoenix.HTMLTest do
     assert Phoenix.HTML.Safe.to_iodata("foo") == "foo"
     assert Phoenix.HTML.Safe.to_iodata('foo') == 'foo'
     assert_raise ArgumentError, ~r/templates only support iodata/, fn ->
-      assert Phoenix.HTML.Safe.to_iodata('foo🐥') == 'foo'
+      Phoenix.HTML.Safe.to_iodata('foo🐥')
     end
   end
 end
