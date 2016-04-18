@@ -66,7 +66,7 @@ defmodule Phoenix.HTML do
   @doc """
   Provides `~e` sigil with HTML safe EEx syntax inside source files.
 
-  Raises on attempts to interpolate with `#{}`, so `~E` should be preferred.
+  Raises on attempts to interpolate with `\#{}`, so `~E` should be preferred.
 
       iex> ~e"\""
       ...> Hello <%= "world" %>
@@ -81,7 +81,7 @@ defmodule Phoenix.HTML do
   @doc """
   Provides `~E` sigil with HTML safe EEx syntax inside source files.
 
-  Does not raise on attempts to interpolate with `#{}`, but rather shows those
+  Does not raise on attempts to interpolate with `\#{}`, but rather shows those
   characters literally, so it should be preferred over `~e`.
 
       iex> ~E"\""
