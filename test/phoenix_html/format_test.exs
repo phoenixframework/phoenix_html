@@ -64,6 +64,21 @@ defmodule Phoenix.HTML.FormatTest do
     """
   end
 
+  test "doesnt add brs" do
+    formatted =
+      format("""
+      Hello,
+      This is dog,
+      How can I help you?
+
+
+      """, insert_brs: false)
+
+    assert formatted == """
+    <p>Hello, This is dog, How can I help you?</p>
+    """
+  end
+
   defp format(text, opts \\ []) do
     text |> text_to_html(opts) |> safe_to_string
   end
