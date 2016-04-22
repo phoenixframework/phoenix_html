@@ -27,6 +27,7 @@ defmodule Phoenix.HTML.Format do
     * `:escape` - if `false` does not html escape input (default: `true`)
     * `:wrapper_tag` - tag to wrap each parapgraph (default: `:p`)
     * `:attributes` - html attributes of the wrapper tag (default: `[]`)
+    * `:insert_brs` - if `true` insert `<br>` for single line breaks (default: `true`)
 
   """
   @spec text_to_html(Phoenix.HTML.unsafe, Keyword.t) :: Phoenix.HTML.safe
@@ -34,11 +35,12 @@ defmodule Phoenix.HTML.Format do
     escape?     = Keyword.get(opts, :escape, true)
     wrapper_tag = Keyword.get(opts, :wrapper_tag, :p)
     attributes  = Keyword.get(opts, :attributes, [])
+    insert_brs? = Keyword.get(opts, :insert_brs, true)
 
     string
     |> maybe_html_escape(escape?)
     |> String.split("\n\n", trim: true)
-    |> Enum.filter_map(&not_blank?/1, &wrap_paragraph(&1, wrapper_tag, attributes))
+    |> Enum.filter_map(&not_blank?/1, &wrap_paragraph(&1, wrapper_tag, attributes, insert_brs?))
     |> Phoenix.HTML.html_escape
   end
 
@@ -50,11 +52,18 @@ defmodule Phoenix.HTML.Format do
   defp not_blank?(""),           do: false
   defp not_blank?(_),            do: true
 
-  defp wrap_paragraph(text, tag, attributes) do
-    [Phoenix.HTML.Tag.content_tag(tag, insert_brs(text), attributes), ?\n]
+  defp wrap_paragraph(text, tag, attributes, insert_brs?) do
+    [Phoenix.HTML.Tag.content_tag(tag, insert_brs(text, insert_brs?), attributes), ?\n]
   end
 
-  defp insert_brs(text) do
+  defp insert_brs(text, false) do
+    text
+    |> String.split("\n", trim: true)
+    |> Enum.intersperse(?\s)
+    |> Phoenix.HTML.raw
+  end
+
+  defp insert_brs(text, true) do
     text
     |> String.split("\n", trim: true)
     |> Enum.map(&Phoenix.HTML.raw/1)
