@@ -54,7 +54,7 @@ defmodule Phoenix.HTML.LinkTest do
     csrf_token = Plug.CSRFProtection.get_csrf_token()
 
     assert safe_to_string(button("hello", to: "/world")) ==
-           ~s[<form action="/world" class="button" method="post">] <>
+           ~s[<form action="/world" method="post">] <>
            ~s[<input name="_csrf_token" type="hidden" value="#{csrf_token}">] <>
            ~s[<input type="submit" value="hello">] <>
            ~s[</form>]
@@ -62,7 +62,7 @@ defmodule Phoenix.HTML.LinkTest do
 
   test "button with get does not generate CSRF" do
     assert safe_to_string(button("hello", to: "/world", method: :get)) ==
-           ~s[<form action="/world" class="button" method="get">] <>
+           ~s[<form action="/world" method="get">] <>
            ~s[<input type="submit" value="hello">] <>
            ~s[</form>]
   end

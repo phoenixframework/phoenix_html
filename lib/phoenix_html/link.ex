@@ -112,7 +112,7 @@ defmodule Phoenix.HTML.Link do
   ## Examples
 
       button("hello", to: "/world")
-      #=> <form action="/world" class="button" method="post">
+      #=> <form action="/world" method="post">
             <input name="_csrf_token" value=""><input type="submit" value="hello">
           </form>
 
@@ -128,7 +128,7 @@ defmodule Phoenix.HTML.Link do
     * `:method` - the method to use with the button. Defaults to :post.
 
     * `:form` - the options for the form. Defaults to
-      `[class: "button", enforce_utf8: false]`
+      `[enforce_utf8: false]`
 
   All other options are forwarded to the underlying button input.
   """
@@ -136,7 +136,7 @@ defmodule Phoenix.HTML.Link do
     {to, opts} = Keyword.pop(opts, :to)
     {method, opts} = Keyword.pop(opts, :method, :post)
 
-    {form, opts} = form_options(opts, method, "button")
+    {form, opts} = form_options(opts, method)
 
     opts =
       opts
@@ -152,7 +152,7 @@ defmodule Phoenix.HTML.Link do
     end
   end
 
-  defp form_options(opts, method, class) do
+  defp form_options(opts, method, class \\ nil) do
     {form, opts} = Keyword.pop(opts, :form, [])
 
     form =
