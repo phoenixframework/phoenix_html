@@ -793,4 +793,23 @@ defmodule Phoenix.HTML.FormTest do
   test "field_name/2 with form" do
     assert safe_form(&field_name(&1, :key)) == "search[key]"
   end
+
+  ## help_text/1
+
+  test "help_text/1" do
+    assert safe_to_string(help_text("Search the whole site")) ==
+          ~s(<small>Search the whole site</small>)
+  end
+
+  ## help_text/2
+
+  test "help_text/2" do
+    assert safe_to_string(help_text("Search the whole site", [class: "text-muted"])) ==
+          ~s(<small class="text-muted">Search the whole site</small>)
+  end
+
+  test "help_text/2 with a block" do
+    assert safe_to_string(help_text([class: "text-muted"], do: "Search the whole site")) ==
+          ~s(<small class="text-muted">Search the whole site</small>)
+  end
 end
