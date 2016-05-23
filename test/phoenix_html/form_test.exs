@@ -26,7 +26,7 @@ defmodule Phoenix.HTML.FormTest do
       "key" => "value",
       "alt_key" => nil,
       "datetime" => %{"year" => "2020", "month" => "4", "day" => "17",
-                      "hour" => "2",   "min" => "11", "sec" => "13"}
+                      "hour" => "2",   "minute" => "11", "second" => "13"}
     }})
   end
 
@@ -562,56 +562,56 @@ defmodule Phoenix.HTML.FormTest do
   test "time_select/4" do
     content = safe_to_string(time_select(:search, :datetime))
     assert content =~ ~s(<select id="search_datetime_hour" name="search[datetime][hour]">)
-    assert content =~ ~s(<select id="search_datetime_min" name="search[datetime][min]">)
-    refute content =~ ~s(<select id="search_datetime_sec" name="search[datetime][sec]">)
+    assert content =~ ~s(<select id="search_datetime_minute" name="search[datetime][minute]">)
+    refute content =~ ~s(<select id="search_datetime_second" name="search[datetime][second]">)
 
-    content = safe_to_string(time_select(:search, :datetime, sec: []))
+    content = safe_to_string(time_select(:search, :datetime, second: []))
     assert content =~ ~s(<select id="search_datetime_hour" name="search[datetime][hour]">)
-    assert content =~ ~s(<select id="search_datetime_min" name="search[datetime][min]">)
-    assert content =~ ~s(<select id="search_datetime_sec" name="search[datetime][sec]">)
+    assert content =~ ~s(<select id="search_datetime_minute" name="search[datetime][minute]">)
+    assert content =~ ~s(<select id="search_datetime_second" name="search[datetime][second]">)
 
-    content = safe_to_string(time_select(:search, :datetime, value: {2, 11, 13}, sec: []))
+    content = safe_to_string(time_select(:search, :datetime, value: {2, 11, 13}, second: []))
     assert content =~ ~s(<option selected="selected" value="2">02</option>)
     assert content =~ ~s(<option selected="selected" value="11">11</option>)
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
 
-    content = safe_to_string(time_select(:search, :datetime, value: {2, 11, 13, 328904}, sec: []))
+    content = safe_to_string(time_select(:search, :datetime, value: {2, 11, 13, 328904}, second: []))
     assert content =~ ~s(<option selected="selected" value="2">02</option>)
     assert content =~ ~s(<option selected="selected" value="11">11</option>)
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
 
     content = safe_to_string(time_select(:search, :datetime,
-                                      value: %{hour: 2, min: 11, sec: 13}, sec: []))
+                                      value: %{hour: 2, minute: 11, second: 13}, second: []))
     assert content =~ ~s(<option selected="selected" value="2">02</option>)
     assert content =~ ~s(<option selected="selected" value="11">11</option>)
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
 
     content = safe_to_string(time_select(:search, :datetime, hour: [prompt: "Hour"],
-                                               min: [prompt: "Minute"], sec: [prompt: "Second"]))
+                                               minute: [prompt: "Minute"], second: [prompt: "Second"]))
     assert content =~ ~s(<select id="search_datetime_hour" name="search[datetime][hour]">) <>
                       ~s(<option value="">Hour</option>)
-    assert content =~ ~s(<select id="search_datetime_min" name="search[datetime][min]">) <>
+    assert content =~ ~s(<select id="search_datetime_minute" name="search[datetime][minute]">) <>
                       ~s(<option value="">Minute</option>)
-    assert content =~ ~s(<select id="search_datetime_sec" name="search[datetime][sec]">) <>
+    assert content =~ ~s(<select id="search_datetime_second" name="search[datetime][second]">) <>
                       ~s(<option value="">Second</option>)
   end
 
   test "time_select/4 with form" do
-    content = safe_form(&time_select(&1, :datetime, default: {1, 2, 3}, sec: []))
+    content = safe_form(&time_select(&1, :datetime, default: {1, 2, 3}, second: []))
     assert content =~ ~s(<select id="search_datetime_hour" name="search[datetime][hour]">)
-    assert content =~ ~s(<select id="search_datetime_min" name="search[datetime][min]">)
-    assert content =~ ~s(<select id="search_datetime_sec" name="search[datetime][sec]">)
+    assert content =~ ~s(<select id="search_datetime_minute" name="search[datetime][minute]">)
+    assert content =~ ~s(<select id="search_datetime_second" name="search[datetime][second]">)
     assert content =~ ~s(<option selected="selected" value="2">02</option>)
     assert content =~ ~s(<option selected="selected" value="11">11</option>)
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
     assert content =~ ~s(<option value="1">01</option><option value="2">02</option>)
 
-    content = safe_form(&time_select(&1, :unknown, default: {1, 2, 3}, sec: []))
+    content = safe_form(&time_select(&1, :unknown, default: {1, 2, 3}, second: []))
     assert content =~ ~s(<option selected="selected" value="1">01</option>)
     assert content =~ ~s(<option selected="selected" value="2">02</option>)
     assert content =~ ~s(<option selected="selected" value="3">03</option>)
 
-    content = safe_form(&time_select(&1, :datetime, value: {1, 2, 3}, sec: []))
+    content = safe_form(&time_select(&1, :datetime, value: {1, 2, 3}, second: []))
     assert content =~ ~s(<option selected="selected" value="1">01</option>)
     assert content =~ ~s(<option selected="selected" value="2">02</option>)
     assert content =~ ~s(<option selected="selected" value="3">03</option>)
@@ -625,19 +625,19 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<select id="search_datetime_month" name="search[datetime][month]">)
     assert content =~ ~s(<select id="search_datetime_day" name="search[datetime][day]">)
     assert content =~ ~s(<select id="search_datetime_hour" name="search[datetime][hour]">)
-    assert content =~ ~s(<select id="search_datetime_min" name="search[datetime][min]">)
-    refute content =~ ~s(<select id="search_datetime_sec" name="search[datetime][sec]">)
+    assert content =~ ~s(<select id="search_datetime_minute" name="search[datetime][minute]">)
+    refute content =~ ~s(<select id="search_datetime_second" name="search[datetime][second]">)
 
-    content = safe_to_string(datetime_select(:search, :datetime, sec: []))
+    content = safe_to_string(datetime_select(:search, :datetime, second: []))
     assert content =~ ~s(<select id="search_datetime_year" name="search[datetime][year]">)
     assert content =~ ~s(<select id="search_datetime_month" name="search[datetime][month]">)
     assert content =~ ~s(<select id="search_datetime_day" name="search[datetime][day]">)
     assert content =~ ~s(<select id="search_datetime_hour" name="search[datetime][hour]">)
-    assert content =~ ~s(<select id="search_datetime_min" name="search[datetime][min]">)
-    assert content =~ ~s(<select id="search_datetime_sec" name="search[datetime][sec]">)
+    assert content =~ ~s(<select id="search_datetime_minute" name="search[datetime][minute]">)
+    assert content =~ ~s(<select id="search_datetime_second" name="search[datetime][second]">)
 
     content = safe_to_string(datetime_select(:search, :datetime,
-                                          value: {{2020, 04, 17}, {2, 11, 13}}, sec: []))
+                                          value: {{2020, 04, 17}, {2, 11, 13}}, second: []))
     assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
     assert content =~ ~s(<option selected="selected" value="4">April</option>)
     assert content =~ ~s(<option selected="selected" value="17">17</option>)
@@ -646,7 +646,7 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
 
     content = safe_to_string(datetime_select(:search, :datetime,
-                                          value: {{2020, 04, 17}, {2, 11, 13, 328904}}, sec: []))
+                                          value: {{2020, 04, 17}, {2, 11, 13, 328904}}, second: []))
     assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
     assert content =~ ~s(<option selected="selected" value="4">April</option>)
     assert content =~ ~s(<option selected="selected" value="17">17</option>)
@@ -656,7 +656,7 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "datetime_select/4 with form" do
-    content = safe_form(&datetime_select(&1, :datetime, default: {{2020, 10, 13}, {1, 2, 3}}, sec: []))
+    content = safe_form(&datetime_select(&1, :datetime, default: {{2020, 10, 13}, {1, 2, 3}}, second: []))
     assert content =~ ~s(<select id="search_datetime_year" name="search[datetime][year]">)
     assert content =~ ~s(<select id="search_datetime_month" name="search[datetime][month]">)
     assert content =~ ~s(<select id="search_datetime_day" name="search[datetime][day]">)
@@ -665,13 +665,13 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option selected="selected" value="17">17</option>)
 
     assert content =~ ~s(<select id="search_datetime_hour" name="search[datetime][hour]">)
-    assert content =~ ~s(<select id="search_datetime_min" name="search[datetime][min]">)
-    assert content =~ ~s(<select id="search_datetime_sec" name="search[datetime][sec]">)
+    assert content =~ ~s(<select id="search_datetime_minute" name="search[datetime][minute]">)
+    assert content =~ ~s(<select id="search_datetime_second" name="search[datetime][second]">)
     assert content =~ ~s(<option selected="selected" value="2">02</option>)
     assert content =~ ~s(<option selected="selected" value="11">11</option>)
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
 
-    content = safe_form(&datetime_select(&1, :unknown, default: {{2020, 10, 13}, {1, 2, 3}}, sec: []))
+    content = safe_form(&datetime_select(&1, :unknown, default: {{2020, 10, 13}, {1, 2, 3}}, second: []))
     assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
     assert content =~ ~s(<option selected="selected" value="10">October</option>)
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
@@ -679,7 +679,7 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option selected="selected" value="2">02</option>)
     assert content =~ ~s(<option selected="selected" value="3">03</option>)
 
-    content = safe_form(&datetime_select(&1, :datetime, value: {{2020, 10, 13}, {1, 2, 3}}, sec: []))
+    content = safe_form(&datetime_select(&1, :datetime, value: {{2020, 10, 13}, {1, 2, 3}}, second: []))
     assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
     assert content =~ ~s(<option selected="selected" value="10">October</option>)
     assert content =~ ~s(<option selected="selected" value="13">13</option>)
@@ -694,21 +694,21 @@ defmodule Phoenix.HTML.FormTest do
                    "Month: ", b.(:month, class: "month"),
                    "Day: ",   b.(:day, class: "day"),
                    "Hour: ",  b.(:hour, class: "hour"),
-                   "Min: ",   b.(:min, class: "min"),
-                   "Sec: ",   b.(:sec, class: "sec")]
+                   "Min: ",   b.(:minute, class: "min"),
+                   "Sec: ",   b.(:second, class: "sec")]
     end
 
     content = safe_to_string(datetime_select(:search, :datetime, builder: builder,
                                              year: [id: "year"], month: [id: "month"],
                                              day: [id: "day"], hour: [id: "hour"],
-                                             min: [id: "min"], sec: [id: "sec"]))
+                                             minute: [id: "min"], second: [id: "sec"]))
 
     assert content =~ ~s(Year: <select class="year" id="year" name="search[datetime][year]">)
     assert content =~ ~s(Month: <select class="month" id="month" name="search[datetime][month]">)
     assert content =~ ~s(Day: <select class="day" id="day" name="search[datetime][day]">)
     assert content =~ ~s(Hour: <select class="hour" id="hour" name="search[datetime][hour]">)
-    assert content =~ ~s(Min: <select class="min" id="min" name="search[datetime][min]">)
-    assert content =~ ~s(Sec: <select class="sec" id="sec" name="search[datetime][sec]">)
+    assert content =~ ~s(Min: <select class="min" id="min" name="search[datetime][minute]">)
+    assert content =~ ~s(Sec: <select class="sec" id="sec" name="search[datetime][second]">)
   end
 
   ## label/4

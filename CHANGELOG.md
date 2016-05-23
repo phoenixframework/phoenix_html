@@ -1,9 +1,10 @@
 # Changelog
 
-## v2.5.2-dev
+## v2.6.0-dev
 
 * Enhancements
-  * Raise helpful error when using invalid iodata.
+  * Raise helpful error when using invalid iodata
+  * Inline time API with Elixir v1.3 time type
 
 ## v2.5.1 (2016-03-12)
 

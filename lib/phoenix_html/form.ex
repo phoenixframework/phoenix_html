@@ -801,20 +801,20 @@ defmodule Phoenix.HTML.Form do
           <select id="user_born_at_month" name="user[born_at][month]">...</select> /
           <select id="user_born_at_day" name="user[born_at][day]">...</select> —
           <select id="user_born_at_hour" name="user[born_at][hour]">...</select> :
-          <select id="user_born_at_min" name="user[born_at][min]">...</select>
+          <select id="user_born_at_min" name="user[born_at][minute]">...</select>
 
-  If you want to include the seconds field (hidden by default), pass `sec: []`:
+  If you want to include the seconds field (hidden by default), pass `second: []`:
 
       # Assuming form contains a User schema
-      datetime_select form, :born_at, sec: []
+      datetime_select form, :born_at, second: []
 
   If you want to configure the years range:
 
       # Assuming form contains a User schema
       datetime_select form, :born_at, year: [options: 1900..2100]
 
-  You are also able to configure `:month`, `:day`, `:hour`, `:min` and
-  `:sec`. All options given to those keys will be forwarded to the
+  You are also able to configure `:month`, `:day`, `:hour`, `:minute` and
+  `:second`. All options given to those keys will be forwarded to the
   underlying select. See `select/4` for more information.
 
   ## Options
@@ -825,7 +825,7 @@ defmodule Phoenix.HTML.Form do
     * `:default` - the default value to use when none was given in
       `:value` and none is available in the form data
 
-    * `:year`, `:month`, `:day`, `:hour`, `:min`, `:sec` - options passed
+    * `:year`, `:month`, `:day`, `:hour`, `:minute`, `:second` - options passed
       to the underlying select. See `select/4` for more information.
       The available values can be given in `:options`.
 
@@ -840,7 +840,7 @@ defmodule Phoenix.HTML.Form do
 
       <%= datetime_select form, :born_at, builder: fn b -> %>
         Date: <%= b.(:day, []) %> / <%= b.(:month, []) %> / <%= b.(:year, []) %>
-        Time: <%= b.(:hour, []) %> : <%= b.(:min, []) %>
+        Time: <%= b.(:hour, []) %> : <%= b.(:minute, []) %>
       <% end %>
 
   Although we have passed empty lists as options (they are required), you
@@ -854,7 +854,7 @@ defmodule Phoenix.HTML.Form do
         builder = fn b ->
           ~e"\""
           Date: <%= b.(:day, []) %> / <%= b.(:month, []) %> / <%= b.(:year, []) %>
-          Time: <%= b.(:hour, []) %> : <%= b.(:min, []) %>
+          Time: <%= b.(:hour, []) %> : <%= b.(:minute, []) %>
           "\""
         end
 
@@ -937,31 +937,37 @@ defmodule Phoenix.HTML.Form do
   end
 
   defp time_builder(b, opts) do
-    time = html_escape [b.(:hour, []), raw(" : "), b.(:min, [])]
+    time = html_escape [b.(:hour, []), raw(" : "), b.(:minute, [])]
 
-    if Keyword.get(opts, :sec) do
-      html_escape [time, raw(" : "), b.(:sec, [])]
+    if Keyword.get(opts, :second) do
+      html_escape [time, raw(" : "), b.(:second, [])]
     else
       time
     end
   end
 
+  defp time_value(%{"hour" => hour, "minute" => min} = map),
+    do: %{hour: hour, minute: min, second: Map.get(map, "second", 0)}
+  defp time_value(%{hour: hour, minute: min} = map),
+    do: %{hour: hour, minute: min, second: Map.get(map, :second, 0)}
+
+  # Backwards compatibility with Ecto v1.1 versions
   defp time_value(%{"hour" => hour, "min" => min} = map),
-    do: %{hour: hour, min: min, sec: Map.get(map, "sec", 0)}
+    do: %{hour: hour, minute: min, second: Map.get(map, "sec", 0)}
   defp time_value(%{hour: hour, min: min} = map),
-    do: %{hour: hour, min: min, sec: Map.get(map, :sec, 0)}
+    do: %{hour: hour, minute: min, second: Map.get(map, :sec, 0)}
 
   defp time_value({_, {hour, min, sec, _msec}}),
-    do: %{hour: hour, min: min, sec: sec}
+    do: %{hour: hour, minute: min, second: sec}
   defp time_value({hour, min, sec, _mseg}),
-    do: %{hour: hour, min: min, sec: sec}
+    do: %{hour: hour, minute: min, second: sec}
   defp time_value({_, {hour, min, sec}}),
-    do: %{hour: hour, min: min, sec: sec}
+    do: %{hour: hour, minute: min, second: sec}
   defp time_value({hour, min, sec}),
-    do: %{hour: hour, min: min, sec: sec}
+    do: %{hour: hour, minute: min, second: sec}
 
   defp time_value(nil),
-    do: %{hour: nil, min: nil, sec: nil}
+    do: %{hour: nil, minute: nil, second: nil}
   defp time_value(other),
     do: raise(ArgumentError, "unrecognized time #{inspect other}")
 
@@ -1007,12 +1013,12 @@ defmodule Phoenix.HTML.Form do
       :hour, opts when time != nil ->
         {value, opts} = datetime_options(:hour, @hours, id, name, parent, time, opts)
         select(:datetime, :hour, value, opts)
-      :min, opts when time != nil ->
-        {value, opts} = datetime_options(:min, @minsec, id, name, parent, time, opts)
-        select(:datetime, :min, value, opts)
-      :sec, opts when time != nil ->
-        {value, opts} = datetime_options(:sec, @minsec, id, name, parent, time, opts)
-        select(:datetime, :sec, value, opts)
+      :minute, opts when time != nil ->
+        {value, opts} = datetime_options(:minute, @minsec, id, name, parent, time, opts)
+        select(:datetime, :minute, value, opts)
+      :second, opts when time != nil ->
+        {value, opts} = datetime_options(:second, @minsec, id, name, parent, time, opts)
+        select(:datetime, :second, value, opts)
     end
   end
 
