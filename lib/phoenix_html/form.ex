@@ -1106,24 +1106,24 @@ defmodule Phoenix.HTML.Form do
   The `form` should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
 
-  When a form is given, the value will be first looked up in
+  When a form is given, the value will first be looked up in
   `params`, then fallback to the optional `default` argument.
-  If none are available, it will try to fetch the value from the
-  form data.
+  If no `default` argument is provided, it will try to fetch
+  the value from the form data.
 
-  Always returns `selected` if a given form is an atom.
+  Always returns `default` if a given form is an atom.
   """
-  def field_value(form, field, selected \\ nil)
+  def field_value(form, field, default \\ nil)
 
-  def field_value(%{data: data, params: params}, field, selected) do
+  def field_value(%{data: data, params: params}, field, default) do
     case Map.fetch(params, Atom.to_string(field)) do
       {:ok, value} -> value
-      :error -> selected || Map.get(data, field)
+      :error -> default || Map.get(data, field)
     end
   end
 
-  def field_value(name, _field, selected) when is_atom(name),
-    do: selected
+  def field_value(name, _field, default) when is_atom(name),
+    do: default
 
   @doc """
   Returns an id of a corresponding form field.
