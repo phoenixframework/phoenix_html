@@ -657,6 +657,11 @@ defmodule Phoenix.HTML.Form do
   (like a regular list or a map) or any Enumerable where the element
   will be used both as key and value for the generated select.
 
+  ## Optgroups
+
+  When a two-item tuple contains a list as its value,
+  the options will be wrapped in an `<optroup>` using the key as its label.
+
   ## Examples
 
       # Assuming form contains a User schema
@@ -678,6 +683,16 @@ defmodule Phoenix.HTML.Form do
           <option value="">Choose your role</option>
           <option value="admin">Admin</option>
           <option value="user">User</option>
+          </select>
+
+      select(form, :country, %{"Europe" => ["UK", "Sweden", "France"], …})
+      #=> <select id="user_country" name="user[country]">
+          <optgroup label="Europe">
+            <option>UK</option>
+            <option>Sweden</option>
+            <option>France</option>
+          </optgroup>
+          ...
           </select>
 
   ## Options
@@ -714,22 +729,30 @@ defmodule Phoenix.HTML.Form do
   defp options_for_select(values, options, value) do
     Enum.reduce values, options, fn
       {option_key, option_value}, acc ->
-        option_key   = html_escape(option_key)
-        option_value = html_escape(option_value)
         option(option_key, option_value, value, acc)
       option, acc ->
-        option = html_escape(option)
         option(option, option, value, acc)
     end
   end
 
-  defp option(option_key, option_value, values, acc) when is_list(values) do
-    opts = [value: option_value, selected: option_value in values]
-    html_escape [acc|content_tag(:option, option_key, opts)]
+  defp option(group_label, group_values, value, acc) when is_list(group_values) do
+    section_options = options_for_select(group_values, [], value)
+    tag = content_tag(:optgroup, section_options, label: group_label)
+    html_escape [acc|tag]
   end
 
   defp option(option_key, option_value, value, acc) do
-    opts = [value: option_value, selected: value == option_value]
+    option_key   = html_escape(option_key)
+    option_value = html_escape(option_value)
+
+    selected =
+      if is_list(value) do
+        option_value in value
+      else
+        value == option_value
+      end
+
+    opts = [value: option_value, selected: selected]
     html_escape [acc|content_tag(:option, option_key, opts)]
   end
 
