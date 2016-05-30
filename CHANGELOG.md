@@ -5,6 +5,11 @@
 * Enhancements
   * Raise helpful error when using invalid iodata
   * Inline time API with Elixir v1.3 time type
+  * Add `:insert_brs` option to `text_to_html/2`
+
+* Client-side changes
+  * Use event delegation in `phoenix_html.js`
+  * Drop IE8 support on `phoenix_html.js`
 
 ## v2.5.1 (2016-03-12)
 
