@@ -44,7 +44,7 @@ defimpl Phoenix.HTML.Safe, for: List do
   end
   def to_iodata(h) when is_integer(h) do
     raise ArgumentError,
-      "lists in Phoenix.HTML templates only support iodata, and not chardata. Integers may only represents bytes. " <>
+      "lists in Phoenix.HTML templates only support iodata, and not chardata. Integers may only represent bytes. " <>
       "It's likely you meant to pass a string with double quotes instead of a char list with single quotes."
   end
 
