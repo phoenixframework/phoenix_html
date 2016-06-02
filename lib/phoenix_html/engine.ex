@@ -4,6 +4,12 @@ defmodule Phoenix.HTML.Engine do
   templates are HTML Safe.
   """
 
+  @anno (if :erlang.system_info(:otp_release) >= '19' do
+    [generated: true]
+  else
+    [line: -1]
+  end)
+
   use EEx.Engine
 
   @doc false
@@ -68,7 +74,7 @@ defmodule Phoenix.HTML.Engine do
     fallback = quote line: line, do: Phoenix.HTML.Safe.to_iodata(other)
 
     # However ignore them for the generated clauses to avoid warnings
-    quote line: -1 do
+    quote @anno do
       case unquote(expr) do
         {:safe, data} -> data
         bin when is_binary(bin) -> Plug.HTML.html_escape(bin)
