@@ -1,11 +1,12 @@
 # Changelog
 
-## v2.6.0-dev
+## v2.6.0 (2016-06-16)
 
 * Enhancements
   * Raise helpful error when using invalid iodata
-  * Inline time API with Elixir v1.3 time type
+  * Inline date/time API with Elixir v1.3 Calendar types
   * Add `:insert_brs` option to `text_to_html/2`
+  * Run on Erlang 19 without warnings
 
 * Client-side changes
   * Use event delegation in `phoenix_html.js`
