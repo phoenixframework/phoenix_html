@@ -7,11 +7,11 @@ defmodule PhoenixHtml.Mixfile do
     [app: :phoenix_html,
      version: @version,
      elixir: "~> 1.0",
-     deps: deps,
+     deps: deps(),
 
      name: "Phoenix.HTML",
      description: "Phoenix.HTML functions for working with HTML strings and templates",
-     package: package,
+     package: package(),
      docs: [source_ref: "v#{@version}", main: "Phoenix.HTML",
             source_url: "https://github.com/phoenixframework/phoenix_html"]]
   end
