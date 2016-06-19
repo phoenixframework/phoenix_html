@@ -12,6 +12,9 @@
   * Use event delegation in `phoenix_html.js`
   * Drop IE8 support on `phoenix_html.js`
 
+* Backwards incompatible changes
+  * `:min`, `:sec` option in `Phoenix.HTML.Form` (`datetime_select/3` and `time_select/3`) are no longer supported. Use `:minute` or `:second` instead.
+
 ## v2.5.1 (2016-03-12)
 
 * Bug fixes
