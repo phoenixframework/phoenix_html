@@ -86,6 +86,8 @@ defmodule Phoenix.HTML.Engine do
   defp expr(expr) do
     Macro.prewalk(expr, &handle_assign/1)
   end
+
+  # TODO: Use EEx assign implementation
   defp handle_assign({:@, meta, [{name, _, atom}]}) when is_atom(name) and is_atom(atom) do
     quote line: meta[:line] || 0 do
       Phoenix.HTML.Engine.fetch_assign(var!(assigns), unquote(name))
