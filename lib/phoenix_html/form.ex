@@ -513,22 +513,20 @@ defmodule Phoenix.HTML.Form do
   end
 
   @doc """
-  Generates a submit input to send the form.
+  Generates a submit button to send the form.
 
-  All options are forwarded to the underlying input tag.
+  All options are forwarded to the underlying button tag.
 
   ## Examples
 
       submit "Submit"
-      #=> <input type="submit" value="Submit">
+      #=> <button type="submit">Submit</button>
 
   """
   def submit(value, opts \\ []) do
-    opts =
-      opts
-      |> Keyword.put_new(:type, "submit")
-      |> Keyword.put_new(:value, value)
-    tag(:input, opts)
+    opts = Keyword.put_new(opts, :type, "submit")
+
+    content_tag(:button, html_escape(value), opts)
   end
 
   @doc """
