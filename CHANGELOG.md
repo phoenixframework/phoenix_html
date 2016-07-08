@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.6.1 (2016-07-08)
+
+* Enhancements
+  * Remove warnings on v1.4
+
+* Bug fixes
+  * Ensure some contents are properly escaped as an integer
+  * Ensure JavaScript data-submit events bubble up until it finds the proper parent
+
 ## v2.6.0 (2016-06-16)
 
 * Enhancements
