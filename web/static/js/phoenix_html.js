@@ -10,11 +10,11 @@ function didHandleSubmitLinkClick(element) {
     if(isLinkToSubmitParent(element)) {
       var message = element.getAttribute('data-confirm');
       if (message === null || confirm(message)) {
-        element.parentNode.submit();
+        element.parentElement.submit();
       };
       return true;
     } else {
-      element = element.parentNode;
+      element = element.parentElement;
     }
   }
   return false;

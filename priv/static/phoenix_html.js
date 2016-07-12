@@ -8,7 +8,7 @@ function isLinkToSubmitParent(element) {
 }
 
 function didHandleSubmitLinkClick(element) {
-  while (element) {
+  while (element && element.getAttribute) {
     if (isLinkToSubmitParent(element)) {
       var message = element.getAttribute('data-confirm');
       if (message === null || confirm(message)) {
