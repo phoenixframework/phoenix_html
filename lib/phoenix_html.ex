@@ -38,7 +38,7 @@ defmodule Phoenix.HTML do
   Keep in mind most helpers will automatically escape your data
   and return safe content:
 
-      <%= tag :p, "<hello>" %>
+      <%= content_tag :p, "<hello>" %>
 
   will properly output:
 
