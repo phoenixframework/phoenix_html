@@ -6,15 +6,15 @@ function isLinkToSubmitParent(element) {
 }
 
 function didHandleSubmitLinkClick(element) {
-  while(element) {
+  while(element && element.getAttribute) {
     if(isLinkToSubmitParent(element)) {
       var message = element.getAttribute('data-confirm');
       if (message === null || confirm(message)) {
-        element.parentElement.submit();
+        element.parentNode.submit();
       };
       return true;
     } else {
-      element = element.parentElement;
+      element = element.parentNode;
     }
   }
   return false;
