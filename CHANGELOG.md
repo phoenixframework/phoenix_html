@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.6.2 (2016-07-15)
+
+* Bug fixes
+  * Ensure JavaScript works on Phantom.js
+
 ## v2.6.1 (2016-07-08)
 
 * Enhancements
