@@ -1,6 +1,13 @@
-function didHandleSubmitLinkClick(element){
-  while(element) {
-    if(element.matches && element.matches('a[data-submit=parent]')){
+function isLinkToSubmitParent(element) {
+  var isLinkTag = element.tagName === 'A';
+  var shouldSubmitParent = element.getAttribute('data-submit') === 'parent';
+
+  return isLinkTag && shouldSubmitParent;
+}
+
+function didHandleSubmitLinkClick(element) {
+  while(element && element.getAttribute) {
+    if(isLinkToSubmitParent(element)) {
       var message = element.getAttribute('data-confirm');
       if (message === null || confirm(message)) {
         element.parentNode.submit();
