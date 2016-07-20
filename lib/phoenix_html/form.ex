@@ -755,12 +755,12 @@ defmodule Phoenix.HTML.Form do
           <option value="2">Power User</option>
           </select>
 
-  When working with structs, associations and embeds, you will need tell
+  When working with structs, associations and embeds, you will need to tell
   Phoenix how to extract the value out of the collection. For example,
   imagine `user.roles` is a list of `%Role{}` structs. You must call it as:
 
       multiple_select(form, :roles, ["Admin": 1, "Power User": 2],
-                      selected: Enum.map(@user.roles, & &1.id))
+                      selected: Enum.map(@user.roles, &(&1.id))
 
   The `:selected` option will mark the given IDs as selected unless the form
   is being resubmitted. When resubmitted, it uses the form params as values.
