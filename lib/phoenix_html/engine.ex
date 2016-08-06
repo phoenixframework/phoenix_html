@@ -87,7 +87,6 @@ defmodule Phoenix.HTML.Engine do
     Macro.prewalk(expr, &handle_assign/1)
   end
 
-  # TODO: Use EEx assign implementation
   defp handle_assign({:@, meta, [{name, _, atom}]}) when is_atom(name) and is_atom(atom) do
     quote line: meta[:line] || 0 do
       Phoenix.HTML.Engine.fetch_assign(var!(assigns), unquote(name))
@@ -97,16 +96,10 @@ defmodule Phoenix.HTML.Engine do
 
   @doc false
   def fetch_assign(assigns, key) do
-    case {key, Dict.fetch(assigns, key)} do
-      {:inner, :error} ->
-        raise ArgumentError, message: """
-        @inner has been removed in favor of explicit rendering with
-        @view_module and @view_template assigns. Update your
-        `<%= @inner %>` code to use `render/3`:
-
-            <%= render @view_module, @view_template, assigns %>
-        """
-      {_, :error} ->
+    case Access.fetch(assigns, key) do
+      {:ok, val} ->
+        val
+      :error ->
         raise ArgumentError, message: """
         assign @#{key} not available in eex template.
 
@@ -114,9 +107,8 @@ defmodule Phoenix.HTML.Engine do
         is a child template, ensure assigns are given explicitly by
         the parent template as they are not automatically forwarded.
 
-        Available assigns: #{inspect Dict.keys(assigns)}
+        Available assigns: #{inspect Enum.map(assigns, &elem(&1, 0))}
         """
-      {_, {:ok, val}} -> val
     end
   end
 end
