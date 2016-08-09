@@ -74,18 +74,31 @@ defmodule Phoenix.HTML.Link do
   def link(text, opts) do
     {to, opts} = Keyword.pop(opts, :to)
     {method, opts} = Keyword.pop(opts, :method, :get)
+    {remote, opts} = Keyword.pop(opts, :remote, false)
 
     unless to do
       raise ArgumentError, "expected non-nil value for :to in link/2, got: #{inspect to}"
     end
 
     if method == :get do
+      if remote do
+        opts = Keyword.put(opts, :"data-remote", "true")
+      end
       content_tag(:a, text, [href: to] ++ opts)
     else
-      opts = Keyword.put_new(opts, :rel, "nofollow")
-      {form, opts} = form_options(opts, method, "link")
+      {form, opts} = form_options(opts, method, "link", remote)
       form_tag(to, form) do
-        content_tag(:a, text, [href: "#", data: [submit: "parent"]] ++ opts)
+        if remote do
+          opts =
+            opts
+            |> Keyword.put_new(:to, to)
+            |> Keyword.put_new(:type, "submit")
+            |> Keyword.put_new(:value, text)
+          tag(:input, opts)
+        else
+          opts = Keyword.put_new(opts, :rel, "nofollow")
+          content_tag(:a, text, [href: "#", data: [submit: "parent"]] ++ opts)
+        end
       end
     end
   end
@@ -152,13 +165,14 @@ defmodule Phoenix.HTML.Link do
     end
   end
 
-  defp form_options(opts, method, class) do
+  defp form_options(opts, method, class, remote \\ false) do
     {form, opts} = Keyword.pop(opts, :form, [])
 
     form =
       form
       |> Keyword.put_new(:class, class)
       |> Keyword.put_new(:method, method)
+      |> Keyword.put_new(:remote, remote)
       |> Keyword.put_new(:enforce_utf8, false)
 
     {form, opts}

@@ -25,12 +25,27 @@ defmodule Phoenix.HTML.LinkTest do
            ~s[</form>]
   end
 
+  test "link with post remote" do
+    csrf_token = Plug.CSRFProtection.get_csrf_token()
+
+    assert safe_to_string(link("hello", to: "/world", method: :post, remote: true)) ==
+           ~s[<form action="/world" class="link" data-remote="true" method="post">] <>
+           ~s[<input name="_csrf_token" type="hidden" value="#{csrf_token}">] <>
+           ~s[<input to="/world" type="submit" value="hello">] <>
+           ~s[</form>]
+  end
+
   test "link with :do contents" do
     assert ~s[<a href="/hello"><p>world</p></a>] == safe_to_string(link to: "/hello" do
       Phoenix.HTML.Tag.content_tag :p, "world"
     end)
 
     assert safe_to_string(link(to: "/hello", do: "world")) == ~s[<a href="/hello">world</a>]
+  end
+
+  test "link remote" do
+    assert safe_to_string(link "world", to: "/hello", remote: true) ==
+           ~s[<a data-remote="true" href="/hello">world</a>]
   end
 
   test "link with invalid args" do
