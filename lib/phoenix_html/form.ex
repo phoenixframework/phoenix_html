@@ -735,7 +735,7 @@ defmodule Phoenix.HTML.Form do
     end
   end
 
-  defp option(group_label, group_values, value, acc) when is_list(group_values) do
+  defp option(group_label, group_values, value, acc) when is_list(group_values) or is_map(group_values) do
     section_options = options_for_select(group_values, [], value)
     tag = content_tag(:optgroup, section_options, label: group_label)
     html_escape [acc|tag]

@@ -472,6 +472,30 @@ defmodule Phoenix.HTML.FormTest do
            ~s(<option value="quz">quz</option>) <>
            ~s(</optgroup>) <>
            ~s(</select>)
+
+    assert safe_form(&select(&1, :key, %{"foo" => %{"1" => "One", "2" => "Two"}, "qux" => ~w(qux quz)}, value: "qux")) ==
+           ~s(<select id="search_key" name="search[key]">) <>
+           ~s(<optgroup label="foo">) <>
+           ~s(<option value="One">1</option>) <>
+           ~s(<option value="Two">2</option>) <>
+           ~s(</optgroup>) <>
+           ~s(<optgroup label="qux">) <>
+           ~s(<option selected="selected" value="qux">qux</option>) <>
+           ~s(<option value="quz">quz</option>) <>
+           ~s(</optgroup>) <>
+           ~s(</select>)
+
+    assert safe_form(&select(&1, :key, %{"foo" => [{"1", "One"}, {"2", "Two"}], "qux" => ~w(qux quz)}, value: "qux")) ==
+           ~s(<select id="search_key" name="search[key]">) <>
+           ~s(<optgroup label="foo">) <>
+           ~s(<option value="One">1</option>) <>
+           ~s(<option value="Two">2</option>) <>
+           ~s(</optgroup>) <>
+           ~s(<optgroup label="qux">) <>
+           ~s(<option selected="selected" value="qux">qux</option>) <>
+           ~s(<option value="quz">quz</option>) <>
+           ~s(</optgroup>) <>
+           ~s(</select>)
   end
 
   # multiple_select/4
