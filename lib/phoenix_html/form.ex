@@ -659,7 +659,7 @@ defmodule Phoenix.HTML.Form do
 
   ## Optgroups
 
-  When a two-item tuple contains a list as its value,
+  When a two-item map contains a list as its value,
   the options will be wrapped in an `<optroup>` using the key as its label.
 
   ## Examples
