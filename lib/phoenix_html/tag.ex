@@ -49,18 +49,19 @@ defmodule Phoenix.HTML.Tag do
   Creates an HTML tag with given name, content, and attributes.
 
       iex> content_tag(:p, "Hello")
-      {:safe, ["<p>", "Hello", "</p>"]}
+      {:safe, [60, "p", "", 62, "Hello", 60, 47, "p", 62]}
       iex> content_tag(:p, "<Hello>", class: "test")
-      {:safe, ["<p class=\"test\">", "&lt;Hello&gt;", "</p>"]}
+      {:safe, [60, "p", " class=\"test\"", 62, "&lt;Hello&gt;", 60, 47, "p", 62]}
 
       iex> content_tag :p, class: "test" do
       ...>   "Hello"
       ...> end
-      {:safe, ["<p class=\"test\">", "Hello", "</p>"]}
+      {:safe, [60, "p", " class=\"test\"", 62, "Hello", 60, 47, "p", 62]}
   """
   def content_tag(name, [do: block]) when is_atom(name) do
     content_tag(name, block, [])
   end
+
   def content_tag(name, content) when is_atom(name) do
     content_tag(name, content, [])
   end
@@ -70,7 +71,9 @@ defmodule Phoenix.HTML.Tag do
   end
 
   def content_tag(name, content, attrs) when is_atom(name) and is_list(attrs) do
-    html_escape [tag(name, attrs), content, {:safe, "</#{name}>"}]
+    name = to_string(name)
+    {:safe, escaped} = html_escape(content)
+    {:safe, [?<, name, build_attrs(name, attrs), ?>, escaped, ?<, ?/, name, ?>]}
   end
 
   defp tag_attrs([]), do: ""
@@ -221,7 +224,7 @@ defmodule Phoenix.HTML.Tag do
   defp csrf_token_tag(opts, extra) do
     case Keyword.pop(opts, :csrf_token, true) do
       {true, opts} ->
-        {opts, extra <> ~s'<input name="_csrf_token" type="hidden" value="#{get_csrf_token}">'}
+        {opts, extra <> ~s'<input name="_csrf_token" type="hidden" value="#{get_csrf_token()}">'}
       {false, opts} ->
         {opts, extra}
     end

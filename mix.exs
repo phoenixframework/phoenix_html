@@ -1,17 +1,18 @@
 defmodule PhoenixHtml.Mixfile do
   use Mix.Project
 
-  @version "2.6.0"
+  # Also change package.json version
+  @version "2.7.0-dev"
 
   def project do
     [app: :phoenix_html,
      version: @version,
      elixir: "~> 1.0",
-     deps: deps,
+     deps: deps(),
 
      name: "Phoenix.HTML",
      description: "Phoenix.HTML functions for working with HTML strings and templates",
-     package: package,
+     package: package(),
      docs: [source_ref: "v#{@version}", main: "Phoenix.HTML",
             source_url: "https://github.com/phoenixframework/phoenix_html"]]
   end
@@ -21,11 +22,8 @@ defmodule PhoenixHtml.Mixfile do
   end
 
   defp deps do
-    [{:plug, "~> 0.13 or ~> 1.0"},
-
-     # Docs dependencies
-     {:earmark, "~> 0.1", only: :docs},
-     {:ex_doc, "~> 0.11", only: :docs}]
+    [{:plug, "~> 1.0"},
+     {:ex_doc, "~> 0.12", only: :docs}]
   end
 
   defp package do

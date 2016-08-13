@@ -24,6 +24,26 @@ defimpl Phoenix.HTML.Safe, for: BitString do
   defdelegate to_iodata(data), to: Plug.HTML, as: :html_escape
 end
 
+defimpl Phoenix.HTML.Safe, for: Time do
+  defdelegate to_iodata(data), to: Time, as: :to_string
+end
+
+defimpl Phoenix.HTML.Safe, for: Date do
+  defdelegate to_iodata(data), to: Date, as: :to_string
+end
+
+defimpl Phoenix.HTML.Safe, for: NaiveDateTime do
+  defdelegate to_iodata(data), to: NaiveDateTime, as: :to_string
+end
+
+defimpl Phoenix.HTML.Safe, for: DateTime do
+  def to_iodata(data) do
+    # Call escape in case someone can inject reserved
+    # characters in the timezone or its abbreviation
+    Plug.HTML.html_escape(DateTime.to_string(data))
+  end
+end
+
 defimpl Phoenix.HTML.Safe, for: List do
   def to_iodata([h|t]) do
     [to_iodata(h)|to_iodata(t)]
@@ -44,7 +64,7 @@ defimpl Phoenix.HTML.Safe, for: List do
   end
   def to_iodata(h) when is_integer(h) do
     raise ArgumentError,
-      "lists in Phoenix.HTML templates only support iodata, and not chardata. Integers may only represents bytes. " <>
+      "lists in Phoenix.HTML templates only support iodata, and not chardata. Integers may only represent bytes. " <>
       "It's likely you meant to pass a string with double quotes instead of a char list with single quotes."
   end
 

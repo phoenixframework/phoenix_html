@@ -19,12 +19,6 @@ defmodule Phoenix.HTML.EngineTest do
     end
   end
 
-  test "raises ArgumentError for @inner assign" do
-    assert_raise ArgumentError, ~r/@inner has been removed/s, fn ->
-      eval("<%= @inner %>", %{})
-    end
-  end
-
   defp eval(string, assigns) do
     {:safe, io} =
       EEx.eval_string(string, [assigns: assigns],

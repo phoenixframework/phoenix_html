@@ -314,10 +314,10 @@ defmodule Phoenix.HTML.FormTest do
 
   test "submit/2" do
     assert safe_to_string(submit("Submit")) ==
-          ~s(<input type="submit" value="Submit">)
+          ~s(<button type="submit">Submit</button>)
 
     assert safe_to_string(submit("Submit", class: "btn")) ==
-          ~s(<input class="btn" type="submit" value="Submit">)
+          ~s(<button class="btn" type="submit">Submit</button>)
   end
 
   ## reset/2

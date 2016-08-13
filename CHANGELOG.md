@@ -1,10 +1,33 @@
 # Changelog
 
-## v2.6.0-dev
+## v2.7.0-dev
+
+* Enhancements
+  * Use buttons for form submits
+
+## v2.6.1 (2016-07-08)
+
+* Enhancements
+  * Remove warnings on v1.4
+
+* Bug fixes
+  * Ensure some contents are properly escaped as an integer
+  * Ensure JavaScript data-submit events bubble up until it finds the proper parent
+
+## v2.6.0 (2016-06-16)
 
 * Enhancements
   * Raise helpful error when using invalid iodata
-  * Inline time API with Elixir v1.3 time type
+  * Inline date/time API with Elixir v1.3 Calendar types
+  * Add `:insert_brs` option to `text_to_html/2`
+  * Run on Erlang 19 without warnings
+
+* Client-side changes
+  * Use event delegation in `phoenix_html.js`
+  * Drop IE8 support on `phoenix_html.js`
+
+* Backwards incompatible changes
+  * `:min`, `:sec` option in `Phoenix.HTML.Form` (`datetime_select/3` and `time_select/3`) are no longer supported. Use `:minute` or `:second` instead.
 
 ## v2.5.1 (2016-03-12)
 

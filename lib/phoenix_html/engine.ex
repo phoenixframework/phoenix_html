@@ -4,6 +4,12 @@ defmodule Phoenix.HTML.Engine do
   templates are HTML Safe.
   """
 
+  @anno (if :erlang.system_info(:otp_release) >= '19' do
+    [generated: true]
+  else
+    [line: -1]
+  end)
+
   use EEx.Engine
 
   @doc false
@@ -68,7 +74,7 @@ defmodule Phoenix.HTML.Engine do
     fallback = quote line: line, do: Phoenix.HTML.Safe.to_iodata(other)
 
     # However ignore them for the generated clauses to avoid warnings
-    quote line: -1 do
+    quote @anno do
       case unquote(expr) do
         {:safe, data} -> data
         bin when is_binary(bin) -> Plug.HTML.html_escape(bin)
@@ -80,6 +86,7 @@ defmodule Phoenix.HTML.Engine do
   defp expr(expr) do
     Macro.prewalk(expr, &handle_assign/1)
   end
+
   defp handle_assign({:@, meta, [{name, _, atom}]}) when is_atom(name) and is_atom(atom) do
     quote line: meta[:line] || 0 do
       Phoenix.HTML.Engine.fetch_assign(var!(assigns), unquote(name))
@@ -89,16 +96,10 @@ defmodule Phoenix.HTML.Engine do
 
   @doc false
   def fetch_assign(assigns, key) do
-    case {key, Dict.fetch(assigns, key)} do
-      {:inner, :error} ->
-        raise ArgumentError, message: """
-        @inner has been removed in favor of explicit rendering with
-        @view_module and @view_template assigns. Update your
-        `<%= @inner %>` code to use `render/3`:
-
-            <%= render @view_module, @view_template, assigns %>
-        """
-      {_, :error} ->
+    case Access.fetch(assigns, key) do
+      {:ok, val} ->
+        val
+      :error ->
         raise ArgumentError, message: """
         assign @#{key} not available in eex template.
 
@@ -106,9 +107,8 @@ defmodule Phoenix.HTML.Engine do
         is a child template, ensure assigns are given explicitly by
         the parent template as they are not automatically forwarded.
 
-        Available assigns: #{inspect Dict.keys(assigns)}
+        Available assigns: #{inspect Enum.map(assigns, &elem(&1, 0))}
         """
-      {_, {:ok, val}} -> val
     end
   end
 end

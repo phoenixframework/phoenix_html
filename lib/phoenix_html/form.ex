@@ -32,8 +32,8 @@ defmodule Phoenix.HTML.Form do
 
   where `User.changeset/2` is defined as follows:
 
-      def changeset(user, params \\ :empty) do
-        cast(user, params, ~w(name age), ~w())
+      def changeset(user, params \\ %{}) do
+        cast(user, params, [:name, :age])
       end
 
   Now a `@changeset` assign is available in views which we
@@ -205,8 +205,10 @@ defmodule Phoenix.HTML.Form do
 
   ## Options
 
-    * `:as` - the name to be used in the form. Automatically inflected
-      when a changeset is given
+    * `:as` - the server side parameter in which all params for this
+      form will be collected (i.e. `as: :user_params` would mean all fields
+      for this form will be accessed as `conn.params.user_params` server
+      side). Automatically inflected when a changeset is given.
 
     * `:method` - the HTTP method. If the method is not "get" nor "post",
       an input tag with name `_method` is generated along-side the form tag.
@@ -513,22 +515,20 @@ defmodule Phoenix.HTML.Form do
   end
 
   @doc """
-  Generates a submit input to send the form.
+  Generates a submit button to send the form.
 
-  All options are forwarded to the underlying input tag.
+  All options are forwarded to the underlying button tag.
 
   ## Examples
 
       submit "Submit"
-      #=> <input type="submit" value="Submit">
+      #=> <button type="submit">Submit</button>
 
   """
   def submit(value, opts \\ []) do
-    opts =
-      opts
-      |> Keyword.put_new(:type, "submit")
-      |> Keyword.put_new(:value, value)
-    tag(:input, opts)
+    opts = Keyword.put_new(opts, :type, "submit")
+
+    content_tag(:button, html_escape(value), opts)
   end
 
   @doc """
@@ -778,12 +778,12 @@ defmodule Phoenix.HTML.Form do
           <option value="2">Power User</option>
           </select>
 
-  When working with structs, associations and embeds, you will need tell
+  When working with structs, associations and embeds, you will need to tell
   Phoenix how to extract the value out of the collection. For example,
   imagine `user.roles` is a list of `%Role{}` structs. You must call it as:
 
       multiple_select(form, :roles, ["Admin": 1, "Power User": 2],
-                      selected: Enum.map(@user.roles, & &1.id))
+                      selected: Enum.map(@user.roles, &(&1.id))
 
   The `:selected` option will mark the given IDs as selected unless the form
   is being resubmitted. When resubmitted, it uses the form params as values.
@@ -1129,24 +1129,24 @@ defmodule Phoenix.HTML.Form do
   The `form` should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
 
-  When a form is given, the value will be first looked up in
+  When a form is given, the value will first be looked up in
   `params`, then fallback to the optional `default` argument.
-  If none are available, it will try to fetch the value from the
-  form data.
+  If no `default` argument is provided, it will try to fetch
+  the value from the form data.
 
-  Always returns `selected` if a given form is an atom.
+  Always returns `default` if a given form is an atom.
   """
-  def field_value(form, field, selected \\ nil)
+  def field_value(form, field, default \\ nil)
 
-  def field_value(%{data: data, params: params}, field, selected) do
+  def field_value(%{data: data, params: params}, field, default) do
     case Map.fetch(params, Atom.to_string(field)) do
       {:ok, value} -> value
-      :error -> selected || Map.get(data, field)
+      :error -> default || Map.get(data, field)
     end
   end
 
-  def field_value(name, _field, selected) when is_atom(name),
-    do: selected
+  def field_value(name, _field, default) when is_atom(name),
+    do: default
 
   @doc """
   Returns an id of a corresponding form field.

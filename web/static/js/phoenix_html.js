@@ -1,15 +1,29 @@
-// Although ^=parent is not technically correct,
-// we need to use it in order to get IE8 support.
-var elements = document.querySelectorAll('[data-submit^=parent]')
-var len = elements.length
+function isLinkToSubmitParent(element) {
+  var isLinkTag = element.tagName === 'A';
+  var shouldSubmitParent = element.getAttribute('data-submit') === 'parent';
 
-for (var i=0; i<len; ++i) {
-  elements[i].addEventListener('click', function(event){
-    var message = this.getAttribute("data-confirm")
-    if(message === null || confirm(message)){
-      this.parentNode.submit()
-    };
-    event.preventDefault()
-    return false
-  }, false)
+  return isLinkTag && shouldSubmitParent;
 }
+
+function didHandleSubmitLinkClick(element) {
+  while(element && element.getAttribute) {
+    if(isLinkToSubmitParent(element)) {
+      var message = element.getAttribute('data-confirm');
+      if (message === null || confirm(message)) {
+        element.parentNode.submit();
+      };
+      return true;
+    } else {
+      element = element.parentNode;
+    }
+  }
+  return false;
+}
+
+// for links with HTTP methods other than GET
+window.addEventListener('click', function (event) {
+  if(event.target && didHandleSubmitLinkClick(event.target)) {
+    event.preventDefault();
+    return false;
+  }
+}, false);

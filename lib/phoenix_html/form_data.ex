@@ -44,7 +44,7 @@ end
 defimpl Phoenix.HTML.FormData, for: Plug.Conn do
   def to_form(conn, opts) do
     {name, opts} = Keyword.pop(opts, :as)
-    name = to_string(name || warn_name(opts) || no_name_error!)
+    name = to_string(name || warn_name(opts) || no_name_error!())
 
     %Phoenix.HTML.Form{
       source: conn,

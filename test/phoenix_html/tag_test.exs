@@ -6,64 +6,67 @@ defmodule Phoenix.HTML.TagTest do
   doctest Phoenix.HTML.Tag
 
   test "tag" do
-    assert tag(:br) ==
-           {:safe, "<br>"}
+    assert tag(:br) |> safe_to_string() ==
+           ~s(<br>)
 
-    assert tag(:input, name: ~s("<3")) ==
-           {:safe, ~s(<input name="&quot;&lt;3&quot;">)}
+    assert tag(:input, name: ~s("<3")) |> safe_to_string() ==
+           ~s(<input name="&quot;&lt;3&quot;">)
 
-    assert tag(:input, name: raw "<3") ==
-           {:safe, ~s(<input name="<3">)}
+    assert tag(:input, name: raw "<3") |> safe_to_string() ==
+           ~s(<input name="<3">)
 
-    assert tag(:input, name: :hello) ==
-           {:safe, ~s(<input name="hello">)}
+    assert tag(:input, name: :hello) |> safe_to_string() ==
+           ~s(<input name="hello">)
 
-    assert tag(:input, type: "text", name: "user_id") ==
-           {:safe, ~s(<input name="user_id" type="text">)}
+    assert tag(:input, type: "text", name: "user_id") |> safe_to_string() ==
+           ~s(<input name="user_id" type="text">)
 
-    assert tag(:input, data: [toggle: "dropdown"]) ==
-           {:safe, ~s(<input data-toggle="dropdown">)}
+    assert tag(:input, data: [toggle: "dropdown"]) |> safe_to_string() ==
+           ~s(<input data-toggle="dropdown">)
 
-    assert tag(:input, my_attr: "blah") ==
-           {:safe, ~s(<input my-attr="blah">)}
+    assert tag(:input, my_attr: "blah") |> safe_to_string() ==
+           ~s(<input my-attr="blah">)
 
-    assert tag(:input, data: [my_attr: "blah"]) ==
-           {:safe, ~s(<input data-my-attr="blah">)}
+    assert tag(:input, data: [my_attr: "blah"]) |> safe_to_string() ==
+           ~s(<input data-my-attr="blah">)
 
-    assert tag(:input, data: [toggle: [target: "#parent", attr: "blah"]]) ==
-           {:safe, ~s(<input data-toggle-attr="blah" data-toggle-target="#parent">)}
+    assert tag(:input, data: [toggle: [target: "#parent", attr: "blah"]]) |> safe_to_string() ==
+           ~s(<input data-toggle-attr="blah" data-toggle-target="#parent">)
 
-    assert tag(:audio, autoplay: true) ==
-           {:safe, ~s(<audio autoplay="autoplay">)}
+    assert tag(:audio, autoplay: true) |> safe_to_string() ==
+           ~s(<audio autoplay="autoplay">)
 
-    assert tag(:audio, autoplay: false) ==
-           {:safe, ~s(<audio>)}
+    assert tag(:audio, autoplay: false) |> safe_to_string() ==
+           ~s(<audio>)
 
-    assert tag(:audio, autoplay: nil) ==
-           {:safe, ~s(<audio>)}
+    assert tag(:audio, autoplay: nil) |> safe_to_string() ==
+           ~s(<audio>)
   end
 
   test "content_tag" do
-    assert content_tag(:p, "Hello") ==
-           {:safe, ["<p>", "Hello", "</p>"]}
+    assert content_tag(:p, "Hello") |> safe_to_string() ==
+           "<p>Hello</p>"
 
-    assert content_tag(:p, "Hello", class: "dark") ==
-           {:safe, ["<p class=\"dark\">", "Hello", "</p>"]}
+    assert content_tag(:p, "Hello", class: "dark") |> safe_to_string() ==
+           "<p class=\"dark\">Hello</p>"
 
-    assert content_tag(:p, [class: "dark"], do: "Hello") ==
-           {:safe, ["<p class=\"dark\">", "Hello", "</p>"]}
+    assert content_tag(:p, [class: "dark"], do: "Hello") |> safe_to_string() ==
+           "<p class=\"dark\">Hello</p>"
 
-    assert content_tag(:p, "<Hello>") ==
-           {:safe, ["<p>", "&lt;Hello&gt;", "</p>"]}
+    assert content_tag(:p, "<Hello>") |> safe_to_string() ==
+           "<p>&lt;Hello&gt;</p>"
 
-    assert content_tag(:p, [class: "dark"], do: "<Hello>") ==
-           {:safe, ["<p class=\"dark\">", "&lt;Hello&gt;", "</p>"]}
+    assert content_tag(:p, 13) |> safe_to_string() ==
+           "<p>13</p>"
 
-    assert content_tag(:p, raw "<Hello>") ==
-           {:safe, ["<p>", "<Hello>", "</p>"]}
+    assert content_tag(:p, [class: "dark"], do: "<Hello>") |> safe_to_string() ==
+           "<p class=\"dark\">&lt;Hello&gt;</p>"
 
-    assert content_tag(:p, [class: "dark"], do: raw "<Hello>") ==
-           {:safe, ["<p class=\"dark\">", "<Hello>", "</p>"]}
+    assert content_tag(:p, raw "<Hello>") |> safe_to_string() ==
+           "<p><Hello></p>"
+
+    assert content_tag(:p, [class: "dark"], do: raw "<Hello>") |> safe_to_string() ==
+           "<p class=\"dark\"><Hello></p>"
 
     content = content_tag(:form, [action: "/users", data: [remote: true]]) do
       tag(:input, name: "user[name]")
@@ -73,17 +76,19 @@ defmodule Phoenix.HTML.TagTest do
            ~s(<form action="/users" data-remote="true">) <>
            ~s(<input name="user[name]"></form>)
 
-    assert content_tag(:p, do: "Hello") ==
-            {:safe, ["<p>", "Hello", "</p>"]}
+    assert content_tag(:p, do: "Hello") |> safe_to_string() ==
+            "<p>Hello</p>"
 
     content = content_tag :ul do
-                content_tag :li do
-                  "Hello"
-                end
-              end
-    assert content == {:safe, ["<ul>", ["<li>", "Hello", "</li>"], "</ul>"]}
+      content_tag :li do
+        "Hello"
+      end
+    end
+    assert safe_to_string(content) ==
+           "<ul><li>Hello</li></ul>"
 
-    assert content_tag(:p, ["hello", ?\s, "world"]) == {:safe, ["<p>", ["hello", 32, "world"], "</p>"]}
+    assert content_tag(:p, ["hello", ?\s, "world"]) |> safe_to_string() ==
+           "<p>hello world</p>"
   end
 
   test "form_tag for get" do
