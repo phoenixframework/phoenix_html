@@ -695,6 +695,13 @@ defmodule Phoenix.HTML.Form do
           ...
           </select>
 
+      # Assuming users is a list of User schemas and form contains a Resource Schema
+      select(form, :user_id, users |> Enum.map(&{&1.name, &1.id}))
+      #=> <select id="user_id" name="resource[user_id]">
+          <option value="1">Ylva</option>
+          <option value="2">Annora</option>
+          </select>
+
   ## Options
 
     * `:prompt` - an option to include at the top of the options with
