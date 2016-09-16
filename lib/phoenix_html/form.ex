@@ -226,7 +226,6 @@ defmodule Phoenix.HTML.Form do
       character to force the browser to use UTF-8 as the charset. When set to
       false, this is disabled.
 
-
   See `Phoenix.HTML.Tag.form_tag/2` for more information on the
   options above.
   """
@@ -525,7 +524,16 @@ defmodule Phoenix.HTML.Form do
       #=> <button type="submit">Submit</button>
 
   """
-  def submit(value, opts \\ []) do
+  def submit([do: _] = block_option), do: submit([], block_option)
+
+  def submit(_, opts \\ [])
+  def submit(opts, [do: _] = block_option) do
+    opts = Keyword.put_new(opts, :type, "submit")
+
+    content_tag(:button, opts, block_option)
+  end
+
+  def submit(value, opts) do
     opts = Keyword.put_new(opts, :type, "submit")
 
     content_tag(:button, html_escape(value), opts)
