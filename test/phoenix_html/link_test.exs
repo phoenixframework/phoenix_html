@@ -56,14 +56,14 @@ defmodule Phoenix.HTML.LinkTest do
     assert safe_to_string(button("hello", to: "/world")) ==
            ~s[<form action="/world" class="button" method="post">] <>
            ~s[<input name="_csrf_token" type="hidden" value="#{csrf_token}">] <>
-           ~s[<input type="submit" value="hello">] <>
+           ~s[<button type="submit">hello</button>] <>
            ~s[</form>]
   end
 
   test "button with get does not generate CSRF" do
     assert safe_to_string(button("hello", to: "/world", method: :get)) ==
            ~s[<form action="/world" class="button" method="get">] <>
-           ~s[<input type="submit" value="hello">] <>
+           ~s[<button type="submit">hello</button>] <>
            ~s[</form>]
   end
 
@@ -73,7 +73,7 @@ defmodule Phoenix.HTML.LinkTest do
     assert safe_to_string(button("hello", to: "/world", form: [class: "btn rounded"], id: "btn")) ==
            ~s[<form action="/world" class="btn rounded" method="post">] <>
            ~s[<input name="_csrf_token" type="hidden" value="#{csrf_token}">] <>
-           ~s[<input id="btn" type="submit" value="hello">] <>
+           ~s[<button id="btn" type="submit">hello</button>] <>
            ~s[</form>]
   end
 end

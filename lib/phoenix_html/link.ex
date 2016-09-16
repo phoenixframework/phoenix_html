@@ -113,12 +113,13 @@ defmodule Phoenix.HTML.Link do
 
       button("hello", to: "/world")
       #=> <form action="/world" class="button" method="post">
-            <input name="_csrf_token" value=""><input type="submit" value="hello">
+            <input name="_csrf_token" value="">
+            <button type="submit">hello</button>
           </form>
 
       button("hello", to: "/world", method: "get", class: "btn")
       #=> <form action="/world" class="btn" method="post">
-            <input type="submit" value="hello">
+            <button type="submit">hello</button>
           </form>
 
   ## Options
@@ -138,17 +139,12 @@ defmodule Phoenix.HTML.Link do
 
     {form, opts} = form_options(opts, method, "button")
 
-    opts =
-      opts
-      |> Keyword.put_new(:type, "submit")
-      |> Keyword.put_new(:value, text)
-
     unless to do
       raise ArgumentError, "option :to is required in button/2"
     end
 
     form_tag(to, form) do
-      tag(:input, opts)
+      Phoenix.HTML.Form.submit(text, opts)
     end
   end
 
