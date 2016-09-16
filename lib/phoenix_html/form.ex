@@ -524,7 +524,9 @@ defmodule Phoenix.HTML.Form do
       #=> <button type="submit">Submit</button>
 
   """
-  def submit(value, opts \\ [])
+  def submit([do: _] = block_option), do: submit([], block_option)
+
+  def submit(_, opts \\ [])
   def submit(opts, [do: _] = block_option) do
     opts = Keyword.put_new(opts, :type, "submit")
 
