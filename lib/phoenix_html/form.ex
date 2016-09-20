@@ -510,6 +510,13 @@ defmodule Phoenix.HTML.Form do
       |> Keyword.put_new(:id, field_id(form, field))
       |> Keyword.put_new(:name, field_name(form, field))
 
+    opts =
+      if opts[:multiple] do
+        Keyword.update!(opts, :name, &("#{&1}[]"))
+      else
+        opts
+      end
+    
     tag(:input, opts)
   end
 

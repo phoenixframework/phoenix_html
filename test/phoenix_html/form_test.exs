@@ -209,6 +209,9 @@ defmodule Phoenix.HTML.FormTest do
 
     assert safe_to_string(file_input(:search, :key, id: "key", name: "search[key][]")) ==
            ~s(<input id="key" name="search[key][]" type="file">)
+        
+    assert safe_to_string(file_input(:search, :key, multiple: true)) ==
+           ~s(<input id="search_key" multiple="multiple" name="search[key][]" type="file">)  
   end
 
   test "file_input/3 with form" do
