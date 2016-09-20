@@ -67,7 +67,7 @@ defmodule Phoenix.HTML.Form do
   to create forms based only on connection information.
 
   This is useful when you are creating forms that are not backed
-  by any kind of data from the model layer, like a search form.
+  by any kind of data from the data layer, like a search form.
 
       <%= form_for @conn, search_path(@conn, :new), [as: :search], fn f -> %>
         <%= text_input f, :for %>
@@ -89,7 +89,7 @@ defmodule Phoenix.HTML.Form do
 
   ## Nested inputs
 
-  If your model layer supports embedding or nested associations,
+  If your data layer supports embedding or nested associations,
   you can use `inputs_for` to attach nested data to the form.
 
   Imagine the following Ecto schemas:
@@ -167,7 +167,7 @@ defmodule Phoenix.HTML.Form do
     * `:errors` - a keyword list of errors that associated with
       the form
   """
-  defstruct source: nil, impl: nil, id: nil, name: nil, data: nil, model: nil,
+  defstruct source: nil, impl: nil, id: nil, name: nil, data: nil,
             hidden: [], params: %{}, errors: [], options: [], index: nil
 
   @type t :: %Form{source: Phoenix.HTML.FormData.t, name: String.t, data: %{atom => term},
@@ -236,10 +236,11 @@ defmodule Phoenix.HTML.Form do
     html_escape [form_tag(action, form.options), fun.(form), raw("</form>")]
   end
 
-  # TODO: Remove model
-  defp normalize_form(%{data: data, model: model} = form) do
-    data = data || model || %{}
-    %{form | data: data, model: data}
+  defp normalize_form(%{data: nil} = form) do
+    %{form | data: %{}}
+  end
+  defp normalize_form(form) do
+    form
   end
 
   @doc """

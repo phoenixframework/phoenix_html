@@ -75,7 +75,7 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
           impl: __MODULE__,
           id: id,
           name: name,
-          model: default,
+          data: default,
           params: params || %{},
           options: opts}]
 
@@ -90,7 +90,7 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
             Enum.map(prepend ++ default ++ append, &{&1, %{}})
           end
 
-        for {{model, params}, index} <- Enum.with_index(entries) do
+        for {{data, params}, index} <- Enum.with_index(entries) do
           index_string = Integer.to_string(index)
           %Phoenix.HTML.Form{
             source: conn,
@@ -98,7 +98,7 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
             index: index,
             id: id <> "_" <> index_string,
             name: name <> "[" <> index_string <> "]",
-            model: model,
+            data: data,
             params: params,
             options: opts}
         end
