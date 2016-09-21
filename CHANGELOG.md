@@ -1,9 +1,12 @@
 # Changelog
 
-## v2.7.0-dev
+## v2.7.0 (2016-09-21)
 
 * Enhancements
-  * Use buttons for form submits
+  * Render button tags for form submits and in the `button/2` function
+  * Allow `submit/2` and `button/2` to receive `do` blocks
+  * Support the `:multiple` option in `file_input/3`
+  * Remove previously deprecated and unused `model` field
 
 ## v2.6.1 (2016-07-08)
 
