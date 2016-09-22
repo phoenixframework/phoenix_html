@@ -9,7 +9,7 @@ function isLinkToSubmitParent(element) {
 
 function getClosestForm(element) {
   while (element && element !== document && element.nodeType === Node.ELEMENT_NODE) {
-    if (element.tagName.toLowerCase() === 'form') {
+    if (element.tagName === 'FORM') {
       return element;
     }
     element = element.parentNode;
