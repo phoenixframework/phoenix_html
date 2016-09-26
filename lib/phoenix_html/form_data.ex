@@ -52,7 +52,8 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
       id: name,
       name: name,
       params: Map.get(conn.params, name) || %{},
-      options: opts
+      options: opts,
+      data: %{}
     }
   end
 

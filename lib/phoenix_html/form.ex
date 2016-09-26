@@ -232,15 +232,8 @@ defmodule Phoenix.HTML.Form do
   @spec form_for(Phoenix.HTML.FormData.t, String.t,
                  Keyword.t, (t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
   def form_for(form_data, action, options \\ [], fun) when is_function(fun, 1) do
-    form = Phoenix.HTML.FormData.to_form(form_data, options) |> normalize_form
+    form = Phoenix.HTML.FormData.to_form(form_data, options)
     html_escape [form_tag(action, form.options), fun.(form), raw("</form>")]
-  end
-
-  defp normalize_form(%{data: nil} = form) do
-    %{form | data: %{}}
-  end
-  defp normalize_form(form) do
-    form
   end
 
   @doc """
@@ -277,7 +270,6 @@ defmodule Phoenix.HTML.Form do
     forms = form.impl.to_form(form.source, form, field, options)
 
     html_escape Enum.map(forms, fn form ->
-      form = normalize_form(form)
       hidden = Enum.map(form.hidden, fn {k, v} -> hidden_input(form, k, value: v) end)
       [hidden, fun.(form)]
     end)
