@@ -7,6 +7,8 @@ defmodule Phoenix.HTML.Tag do
   import Plug.CSRFProtection, only: [get_csrf_token: 0]
 
   @tag_prefixes [:aria, :data]
+  @csrf_param "_csrf_token"
+  @method_param "_method"
 
   @doc ~S"""
   Creates an HTML tag with the given name and options.
@@ -187,7 +189,7 @@ defmodule Phoenix.HTML.Tag do
         "get"  -> {opts, ""}
         "post" -> csrf_token_tag(Keyword.put(opts, :method, "post"), "")
         _      -> csrf_token_tag(Keyword.put(opts, :method, "post"),
-                                 ~s'<input name="_method" type="hidden" value="#{method}">')
+                                 ~s'<input name="#{@method_param}" type="hidden" value="#{method}">')
       end
 
     {opts, extra} =
@@ -224,9 +226,22 @@ defmodule Phoenix.HTML.Tag do
   defp csrf_token_tag(opts, extra) do
     case Keyword.pop(opts, :csrf_token, true) do
       {true, opts} ->
-        {opts, extra <> ~s'<input name="_csrf_token" type="hidden" value="#{get_csrf_token()}">'}
+        {opts, extra <> ~s'<input name="#{@csrf_param}" type="hidden" value="#{get_csrf_token()}">'}
       {false, opts} ->
         {opts, extra}
     end
+  end
+
+  @doc """
+  Generates a meta tag with CSRF information.
+
+  ## Tag attributes
+    `content`      - a valid csrf token
+    `csrf-param`   - a request parameter where expected csrf token
+    `method-param` - a request parameter where expected a custom HTTP method
+  """
+  def csrf_meta_tag do
+    tag :meta, charset: "UTF-8", name: "csrf-token", content: get_csrf_token(),
+               'csrf-param': @csrf_param, 'method-param': @method_param
   end
 end
