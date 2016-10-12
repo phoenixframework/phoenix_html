@@ -145,8 +145,6 @@ defmodule Phoenix.HTML do
     do: {:safe, ""}
   def html_escape(bin) when is_binary(bin),
     do: {:safe, Plug.HTML.html_escape(bin)}
-  def html_escape(list) when is_list(list),
-    do: {:safe, Phoenix.HTML.Safe.List.to_iodata(list)}
   def html_escape(other),
     do: {:safe, Phoenix.HTML.Safe.to_iodata(other)}
 
