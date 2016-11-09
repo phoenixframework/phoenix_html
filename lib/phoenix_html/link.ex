@@ -151,16 +151,22 @@ defmodule Phoenix.HTML.Link do
   end
 
   defp extract_button_options(opts) do
-    {to, opts} = Keyword.pop(opts, :to)
+    {to, opts} = pop_required_option!(opts, :to, "option :to is required in button/2")
     {method, opts} = Keyword.pop(opts, :method, :post)
 
     {form, opts} = form_options(opts, method, "button")
 
-    unless to do
-      raise ArgumentError, "option :to is required in button/2"
+    {to, form, opts}
+  end
+
+  defp pop_required_option!(opts, key, error_message) do
+    {value, opts} = Keyword.pop(opts, key)
+
+    unless value do
+      raise ArgumentError, error_message
     end
 
-    {to, form, opts}
+    {value, opts}
   end
 
   defp form_options(opts, method, class) do
