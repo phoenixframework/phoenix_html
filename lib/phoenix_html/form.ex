@@ -536,7 +536,7 @@ defmodule Phoenix.HTML.Form do
   def submit(value, opts) do
     opts = Keyword.put_new(opts, :type, "submit")
 
-    content_tag(:button, html_escape(value), opts)
+    content_tag(:button, value, opts)
   end
 
   @doc """

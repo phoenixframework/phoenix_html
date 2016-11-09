@@ -327,6 +327,18 @@ defmodule Phoenix.HTML.FormTest do
 
     assert safe_to_string(submit(do: "Submit")) ==
           ~s(<button type="submit">Submit</button>)
+
+    assert safe_to_string(submit("<Submit>")) ==
+          ~s(<button type="submit">&lt;Submit&gt;</button>)
+
+    assert safe_to_string(submit("<Submit>", class: "btn")) ==
+          ~s(<button class="btn" type="submit">&lt;Submit&gt;</button>)
+
+    assert safe_to_string(submit([class: "btn"], do: "<Submit>")) ==
+          ~s(<button class="btn" type="submit">&lt;Submit&gt;</button>)
+
+    assert safe_to_string(submit(do: "<Submit>")) ==
+          ~s(<button type="submit">&lt;Submit&gt;</button>)
   end
 
   ## reset/2
