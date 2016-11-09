@@ -133,7 +133,24 @@ defmodule Phoenix.HTML.Link do
 
   All other options are forwarded to the underlying button input.
   """
+
+  def button(opts, [do: contents]) do
+    {to, form, opts} = extract_button_options(opts)
+
+    form_tag(to, form) do
+      Phoenix.HTML.Form.submit(opts, [do: contents])
+    end
+  end
+
   def button(text, opts) do
+    {to, form, opts} = extract_button_options(opts)
+
+    form_tag(to, form) do
+      Phoenix.HTML.Form.submit(text, opts)
+    end
+  end
+
+  defp extract_button_options(opts) do
     {to, opts} = Keyword.pop(opts, :to)
     {method, opts} = Keyword.pop(opts, :method, :post)
 
@@ -143,9 +160,7 @@ defmodule Phoenix.HTML.Link do
       raise ArgumentError, "option :to is required in button/2"
     end
 
-    form_tag(to, form) do
-      Phoenix.HTML.Form.submit(text, opts)
-    end
+    {to, form, opts}
   end
 
   defp form_options(opts, method, class) do

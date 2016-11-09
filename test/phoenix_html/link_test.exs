@@ -67,6 +67,21 @@ defmodule Phoenix.HTML.LinkTest do
            ~s[</form>]
   end
 
+  test "button with do" do
+    csrf_token = Plug.CSRFProtection.get_csrf_token()
+
+    output = safe_to_string(
+      button to: "/world", class: "small" do
+        raw("<span>Hi</span>")
+      end
+    )
+
+    assert output == ~s[<form action="/world" class="button" method="post">] <>
+      ~s[<input name="_csrf_token" type="hidden" value="#{csrf_token}">] <>
+      ~s[<button class="small" type="submit"><span>Hi</span></button>] <>
+      ~s[</form>]
+  end
+
   test "button with class overrides default" do
     csrf_token = Plug.CSRFProtection.get_csrf_token()
 
