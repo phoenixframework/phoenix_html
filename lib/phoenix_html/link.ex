@@ -72,12 +72,8 @@ defmodule Phoenix.HTML.Link do
   end
 
   def link(text, opts) do
-    {to, opts} = Keyword.pop(opts, :to)
+    {to, opts} = pop_required_option!(opts, :to, "expected non-nil value for :to in link/2")
     {method, opts} = Keyword.pop(opts, :method, :get)
-
-    unless to do
-      raise ArgumentError, "expected non-nil value for :to in link/2, got: #{inspect to}"
-    end
 
     if method == :get do
       content_tag(:a, text, [href: to] ++ opts)
@@ -94,11 +90,8 @@ defmodule Phoenix.HTML.Link do
   # No docs since this function is only called when a `do` block is passed as
   # `do:` instead of `do...end` (and that case is documented in `link/2`).
   def link(opts) when is_list(opts) do
-    {contents, opts} = Keyword.pop(opts, :do)
-
-    unless contents do
-      raise ArgumentError, "link/2 requires a text as first argument or contents in the :do block"
-    end
+    error = "link/2 requires a text as first argument or contents in the :do block"
+    {contents, opts} = pop_required_option!(opts, :do, error)
 
     link(contents, opts)
   end
