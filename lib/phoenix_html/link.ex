@@ -72,12 +72,8 @@ defmodule Phoenix.HTML.Link do
   end
 
   def link(text, opts) do
-    {to, opts} = Keyword.pop(opts, :to)
+    {to, opts} = pop_required_option!(opts, :to, "expected non-nil value for :to in link/2")
     {method, opts} = Keyword.pop(opts, :method, :get)
-
-    unless to do
-      raise ArgumentError, "expected non-nil value for :to in link/2, got: #{inspect to}"
-    end
 
     if method == :get do
       content_tag(:a, text, [href: to] ++ opts)
@@ -94,11 +90,8 @@ defmodule Phoenix.HTML.Link do
   # No docs since this function is only called when a `do` block is passed as
   # `do:` instead of `do...end` (and that case is documented in `link/2`).
   def link(opts) when is_list(opts) do
-    {contents, opts} = Keyword.pop(opts, :do)
-
-    unless contents do
-      raise ArgumentError, "link/2 requires a text as first argument or contents in the :do block"
-    end
+    error = "link/2 requires a text as first argument or contents in the :do block"
+    {contents, opts} = pop_required_option!(opts, :do, error)
 
     link(contents, opts)
   end
@@ -133,19 +126,40 @@ defmodule Phoenix.HTML.Link do
 
   All other options are forwarded to the underlying button input.
   """
-  def button(text, opts) do
-    {to, opts} = Keyword.pop(opts, :to)
-    {method, opts} = Keyword.pop(opts, :method, :post)
 
-    {form, opts} = form_options(opts, method, "button")
+  def button(opts, [do: contents]) do
+    {to, form, opts} = extract_button_options(opts)
 
-    unless to do
-      raise ArgumentError, "option :to is required in button/2"
+    form_tag(to, form) do
+      Phoenix.HTML.Form.submit(opts, [do: contents])
     end
+  end
+
+  def button(text, opts) do
+    {to, form, opts} = extract_button_options(opts)
 
     form_tag(to, form) do
       Phoenix.HTML.Form.submit(text, opts)
     end
+  end
+
+  defp extract_button_options(opts) do
+    {to, opts} = pop_required_option!(opts, :to, "option :to is required in button/2")
+    {method, opts} = Keyword.pop(opts, :method, :post)
+
+    {form, opts} = form_options(opts, method, "button")
+
+    {to, form, opts}
+  end
+
+  defp pop_required_option!(opts, key, error_message) do
+    {value, opts} = Keyword.pop(opts, key)
+
+    unless value do
+      raise ArgumentError, error_message
+    end
+
+    {value, opts}
   end
 
   defp form_options(opts, method, class) do

@@ -34,7 +34,7 @@ defmodule Phoenix.HTML.LinkTest do
   end
 
   test "link with invalid args" do
-    msg = "expected non-nil value for :to in link/2, got: nil"
+    msg = "expected non-nil value for :to in link/2"
     assert_raise ArgumentError, msg, fn ->
       link("foo", [bar: "baz"])
     end
@@ -65,6 +65,21 @@ defmodule Phoenix.HTML.LinkTest do
            ~s[<form action="/world" class="button" method="get">] <>
            ~s[<button type="submit">hello</button>] <>
            ~s[</form>]
+  end
+
+  test "button with do" do
+    csrf_token = Plug.CSRFProtection.get_csrf_token()
+
+    output = safe_to_string(
+      button to: "/world", class: "small" do
+        raw("<span>Hi</span>")
+      end
+    )
+
+    assert output == ~s[<form action="/world" class="button" method="post">] <>
+      ~s[<input name="_csrf_token" type="hidden" value="#{csrf_token}">] <>
+      ~s[<button class="small" type="submit"><span>Hi</span></button>] <>
+      ~s[</form>]
   end
 
   test "button with class overrides default" do
