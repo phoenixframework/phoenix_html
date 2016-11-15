@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.8.0 (2016-11-15)
+
+* Enhancements
+  * Add `csrf_meta_tag` helper to `Tag`
+  * Allow passing a `do:` option to `Link.button/2`
+
 ## v2.7.0 (2016-09-21)
 
 * Enhancements
