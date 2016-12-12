@@ -111,7 +111,7 @@ defmodule Phoenix.HTML.Link do
           </form>
 
       button("hello", to: "/world", method: "get", class: "btn")
-      #=> <form action="/world" class="btn" method="post">
+      #=> <form action="/world" class="btn" method="get">
             <button type="submit">hello</button>
           </form>
 
