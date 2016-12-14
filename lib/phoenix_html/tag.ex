@@ -14,9 +14,9 @@ defmodule Phoenix.HTML.Tag do
   Creates an HTML tag with the given name and options.
 
       iex> tag(:br)
-      {:safe, "<br>"}
+      {:safe, [60, "br", [], 62]}
       iex> tag(:input, type: "text", name: "user_id")
-      {:safe, "<input name=\"user_id\" type=\"text\">"}
+      {:safe, [60, "input", [[32, "name", 61, 34, "user_id", 34], [32, "type", 61, 34, "text", 34]], 62]}
 
   ## Data attributes
 
@@ -26,7 +26,7 @@ defmodule Phoenix.HTML.Tag do
   in the tag's attributes keyword list:
 
       iex> tag(:input, [{:data, [foo: "bar"]}, id: "some_id"])
-      {:safe, "<input data-foo=\"bar\" id=\"some_id\">"}
+      {:safe, [60, "input", [[32, "data-foo", 61, 34, "bar", 34], [32, "id", 61, 34, "some_id", 34]], 62]}
 
   ## Boolean values
 
@@ -35,30 +35,30 @@ defmodule Phoenix.HTML.Tag do
   the attribute is completely removed if it is false:
 
       iex> tag(:audio, autoplay: true)
-      {:safe, "<audio autoplay=\"autoplay\">"}
+      {:safe, [60, "audio", [[32, "autoplay", 61, 34, "autoplay", 34]], 62]}
       iex> tag(:audio, autoplay: false)
-      {:safe, "<audio>"}
+      {:safe, [60, "audio", [], 62]}
 
   If you want the boolean attribute to be sent as is,
   you can explicitly convert it to a string before.
   """
   def tag(name), do: tag(name, [])
   def tag(name, attrs) when is_list(attrs) do
-    {:safe, "<#{name}#{build_attrs(name, attrs)}>"}
+    {:safe, [?<, to_string(name), build_attrs(name, attrs), ?>]}
   end
 
   @doc ~S"""
   Creates an HTML tag with given name, content, and attributes.
 
       iex> content_tag(:p, "Hello")
-      {:safe, [60, "p", "", 62, "Hello", 60, 47, "p", 62]}
+      {:safe, [60, "p", [], 62, "Hello", 60, 47, "p", 62]}
       iex> content_tag(:p, "<Hello>", class: "test")
-      {:safe, [60, "p", " class=\"test\"", 62, "&lt;Hello&gt;", 60, 47, "p", 62]}
+      {:safe, [60, "p", [[32, "class", 61, 34, "test", 34]], 62, "&lt;Hello&gt;", 60, 47, "p", 62]}
 
       iex> content_tag :p, class: "test" do
       ...>   "Hello"
       ...> end
-      {:safe, [60, "p", " class=\"test\"", 62, "Hello", 60, 47, "p", 62]}
+      {:safe, [60, "p", [[32, "class", 61, 34, "test", 34]], 62, "Hello", 60, 47, "p", 62]}
   """
   def content_tag(name, [do: block]) when is_atom(name) do
     content_tag(name, block, [])
@@ -78,17 +78,17 @@ defmodule Phoenix.HTML.Tag do
     {:safe, [?<, name, build_attrs(name, attrs), ?>, escaped, ?<, ?/, name, ?>]}
   end
 
-  defp tag_attrs([]), do: ""
+  defp tag_attrs([]), do: []
   defp tag_attrs(attrs) do
-    for {k, v} <- attrs, into: "" do
-      " " <> k <> "=" <> "\"" <> attr_escape(v) <> "\""
+    for {k, v} <- attrs do
+      [?\s, k, ?=, ?", attr_escape(v), ?"]
     end
   end
 
   defp attr_escape({:safe, data}),
     do: data
   defp attr_escape(nil),
-    do: ""
+    do: []
   defp attr_escape(other) when is_binary(other),
     do: Plug.HTML.html_escape(other)
   defp attr_escape(other),
@@ -104,7 +104,7 @@ defmodule Phoenix.HTML.Tag do
     end
   end
 
-  defp build_attrs(_tag, []), do: ""
+  defp build_attrs(_tag, []), do: []
   defp build_attrs(tag, attrs), do: build_attrs(tag, attrs, [])
 
   defp build_attrs(_tag, [], acc),
