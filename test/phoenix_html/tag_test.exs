@@ -143,7 +143,7 @@ defmodule Phoenix.HTML.TagTest do
   test "csrf_meta_tag" do
     csrf_token = Plug.CSRFProtection.get_csrf_token()
 
-    assert safe_to_string(csrf_meta_tag) ==
+    assert safe_to_string(csrf_meta_tag()) ==
            ~s(<meta charset="UTF-8" content="#{csrf_token}" csrf-param="_csrf_token" method-param="_method" name="csrf-token">)
   end
 end
