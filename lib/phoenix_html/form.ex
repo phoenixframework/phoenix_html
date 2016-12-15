@@ -279,7 +279,7 @@ defmodule Phoenix.HTML.Form do
   Returns the HTML5 validations that would apply to
   the given field.
   """
-  @spec input_validations(t, atom) :: boolean
+  @spec input_validations(t, atom) :: Keyword.t
   def input_validations(form, field) do
     form.impl.input_validations(form.source, field)
   end
