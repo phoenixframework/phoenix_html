@@ -32,7 +32,6 @@ function didHandleSubmitLinkClick(element) {
   return false;
 }
 
-// for links with HTTP methods other than GET
 window.addEventListener('click', function (event) {
   if (event.target && didHandleSubmitLinkClick(event.target)) {
     event.preventDefault();

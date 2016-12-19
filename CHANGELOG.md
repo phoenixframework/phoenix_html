@@ -1,10 +1,17 @@
 # Changelog
 
+## v2.9.0-dev
+
+* Enhancements
+  * Add `img_tag/2` helper to `Phoenix.HTML.Tag`
+  * Submit nearest form even if not direct descendent
+  * Use more iodata for `tag/2` and `content_tag/3`
+
 ## v2.8.0 (2016-11-15)
 
 * Enhancements
-  * Add `csrf_meta_tag` helper to `Tag`
-  * Allow passing a `do:` option to `Link.button/2`
+  * Add `csrf_meta_tag/0` helper to `Phoenix.HTML.Tag`
+  * Allow passing a `do:` option to `Phoenix.HTML.Link.button/2`
 
 ## v2.7.0 (2016-09-21)
 

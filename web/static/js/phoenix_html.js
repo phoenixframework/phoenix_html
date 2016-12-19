@@ -5,12 +5,22 @@ function isLinkToSubmitParent(element) {
   return isLinkTag && shouldSubmitParent;
 }
 
+function getClosestForm(element) {
+  while (element && element !== document && element.nodeType === Node.ELEMENT_NODE) {
+    if (element.tagName === 'FORM') {
+      return element;
+    }
+    element = element.parentNode;
+  }
+  return null;
+}
+
 function didHandleSubmitLinkClick(element) {
-  while(element && element.getAttribute) {
-    if(isLinkToSubmitParent(element)) {
+  while (element && element.getAttribute) {
+    if (isLinkToSubmitParent(element)) {
       var message = element.getAttribute('data-confirm');
       if (message === null || confirm(message)) {
-        element.parentNode.submit();
+        getClosestForm(element).submit();
       };
       return true;
     } else {
@@ -20,9 +30,8 @@ function didHandleSubmitLinkClick(element) {
   return false;
 }
 
-// for links with HTTP methods other than GET
 window.addEventListener('click', function (event) {
-  if(event.target && didHandleSubmitLinkClick(event.target)) {
+  if (event.target && didHandleSubmitLinkClick(event.target)) {
     event.preventDefault();
     return false;
   }

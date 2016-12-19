@@ -7,6 +7,10 @@ exports.config = {
     definition: false
   },
 
+  npm: {
+    enabled: false
+  },
+
   files: {
     javascripts: {
       joinTo: 'phoenix_html.js'
