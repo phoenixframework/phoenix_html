@@ -1,6 +1,6 @@
 # Changelog
 
-## v2.9.0-dev
+## v2.9.0 (2016-12-19)
 
 * Enhancements
   * Add `img_tag/2` helper to `Phoenix.HTML.Tag`
