@@ -261,13 +261,13 @@ defmodule Phoenix.HTML.Form do
 
   """
   @spec inputs_for(t, atom, Keyword.t, (t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
-  def inputs_for(form, field, options \\ [], fun) do
+  def inputs_for(%{impl: impl} = form, field, options \\ [], fun) do
     options =
       form.options
       |> Keyword.take([:multipart])
       |> Keyword.merge(options)
 
-    forms = form.impl.to_form(form.source, form, field, options)
+    forms = impl.to_form(form.source, form, field, options)
 
     html_escape Enum.map(forms, fn form ->
       hidden = Enum.map(form.hidden, fn {k, v} -> hidden_input(form, k, value: v) end)
@@ -275,13 +275,75 @@ defmodule Phoenix.HTML.Form do
     end)
   end
 
+
+  @doc """
+  Returns a value of a corresponding form field.
+
+  The `form` should either be a `Phoenix.HTML.Form` emitted
+  by `form_for` or an atom.
+
+  When a form is given, the value will first be looked up in
+  `params`, then fallback to the optional `default` argument.
+  If no `default` argument is provided, it will try to fetch
+  the value from the form data.
+
+  Always returns `default` if a given form is an atom.
+  """
+  def input_value(form, field, default \\ nil)
+
+  def input_value(%{params: params, source: source, impl: impl} = form, field, default) do
+    case Map.fetch(params, Atom.to_string(field)) do
+      {:ok, value} ->
+        value
+      :error when is_nil(default) ->
+        # TODO: Remove try on 3.0
+        try do
+          impl.input_value(source, form, field)
+        rescue
+          UndefinedFunctionError -> Map.get(form.data, field)
+        end
+      :error ->
+        default
+    end
+  end
+
+  def input_value(name, _field, default) when is_atom(name),
+    do: default
+
+  @doc """
+  Returns an id of a corresponding form field.
+
+  The form should either be a `Phoenix.HTML.Form` emitted
+  by `form_for` or an atom.
+  """
+  def input_id(%{id: id}, field),
+    do: "#{id}_#{field}"
+  def input_id(name, field) when is_atom(name),
+    do: "#{name}_#{field}"
+
+  @doc """
+  Returns a name of a corresponding form field.
+
+  The form should either be a `Phoenix.HTML.Form` emitted
+  by `form_for` or an atom.
+  """
+  def input_name(%{name: name}, field),
+    do: "#{name}[#{field}]"
+  def input_name(name, field) when is_atom(name),
+    do: "#{name}[#{field}]"
+
   @doc """
   Returns the HTML5 validations that would apply to
   the given field.
   """
   @spec input_validations(t, atom) :: Keyword.t
-  def input_validations(form, field) do
-    form.impl.input_validations(form.source, field)
+  def input_validations(%{source: source, impl: impl} = form, field) do
+    # TODO: Remove me on 3.0
+    try do
+      impl.input_validations(source, form, field)
+    rescue
+      UndefinedFunctionError -> impl.input_validations(source, field)
+    end
   end
 
   @mapping %{
@@ -306,8 +368,14 @@ defmodule Phoenix.HTML.Form do
 
   """
   @spec input_type(t, atom) :: atom
-  def input_type(form, field, mapping \\ @mapping) do
-    type = form.impl.input_type(form.source, field)
+  def input_type(%{impl: impl, source: source} = form, field, mapping \\ @mapping) do
+    type =
+      # TODO: Remove me on 3.0
+      try do
+        impl.input_type(source, form, field)
+      rescue
+        UndefinedFunctionError -> impl.input_type(source, field)
+      end
 
     if type == :text_input do
       field = Atom.to_string(field)
@@ -385,8 +453,8 @@ defmodule Phoenix.HTML.Form do
     opts =
       opts
       |> Keyword.put_new(:type, "password")
-      |> Keyword.put_new(:id, field_id(form, field))
-      |> Keyword.put_new(:name, field_name(form, field))
+      |> Keyword.put_new(:id, input_id(form, field))
+      |> Keyword.put_new(:name, input_name(form, field))
     tag(:input, opts)
   end
 
@@ -442,9 +510,9 @@ defmodule Phoenix.HTML.Form do
     opts =
       opts
       |> Keyword.put_new(:type, type)
-      |> Keyword.put_new(:id, field_id(form, field))
-      |> Keyword.put_new(:name, field_name(form, field))
-      |> Keyword.put_new(:value, field_value(form, field))
+      |> Keyword.put_new(:id, input_id(form, field))
+      |> Keyword.put_new(:name, input_name(form, field))
+      |> Keyword.put_new(:value, input_value(form, field))
     tag(:input, opts)
   end
 
@@ -476,10 +544,10 @@ defmodule Phoenix.HTML.Form do
   def textarea(form, field, opts \\ []) do
     opts =
       opts
-      |> Keyword.put_new(:id, field_id(form, field))
-      |> Keyword.put_new(:name, field_name(form, field))
+      |> Keyword.put_new(:id, input_id(form, field))
+      |> Keyword.put_new(:name, input_name(form, field))
 
-    {value, opts} = Keyword.pop(opts, :value, field_value(form, field) || "")
+    {value, opts} = Keyword.pop(opts, :value, input_value(form, field) || "")
     content_tag(:textarea, html_escape(["\n", value]), opts)
   end
 
@@ -500,8 +568,8 @@ defmodule Phoenix.HTML.Form do
     opts =
       opts
       |> Keyword.put_new(:type, :file)
-      |> Keyword.put_new(:id, field_id(form, field))
-      |> Keyword.put_new(:name, field_name(form, field))
+      |> Keyword.put_new(:id, input_id(form, field))
+      |> Keyword.put_new(:name, input_name(form, field))
 
     opts =
       if opts[:multiple] do
@@ -584,11 +652,11 @@ defmodule Phoenix.HTML.Form do
     opts =
       opts
       |> Keyword.put_new(:type, "radio")
-      |> Keyword.put_new(:id, field_id(form, field) <> "_" <> elem(value, 1))
-      |> Keyword.put_new(:name, field_name(form, field))
+      |> Keyword.put_new(:id, input_id(form, field) <> "_" <> elem(value, 1))
+      |> Keyword.put_new(:name, input_name(form, field))
 
     opts =
-      if value == html_escape(field_value(form, field)) do
+      if value == html_escape(input_value(form, field)) do
         Keyword.put_new(opts, :checked, true)
       else
         opts
@@ -633,10 +701,10 @@ defmodule Phoenix.HTML.Form do
     opts =
       opts
       |> Keyword.put_new(:type, "checkbox")
-      |> Keyword.put_new(:id, field_id(form, field))
-      |> Keyword.put_new(:name, field_name(form, field))
+      |> Keyword.put_new(:id, input_id(form, field))
+      |> Keyword.put_new(:name, input_name(form, field))
 
-    {value, opts}           = Keyword.pop(opts, :value, field_value(form, field))
+    {value, opts}           = Keyword.pop(opts, :value, input_value(form, field))
     {checked_value, opts}   = Keyword.pop(opts, :checked_value, true)
     {unchecked_value, opts} = Keyword.pop(opts, :unchecked_value, false)
 
@@ -725,7 +793,7 @@ defmodule Phoenix.HTML.Form do
   """
   def select(form, field, options, opts \\ []) do
     {selected, opts} = Keyword.pop(opts, :selected)
-    {value, opts}    = Keyword.pop(opts, :value, field_value(form, field, selected))
+    {value, opts}    = Keyword.pop(opts, :value, input_value(form, field, selected))
 
     {prefix, opts} = case Keyword.pop(opts, :prompt) do
       {nil, opts}    -> {raw(""), opts}
@@ -734,8 +802,8 @@ defmodule Phoenix.HTML.Form do
 
     opts =
       opts
-      |> Keyword.put_new(:id, field_id(form, field))
-      |> Keyword.put_new(:name, field_name(form, field))
+      |> Keyword.put_new(:id, input_id(form, field))
+      |> Keyword.put_new(:name, input_name(form, field))
 
     options = options_for_select(options, prefix, html_escape(value))
     content_tag(:select, options, opts)
@@ -814,12 +882,12 @@ defmodule Phoenix.HTML.Form do
   """
   def multiple_select(form, field, options, opts \\ []) do
     {selected, opts} = Keyword.pop(opts, :selected)
-    {multiple, opts} = Keyword.pop(opts, :value, field_value(form, field, selected) || [])
+    {multiple, opts} = Keyword.pop(opts, :value, input_value(form, field, selected) || [])
 
     opts =
       opts
-      |> Keyword.put_new(:id, field_id(form, field))
-      |> Keyword.put_new(:name, field_name(form, field) <> "[]")
+      |> Keyword.put_new(:id, input_id(form, field))
+      |> Keyword.put_new(:name, input_name(form, field) <> "[]")
       |> Keyword.put_new(:multiple, "")
 
     options = options_for_select(options, "", Enum.map(multiple, &html_escape/1))
@@ -921,7 +989,7 @@ defmodule Phoenix.HTML.Form do
 
   """
   def datetime_select(form, field, opts \\ []) do
-    value = Keyword.get(opts, :value, field_value(form, field) || Keyword.get(opts, :default))
+    value = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
 
     builder =
       Keyword.get(opts, :builder) || fn b ->
@@ -939,7 +1007,7 @@ defmodule Phoenix.HTML.Form do
   Check `datetime_select/3` for more information on options and supported values.
   """
   def date_select(form, field, opts \\ []) do
-    value   = Keyword.get(opts, :value, field_value(form, field) || Keyword.get(opts, :default))
+    value   = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
     builder = Keyword.get(opts, :builder) || &date_builder(&1, opts)
     builder.(datetime_builder(form, field, date_value(value), nil, opts))
   end
@@ -969,7 +1037,7 @@ defmodule Phoenix.HTML.Form do
   Check `datetime_select/3` for more information on options and supported values.
   """
   def time_select(form, field, opts \\ []) do
-    value   = Keyword.get(opts, :value, field_value(form, field) || Keyword.get(opts, :default))
+    value   = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
     builder = Keyword.get(opts, :builder) || &time_builder(&1, opts)
     builder.(datetime_builder(form, field, nil, time_value(value), opts))
   end
@@ -1034,8 +1102,8 @@ defmodule Phoenix.HTML.Form do
   @minsec map.(0..59)
 
   defp datetime_builder(form, field, date, time, parent) do
-    id   = Keyword.get(parent, :id, field_id(form, field))
-    name = Keyword.get(parent, :name, field_name(form, field))
+    id   = Keyword.get(parent, :id, input_id(form, field))
+    name = Keyword.get(parent, :name, input_name(form, field))
 
     fn
       :year, opts when date != nil ->
@@ -1130,59 +1198,22 @@ defmodule Phoenix.HTML.Form do
   See `label/2`.
   """
   def label(form, field, text, opts) when is_binary(text) and is_list(opts) do
-    opts = Keyword.put_new(opts, :for, field_id(form, field))
+    opts = Keyword.put_new(opts, :for, input_id(form, field))
     content_tag(:label, text, opts)
   end
   def label(form, field, opts, [do: block]) do
-    opts = Keyword.put_new(opts, :for, field_id(form, field))
+    opts = Keyword.put_new(opts, :for, input_id(form, field))
     content_tag(:label, opts, do: block)
   end
 
-  @doc """
-  Returns a value of a corresponding form field.
+  # TODO: Remove me on 3.0
 
-  The `form` should either be a `Phoenix.HTML.Form` emitted
-  by `form_for` or an atom.
+  @doc false
+  def field_value(form, field, default \\ nil), do: input_value(form, field, default)
 
-  When a form is given, the value will first be looked up in
-  `params`, then fallback to the optional `default` argument.
-  If no `default` argument is provided, it will try to fetch
-  the value from the form data.
+  @doc false
+  def field_name(form, field), do: input_name(form, field)
 
-  Always returns `default` if a given form is an atom.
-  """
-  def field_value(form, field, default \\ nil)
-
-  def field_value(%{data: data, params: params}, field, default) do
-    case Map.fetch(params, Atom.to_string(field)) do
-      {:ok, value} -> value
-      :error -> default || Map.get(data, field)
-    end
-  end
-
-  def field_value(name, _field, default) when is_atom(name),
-    do: default
-
-  @doc """
-  Returns an id of a corresponding form field.
-
-  The form should either be a `Phoenix.HTML.Form` emitted
-  by `form_for` or an atom.
-  """
-  def field_id(%{id: id}, field),
-    do: "#{id}_#{field}"
-  def field_id(name, field) when is_atom(name),
-    do: "#{name}_#{field}"
-
-  @doc """
-  Returns a name of a corresponding form field.
-
-  The form should either be a `Phoenix.HTML.Form` emitted
-  by `form_for` or an atom.
-  """
-  def field_name(%{name: name}, field),
-    do: "#{name}[#{field}]"
-  def field_name(name, field) when is_atom(name),
-    do: "#{name}[#{field}]"
-
+  @doc false
+  def field_id(form, field), do: input_id(form, field)
 end

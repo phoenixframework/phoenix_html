@@ -837,42 +837,42 @@ defmodule Phoenix.HTML.FormTest do
           ~s(<label for="search_key">Hello</label>)
   end
 
-  ## field_value/2
+  ## input_value/2
 
-  test "field_value/2 without form" do
-    assert field_value(:search, :key) == nil
+  test "input_value/2 without form" do
+    assert input_value(:search, :key) == nil
   end
 
-  test "field_value/2 with form" do
-    assert safe_form(&field_value(&1, :key)) == "value"
+  test "input_value/2 with form" do
+    assert safe_form(&input_value(&1, :key)) == "value"
   end
 
-  test "field_value/2 with form and data" do
-    assert safe_form(&field_value(put_in(&1.data[:key], "original"), :key)) == "value"
-    assert safe_form(&field_value(put_in(&1.data[:no_key], "original"), :no_key)) == "original"
+  test "input_value/2 with form and data" do
+    assert safe_form(&input_value(put_in(&1.data[:key], "original"), :key)) == "value"
+    assert safe_form(&input_value(put_in(&1.data[:no_key], "original"), :no_key)) == "original"
     safe_form(fn f ->
-        assert field_value(put_in(f.data[:alt_key], "original"), :alt_key) == nil
+        assert input_value(put_in(f.data[:alt_key], "original"), :alt_key) == nil
         ""
     end)
   end
 
-  ## field_id/2
+  ## input_id/2
 
-  test "field_id/2 without form" do
-    assert field_id(:search, :key) == "search_key"
+  test "input_id/2 without form" do
+    assert input_id(:search, :key) == "search_key"
   end
 
-  test "field_id/2 with form" do
-    assert safe_form(&field_id(&1, :key)) == "search_key"
+  test "input_id/2 with form" do
+    assert safe_form(&input_id(&1, :key)) == "search_key"
   end
 
-  ## field_name/2
+  ## input_name/2
 
-  test "field_name/2 without form" do
-    assert field_name(:search, :key) == "search[key]"
+  test "input_name/2 without form" do
+    assert input_name(:search, :key) == "search[key]"
   end
 
-  test "field_name/2 with form" do
-    assert safe_form(&field_name(&1, :key)) == "search[key]"
+  test "input_name/2 with form" do
+    assert safe_form(&input_name(&1, :key)) == "search[key]"
   end
 end

@@ -6,6 +6,7 @@
   * Add `img_tag/2` helper to `Phoenix.HTML.Tag`
   * Submit nearest form even if not direct descendent
   * Use more iodata for `tag/2` and `content_tag/3`
+  * Add `input_value/3`, `input_id/2` and `input_name/2` as a unified API around the input (alongside `input_type/3` and `input_validations/2`)
 
 ## v2.8.0 (2016-11-15)
 

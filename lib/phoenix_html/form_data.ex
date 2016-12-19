@@ -27,18 +27,24 @@ defprotocol Phoenix.HTML.FormData do
   def to_form(data, form, field, options)
 
   @doc """
+  Returns the value for the given field.
+  """
+  @spec input_value(t, Phoenix.HTML.Form.t, atom) :: term
+  def input_value(data, form, field)
+
+  @doc """
   Returns the HTML5 validations that would apply to
   the given field.
   """
-  @spec input_validations(t, atom) :: Keyword.t
-  def input_validations(data, field)
+  @spec input_validations(t, Phoenix.HTML.Form.t, atom) :: Keyword.t
+  def input_validations(data, form, field)
 
   @doc """
   Receives the given field and returns its input type (:text_input,
   :select, etc). Returns `nil` if the type is unknown.
   """
-  @spec input_type(t, atom) :: atom | nil
-  def input_type(data, field)
+  @spec input_type(t, Phoenix.HTML.Form.t, atom) :: atom | nil
+  def input_type(data, form, field)
 end
 
 defimpl Phoenix.HTML.FormData, for: Plug.Conn do
@@ -106,8 +112,9 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
     end
   end
 
-  def input_type(_data, _field), do: :text_input
-  def input_validations(_data, _field), do: []
+  def input_type(_conn, _form, _field), do: :text_input
+  def input_value(_conn, %{data: data}, field), do: Map.get(data, field)
+  def input_validations(_conn, _form, _field), do: []
 
   defp no_name_error! do
     raise ArgumentError, "form_for/4 expects [as: NAME] to be given as option " <>
