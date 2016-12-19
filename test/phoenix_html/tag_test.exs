@@ -92,10 +92,11 @@ defmodule Phoenix.HTML.TagTest do
   end
 
   test "img_tag" do
-    assert img("user.png") |> safe_to_string() == ~s(<img src="user.png">)
+    assert img_tag("user.png") |> safe_to_string() ==
+           ~s(<img src="user.png">)
 
-    assert img("user.png", [class: "big"]) |> safe_to_string() ==
-      ~s(<img class="big" src="user.png">)
+    assert img_tag("user.png", [class: "big"]) |> safe_to_string() ==
+           ~s(<img class="big" src="user.png">)
   end
 
   test "form_tag for get" do

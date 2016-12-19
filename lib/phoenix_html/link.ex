@@ -126,7 +126,6 @@ defmodule Phoenix.HTML.Link do
 
   All other options are forwarded to the underlying button input.
   """
-
   def button(opts, [do: contents]) do
     {to, form, opts} = extract_button_options(opts)
 
