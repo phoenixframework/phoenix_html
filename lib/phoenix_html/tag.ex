@@ -244,4 +244,20 @@ defmodule Phoenix.HTML.Tag do
     tag :meta, charset: "UTF-8", name: "csrf-token", content: get_csrf_token(),
                'csrf-param': @csrf_param, 'method-param': @method_param
   end
+
+  @doc """
+  Generates an img tag with a src.
+
+  ## Examples
+
+      img(user.photo_path)
+      <img src="photo.png">
+
+      img(user.photo, class: "image")
+      <img src="smile.png" class="image">
+  """
+  def img(src, opts \\ []) do
+    opts = Keyword.merge([src: src], opts)
+    tag(:img, opts)
+  end
 end

@@ -91,6 +91,13 @@ defmodule Phoenix.HTML.TagTest do
            "<p>hello world</p>"
   end
 
+  test "img_tag" do
+    assert img("user.png") |> safe_to_string() == ~s(<img src="user.png">)
+
+    assert img("user.png", [class: "big"]) |> safe_to_string() ==
+      ~s(<img class="big" src="user.png">)
+  end
+
   test "form_tag for get" do
     assert safe_to_string(form_tag("/", method: :get)) ==
            ~s(<form accept-charset="UTF-8" action="/" method="get">) <>
