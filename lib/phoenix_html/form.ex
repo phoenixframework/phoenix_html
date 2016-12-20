@@ -291,19 +291,19 @@ defmodule Phoenix.HTML.Form do
   """
   def input_value(form, field, default \\ nil)
 
-  def input_value(%{params: params, source: source, impl: impl} = form, field, default) do
-    case Map.fetch(params, Atom.to_string(field)) do
-      {:ok, value} ->
-        value
-      :error when is_nil(default) ->
-        # TODO: Remove try on 3.0
-        try do
-          impl.input_value(source, form, field)
-        rescue
-          UndefinedFunctionError -> Map.get(form.data, field)
+  def input_value(%{source: source, impl: impl} = form, field, default) do
+    try do
+      impl.input_value(source, form, field, default)
+    rescue
+      UndefinedFunctionError ->
+        case Map.fetch(form.params, Atom.to_string(field)) do
+          {:ok, value} ->
+            value
+          :error when is_nil(default) ->
+            Map.get(form.data, field)
+          :error ->
+            default
         end
-      :error ->
-        default
     end
   end
 
@@ -577,7 +577,7 @@ defmodule Phoenix.HTML.Form do
       else
         opts
       end
-    
+
     tag(:input, opts)
   end
 
