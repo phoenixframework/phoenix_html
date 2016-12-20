@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.9.1 (2016-12-20)
+
+* Bug fixes
+  * Implement proper input_value/4 callback
+
 ## v2.9.0 (2016-12-19)
 
 * Enhancements
