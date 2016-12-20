@@ -283,11 +283,17 @@ defmodule Phoenix.HTML.Form do
   by `form_for` or an atom.
 
   When a form is given, the value will first be looked up in
-  `params`, then fallback to the optional `default` argument.
-  If no `default` argument is provided, it will try to fetch
+  `params`, then fallback to the optional `computed` argument.
+  If no `computed` argument is provided, it will try to fetch
   the value from the form data.
 
-  Always returns `default` if a given form is an atom.
+  The `computed` argumented has higher precedence over the
+  `data` since it is an attribute computed from the `data`.
+  For example:
+
+      input_value(form, :name, String.upcase(form.data.name))
+
+  Always returns `computed` if the given form is an atom.
   """
   def input_value(form, field, default \\ nil)
 
