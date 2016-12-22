@@ -856,13 +856,13 @@ defmodule Phoenix.HTML.Form do
 
       # Assuming form contains a User schema
       multiple_select(form, :roles, ["Admin": 1, "Power User": 2])
-      #=> <select id="user_roles" name="user[roles][]">
+      #=> <select id="user_roles" multiple="" name="user[roles][]">
           <option value="1">Admin</option>
           <option value="2">Power User</option>
           </select>
 
       multiple_select(form, :roles, ["Admin": 1, "Power User": 2], value: [1])
-      #=> <select id="user_roles" name="user[roles]">
+      #=> <select id="user_roles" multiple="" name="user[roles]">
           <option value="1" selected="selected" >Admin</option>
           <option value="2">Power User</option>
           </select>
