@@ -29,8 +29,8 @@ defprotocol Phoenix.HTML.FormData do
   @doc """
   Returns the value for the given field.
   """
-  @spec input_value(t, Phoenix.HTML.Form.t, atom, term) :: term
-  def input_value(data, form, field, computed)
+  @spec input_value(t, Phoenix.HTML.Form.t, atom) :: term
+  def input_value(data, form, field)
 
   @doc """
   Returns the HTML5 validations that would apply to
@@ -112,14 +112,12 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
     end
   end
 
-  def input_value(_conn, %{data: data, params: params}, field, computed) do
+  def input_value(_conn, %{data: data, params: params}, field) do
     case Map.fetch(params, Atom.to_string(field)) do
       {:ok, value} ->
         value
-      :error when is_nil(computed) ->
-        Map.get(data, field)
       :error ->
-        computed
+        Map.get(data, field)
     end
   end
 

@@ -275,46 +275,32 @@ defmodule Phoenix.HTML.Form do
     end)
   end
 
-
   @doc """
   Returns a value of a corresponding form field.
 
   The `form` should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
 
-  When a form is given, the value will first be looked up in
-  `params`, then fallback to the optional `computed` argument.
-  If no `computed` argument is provided, it will try to fetch
-  the value from the form data.
-
-  The `computed` argumented has higher precedence over the
-  `data` since it is an attribute computed from the `data`.
-  For example:
-
-      input_value(form, :name, String.upcase(form.data.name))
-
-  Always returns `computed` if the given form is an atom.
+  When a form is given, it will lookup for changes and then
+  fallback to parameters and finally fallback to the default
+  struct/map value.
   """
-  def input_value(form, field, default \\ nil)
-
-  def input_value(%{source: source, impl: impl} = form, field, default) do
+  def input_value(%{source: source, impl: impl} = form, field) when is_atom(field) do
     try do
-      impl.input_value(source, form, field, default)
+      impl.input_value(source, form, field)
     rescue
       UndefinedFunctionError ->
         case Map.fetch(form.params, Atom.to_string(field)) do
           {:ok, value} ->
             value
-          :error when is_nil(default) ->
-            Map.get(form.data, field)
           :error ->
-            default
+            Map.get(form.data, field)
         end
     end
   end
 
-  def input_value(name, _field, default) when is_atom(name),
-    do: default
+  def input_value(name, field) when is_atom(name) and is_atom(field),
+    do: nil
 
   @doc """
   Returns an id of a corresponding form field.
@@ -789,17 +775,12 @@ defmodule Phoenix.HTML.Form do
     * `:prompt` - an option to include at the top of the options with
       the given prompt text
 
-    * `:value` - the value used to select a given option.
-      The default value is extracted from the form data if available
-
-    * `:selected` - the default value to use when none was given in
-      `:value` and none was sent as parameter
+    * `:selected` - the default value to use when none was sent as parameter
 
   All other options are forwarded to the underlying HTML tag.
   """
   def select(form, field, options, opts \\ []) do
-    {selected, opts} = Keyword.pop(opts, :selected)
-    {value, opts}    = Keyword.pop(opts, :value, input_value(form, field, selected))
+    {selected, opts} = selected(form, field, opts) || []
 
     {prefix, opts} = case Keyword.pop(opts, :prompt) do
       {nil, opts}    -> {raw(""), opts}
@@ -811,8 +792,26 @@ defmodule Phoenix.HTML.Form do
       |> Keyword.put_new(:id, input_id(form, field))
       |> Keyword.put_new(:name, input_name(form, field))
 
-    options = options_for_select(options, prefix, html_escape(value))
+    options = options_for_select(options, prefix, html_escape(selected))
     content_tag(:select, options, opts)
+  end
+
+  defp selected(form, field, opts) do
+    {value, opts} = Keyword.pop(opts, :value)
+    {selected, opts} = Keyword.pop(opts, :selected)
+
+    if value != nil do
+      {value, opts}
+    else
+      field = Atom.to_string(field)
+
+      case form do
+        %{params: %{^field => sent}} ->
+          {sent, opts}
+        _ ->
+          {selected, opts}
+      end
+    end
   end
 
   defp options_for_select(values, options, value) do
@@ -861,7 +860,7 @@ defmodule Phoenix.HTML.Form do
           <option value="2">Power User</option>
           </select>
 
-      multiple_select(form, :roles, ["Admin": 1, "Power User": 2], value: [1])
+      multiple_select(form, :roles, ["Admin": 1, "Power User": 2], selected: [1])
       #=> <select id="user_roles" name="user[roles]">
           <option value="1" selected="selected" >Admin</option>
           <option value="2">Power User</option>
@@ -879,16 +878,13 @@ defmodule Phoenix.HTML.Form do
 
   ## Options
 
-    * `:value` - an Enum of values used to select given options.
-
-    * `:selected` - the default value to use when none was given in
-      `:value` and none was sent as parameter
+    * `:selected` - the default options to be marked as selected. The values
+       on this list are ignored in case ids have been set as parameters.
 
   All other options are forwarded to the underlying HTML tag.
   """
   def multiple_select(form, field, options, opts \\ []) do
-    {selected, opts} = Keyword.pop(opts, :selected)
-    {multiple, opts} = Keyword.pop(opts, :value, input_value(form, field, selected) || [])
+    {selected, opts} = selected(form, field, opts)
 
     opts =
       opts
@@ -896,7 +892,7 @@ defmodule Phoenix.HTML.Form do
       |> Keyword.put_new(:name, input_name(form, field) <> "[]")
       |> Keyword.put_new(:multiple, "")
 
-    options = options_for_select(options, "", Enum.map(multiple, &html_escape/1))
+    options = options_for_select(options, "", Enum.map(List.wrap(selected), &html_escape/1))
     content_tag(:select, options, opts)
   end
 
@@ -1215,7 +1211,7 @@ defmodule Phoenix.HTML.Form do
   # TODO: Remove me on 3.0
 
   @doc false
-  def field_value(form, field, default \\ nil), do: input_value(form, field, default)
+  def field_value(form, field, default \\ nil), do: input_value(form, field) || default
 
   @doc false
   def field_name(form, field), do: input_name(form, field)
