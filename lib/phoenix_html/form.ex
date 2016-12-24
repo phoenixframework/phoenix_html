@@ -803,13 +803,13 @@ defmodule Phoenix.HTML.Form do
     if value != nil do
       {value, opts}
     else
-      field = Atom.to_string(field)
+      param = Atom.to_string(field)
 
       case form do
-        %{params: %{^field => sent}} ->
+        %{params: %{^param => sent}} ->
           {sent, opts}
         _ ->
-          {selected, opts}
+          {selected || input_value(form, field), opts}
       end
     end
   end

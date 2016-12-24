@@ -1,9 +1,14 @@
 # Changelog
 
+## v2.9.2 (2016-12-24)
+
+* Bug fixes
+  * Always read from `form.params` and then from `:selected` in `select` and `multiple_select` before falling back to `input_value/2`
+
 ## v2.9.1 (2016-12-20)
 
 * Bug fixes
-  * Implement proper input_value/4 callback
+  * Implement proper `input_value/3` callback
 
 ## v2.9.0 (2016-12-19)
 
