@@ -21,7 +21,7 @@ function didHandleSubmitLinkClick(element) {
       var message = element.getAttribute('data-confirm');
       if (message === null || confirm(message)) {
         getClosestForm(element).submit();
-      };
+      }
       return true;
     } else {
       element = element.parentNode;

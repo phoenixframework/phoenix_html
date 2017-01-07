@@ -25,7 +25,7 @@ defmodule Phoenix.HTML.Format do
   ## Options
 
     * `:escape` - if `false` does not html escape input (default: `true`)
-    * `:wrapper_tag` - tag to wrap each parapgraph (default: `:p`)
+    * `:wrapper_tag` - tag to wrap each paragraph (default: `:p`)
     * `:attributes` - html attributes of the wrapper tag (default: `[]`)
     * `:insert_brs` - if `true` insert `<br>` for single line breaks (default: `true`)
 

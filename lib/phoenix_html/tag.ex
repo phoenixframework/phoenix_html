@@ -164,7 +164,7 @@ defmodule Phoenix.HTML.Tag do
 
   ## Enforce UTF-8
 
-  Alhought forms provide the `accept-charset` attribute, which we set
+  Although forms provide the `accept-charset` attribute, which we set
   to UTF-8, Internet Explorer 5 up to 8 may ignore the value of this
   attribute if the user chooses their browser to do so. This ends up
   triggering the browser to send data in a format that is not
