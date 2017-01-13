@@ -818,6 +818,8 @@ defmodule Phoenix.HTML.Form do
     Enum.reduce values, options, fn
       {option_key, option_value}, acc ->
         option(option_key, option_value, value, acc)
+      %{ label: option_key, value: option_value }, acc ->
+        option(option_key, option_value, value, acc)
       option, acc ->
         option(option, option, value, acc)
     end
