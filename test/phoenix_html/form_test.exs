@@ -841,6 +841,8 @@ defmodule Phoenix.HTML.FormTest do
 
   test "input_value/2 without form" do
     assert input_value(:search, :key) == nil
+    assert input_value(:search, 1) == nil
+    assert input_value(:search, "key") == nil
   end
 
   test "input_value/2 with form" do
