@@ -299,7 +299,7 @@ defmodule Phoenix.HTML.Form do
     end
   end
 
-  def input_value(name, field) when is_atom(name) and is_atom(field),
+  def input_value(name, field) when is_atom(name),
     do: nil
 
   @doc """
