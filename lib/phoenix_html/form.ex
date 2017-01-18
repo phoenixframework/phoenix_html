@@ -518,8 +518,8 @@ defmodule Phoenix.HTML.Form do
 
   See `text_input/3` for example and docs.
   """
-  def datetime_input(form, field, opts \\ []) do
-    generic_input(:datetime, form, field, opts)
+  def datetime_local_input(form, field, opts \\ []) do
+    generic_input(:'datetime-local', form, field, opts)
   end
 
   @doc """
