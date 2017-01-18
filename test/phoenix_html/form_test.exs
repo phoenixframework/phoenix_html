@@ -300,7 +300,7 @@ defmodule Phoenix.HTML.FormTest do
           ~s(<input id="key" name="search[key][]" type="tel" value="foo">)
   end
 
-  ## date_input/3
+  ## range_input/3
 
   test "range_input/3" do
     assert safe_to_string(range_input(:search, :key)) ==
