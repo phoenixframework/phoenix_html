@@ -225,6 +225,9 @@ defmodule Phoenix.HTML.Form do
       to "UTF-8" and a hidden input named `_utf8` containing a unicode
       character to force the browser to use UTF-8 as the charset. When set to
       false, this is disabled.
+     
+    * Other options will be passed as html attributes.
+      ie, `class: "foo", id: "bar"`
 
   See `Phoenix.HTML.Tag.form_tag/2` for more information on the
   options above.
