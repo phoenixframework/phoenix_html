@@ -677,7 +677,7 @@ defmodule Phoenix.HTML.Form do
     * `:checked_value` - the value to be sent when the checkbox is checked.
       Defaults to "true"
 
-    * `:unchecked_value` - the value to be sent then the checkbox is unchecked,
+    * `:unchecked_value` - the value to be sent when the checkbox is unchecked,
       Defaults to "false"
 
     * `:value` - the value used to check if a checkbox is checked or unchecked.
