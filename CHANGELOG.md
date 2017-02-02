@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.9.3 (2016-12-24)
+
+* Bug fixes
+  * Once again support any name for atom forms
+
 ## v2.9.2 (2016-12-24)
 
 * Bug fixes
