@@ -848,7 +848,7 @@ defmodule Phoenix.HTML.Form do
       options, acc when is_list(options) ->
         {option_key, options} = Keyword.pop(options, :key)
         option_key || raise ArgumentError,
-                            "expected :content key when building <option> from keyword list: #{inspect options}"
+                            "expected :key key when building <option> from keyword list: #{inspect options}"
 
         {option_value, options} = Keyword.pop(options, :value)
         option_value || raise ArgumentError,
