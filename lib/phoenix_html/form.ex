@@ -225,7 +225,7 @@ defmodule Phoenix.HTML.Form do
       to "UTF-8" and a hidden input named `_utf8` containing a unicode
       character to force the browser to use UTF-8 as the charset. When set to
       false, this is disabled.
-     
+
     * Other options will be passed as html attributes.
       ie, `class: "foo", id: "bar"`
 
@@ -724,14 +724,26 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Generates a select tag with the given `options`.
 
-  Values are expected to be an Enumerable containing two-item tuples
-  (like a regular list or a map) or any Enumerable where the element
-  will be used both as key and value for the generated select.
+  `options` are expected to be an enumerable which will be used to
+  generate each respective `option`. The enumerable may have:
+
+    * keyword lists - each keyword list is expected to have the keys
+      `:value` and `:label`. Additional keys such as `:disabled` may
+      be given to customize the option
+
+    * two-item tuples - where the first element is an atom, string or
+      integer to be used as the option label and the second element is
+      an atom, string or integer to be used as the option value
+
+    * atom, string or integer - which will be used as both label and value
+      for the generated select
 
   ## Optgroups
 
-  When a two-item map contains a list as its value,
-  the options will be wrapped in an `<optroup>` using the key as its label.
+  If `options` is map or keyword list where the first element is a string,
+  atom or integer and the second element is a list or a map, it is assumed
+  the key will be wrapped in an `<optroup>` and the value will be used to
+  generate `<options>` nested under the group.
 
   ## Examples
 
@@ -749,6 +761,13 @@ defmodule Phoenix.HTML.Form do
           <option value="user">User</option>
           </select>
 
+      select(form, :role, [[key: "Admin", value: "admin", disabled: true],
+                           [key: "User", value: "user"])
+      #=> <select id="user_role" name="user[role]">
+          <option value="admin" disabled="disabled">Admin</option>
+          <option value="user">User</option>
+          </select>
+
       select(form, :role, ["Admin": "admin", "User": "user"], prompt: "Choose your role")
       #=> <select id="user_role" name="user[role]">
           <option value="">Choose your role</option>
@@ -756,7 +775,19 @@ defmodule Phoenix.HTML.Form do
           <option value="user">User</option>
           </select>
 
-      select(form, :country, %{"Europe" => ["UK", "Sweden", "France"], …})
+  If you want to select an option that comes from the database,
+  such as a manager for a given project, you may write:
+
+      select(form, :manager_id, Enum.map(@managers, &{&1.name, &1.id}))
+      #=> <select id="manager_id" name="project[manager_id]">
+          <option value="1">Mary Jane</option>
+          <option value="2">John Doe</option>
+          </select>
+
+  Finally, if the values are a list or a map, we use the keys for
+  grouping:
+
+      select(form, :country, ["Europe": ["UK", "Sweden", "France"]], ...})
       #=> <select id="user_country" name="user[country]">
           <optgroup label="Europe">
             <option>UK</option>
@@ -764,13 +795,6 @@ defmodule Phoenix.HTML.Form do
             <option>France</option>
           </optgroup>
           ...
-          </select>
-
-      # Assuming users is a list of User schemas and form contains a Resource Schema
-      select(form, :user_id, users |> Enum.map(&{&1.name, &1.id}))
-      #=> <select id="user_id" name="resource[user_id]">
-          <option value="1">Ylva</option>
-          <option value="2">Annora</option>
           </select>
 
   ## Options
@@ -820,19 +844,28 @@ defmodule Phoenix.HTML.Form do
   defp options_for_select(values, options, value) do
     Enum.reduce values, options, fn
       {option_key, option_value}, acc ->
-        option(option_key, option_value, value, acc)
+        [acc | option(option_key, option_value, [], value)]
+      options, acc when is_list(options) ->
+        {option_key, options} = Keyword.pop(options, :key)
+        option_key || raise ArgumentError,
+                            "expected :content key when building <option> from keyword list: #{inspect options}"
+
+        {option_value, options} = Keyword.pop(options, :value)
+        option_value || raise ArgumentError,
+                              "expected :value key when building <option> from keyword list: #{inspect options}"
+
+        [acc | option(option_key, option_value, options, value)]
       option, acc ->
-        option(option, option, value, acc)
+        [acc | option(option, option, [], value)]
     end
   end
 
-  defp option(group_label, group_values, value, acc) when is_list(group_values) or is_map(group_values) do
+  defp option(group_label, group_values, [], value) when is_list(group_values) or is_map(group_values) do
     section_options = options_for_select(group_values, [], value)
-    tag = content_tag(:optgroup, section_options, label: group_label)
-    html_escape [acc|tag]
+    content_tag(:optgroup, section_options, label: group_label)
   end
 
-  defp option(option_key, option_value, value, acc) do
+  defp option(option_key, option_value, extra, value) do
     option_key   = html_escape(option_key)
     option_value = html_escape(option_value)
 
@@ -843,8 +876,8 @@ defmodule Phoenix.HTML.Form do
         value == option_value
       end
 
-    opts = [value: option_value, selected: selected]
-    html_escape [acc|content_tag(:option, option_key, opts)]
+    opts = [value: option_value, selected: selected] ++ extra
+    content_tag(:option, option_key, opts)
   end
 
   @doc """

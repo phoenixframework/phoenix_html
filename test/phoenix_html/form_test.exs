@@ -429,6 +429,13 @@ defmodule Phoenix.HTML.FormTest do
            ~s(<option value="bar">Bar</option>) <>
            ~s(</select>)
 
+    assert safe_to_string(select(:search, :key, [[key: "Foo", value: "foo"],
+                                                 [key: "Bar", value: "bar", disabled: true]])) ==
+           ~s(<select id="search_key" name="search[key]">) <>
+           ~s(<option value="foo">Foo</option>) <>
+           ~s(<option disabled="disabled" value="bar">Bar</option>) <>
+           ~s(</select>)
+
     assert safe_to_string(select(:search, :key, [Foo: "foo", Bar: "bar"], prompt: "Choose your destiny")) ==
            ~s(<select id="search_key" name="search[key]">) <>
            ~s(<option value="">Choose your destiny</option>) <>
@@ -454,6 +461,13 @@ defmodule Phoenix.HTML.FormTest do
            ~s(<select id="search_other" name="search[other]">) <>
            ~s(<option value="value">value</option>) <>
            ~s(<option selected="selected" value="novalue">novalue</option>) <>
+           ~s(</select>)
+
+    assert safe_form(&select(&1, :key, [[value: "value", key: "Value", disabled: true],
+                                        [value: "novalue", key: "No Value"]], selected: "novalue")) ==
+           ~s(<select id="search_key" name="search[key]">) <>
+           ~s(<option disabled="disabled" selected="selected" value="value">Value</option>) <>
+           ~s(<option value="novalue">No Value</option>) <>
            ~s(</select>)
 
     assert safe_form(&select(put_in(&1.data[:other], "value"), :other, ~w(value novalue), selected: "novalue")) ==
@@ -482,7 +496,7 @@ defmodule Phoenix.HTML.FormTest do
            ~s(</optgroup>) <>
            ~s(</select>)
 
-    assert safe_form(&select(&1, :key, [{"foo", [{"1", "One"}, {"2", "Two"}]}, {"qux", ~w(qux quz)}], value: "qux")) ==
+    assert safe_form(&select(&1, :key, ["foo": [{"1", "One"}, {"2", "Two"}], "qux": ~w(qux quz)], value: "qux")) ==
            ~s(<select id="search_key" name="search[key]">) <>
            ~s(<optgroup label="foo">) <>
            ~s(<option value="One">1</option>) <>
