@@ -628,8 +628,8 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Generates a radio button.
 
-  Invoke this function for each possible value you to be
-  sent to the server.
+  Invoke this function for each possible value you want
+  to be sent to the server.
 
   ## Examples
 
