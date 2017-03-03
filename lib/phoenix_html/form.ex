@@ -925,7 +925,7 @@ defmodule Phoenix.HTML.Form do
           </select>
 
       multiple_select(form, :roles, ["Admin": 1, "Power User": 2], selected: [1])
-      #=> <select id="user_roles" name="user[roles]">
+      #=> <select id="user_roles" name="user[roles][]">
           <option value="1" selected="selected" >Admin</option>
           <option value="2">Power User</option>
           </select>
@@ -948,16 +948,12 @@ defmodule Phoenix.HTML.Form do
   All other options are forwarded to the underlying HTML tag.
   """
   def multiple_select(form, field, options, opts \\ []) do
-    {selected, opts} = selected(form, field, opts)
+    # TODO: Deprecate after backwards compatibility period; remove tests and update docs.
+    # IO.puts :stderr, "warning: `Phoenix.HTML.Form.multiple_select/4` is deprecated," <>
+    #                  "please use `select/4` with `multiple: true` option instead\n" <> Exception.format_stacktrace
 
-    opts =
-      opts
-      |> Keyword.put_new(:id, input_id(form, field))
-      |> Keyword.put_new(:name, input_name(form, field) <> "[]")
-      |> Keyword.put_new(:multiple, "")
-
-    options = options_for_select(options, "", Enum.map(List.wrap(selected), &html_escape/1))
-    content_tag(:select, options, opts)
+    opts = Keyword.put_new(opts, :multiple, "")
+    select(form, field, options, opts)
   end
 
   ## Datetime
