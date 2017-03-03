@@ -804,6 +804,9 @@ defmodule Phoenix.HTML.Form do
 
     * `:selected` - the default value to use when none was sent as parameter
 
+  Be aware that a `:multiple` option will not generate a correctly
+  functioning multiple select element. Use `multiple_select/4` instead.
+
   All other options are forwarded to the underlying HTML tag.
   """
   def select(form, field, options, opts \\ []) do
