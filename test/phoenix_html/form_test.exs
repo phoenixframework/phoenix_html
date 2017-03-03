@@ -533,6 +533,40 @@ defmodule Phoenix.HTML.FormTest do
            ~s(</select>)
   end
 
+  test "select/4 with multiple" do
+    assert safe_to_string(select(:search, :key, ~w(foo bar), multiple: true)) ==
+        ~s(<select id="search_key" multiple="" name="search[key][]">) <>
+        ~s(<option value="foo">foo</option>) <>
+        ~s(<option value="bar">bar</option>) <>
+        ~s(</select>)
+
+    assert safe_to_string(select(:search, :key, ~w(foo bar), multiple: false)) ==
+        ~s(<select id="search_key" name="search[key]">) <>
+        ~s(<option value="foo">foo</option>) <>
+        ~s(<option value="bar">bar</option>) <>
+        ~s(</select>)
+
+    assert safe_to_string(select(:search, :key, ~w(foo bar), multiple: nil)) ==
+        ~s(<select id="search_key" name="search[key]">) <>
+        ~s(<option value="foo">foo</option>) <>
+        ~s(<option value="bar">bar</option>) <>
+        ~s(</select>)
+
+    assert safe_to_string(select(:search, :key, ~w(foo bar baz), multiple: true, selected: ["foo", "baz"])) ==
+        ~s(<select id="search_key" multiple="" name="search[key][]">) <>
+        ~s(<option selected="selected" value="foo">foo</option>) <>
+        ~s(<option value="bar">bar</option>) <>
+        ~s(<option selected="selected" value="baz">baz</option>) <>
+        ~s(</select>)
+
+    assert safe_to_string(select(:search, :key, ~w(foo bar baz), name: "query", multiple: true, selected: ["foo", "baz"])) ==
+        ~s(<select id="search_key" multiple="" name="query">) <>
+        ~s(<option selected="selected" value="foo">foo</option>) <>
+        ~s(<option value="bar">bar</option>) <>
+        ~s(<option selected="selected" value="baz">baz</option>) <>
+        ~s(</select>)
+  end
+
   # multiple_select/4
 
   test "multiple_select/4" do
