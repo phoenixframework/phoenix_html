@@ -897,7 +897,7 @@ defmodule Phoenix.HTML.Form do
           </select>
 
       multiple_select(form, :roles, ["Admin": 1, "Power User": 2], selected: [1])
-      #=> <select id="user_roles" name="user[roles]">
+      #=> <select id="user_roles" name="user[roles][]">
           <option value="1" selected="selected" >Admin</option>
           <option value="2">Power User</option>
           </select>
