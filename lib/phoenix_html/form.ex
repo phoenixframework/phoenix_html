@@ -1134,8 +1134,8 @@ defmodule Phoenix.HTML.Form do
   ]
 
   map = &Enum.map(&1, fn i ->
-    i = Integer.to_string(i)
-    {String.rjust(i, 2, ?0), i}
+    pre = if i < 9, do: "0"
+    {"#{pre}#{i}", i}
   end)
 
   @days   map.(1..31)
