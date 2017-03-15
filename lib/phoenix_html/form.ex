@@ -775,6 +775,12 @@ defmodule Phoenix.HTML.Form do
           <option value="user">User</option>
           </select>
 
+      select(form, :roles, ["Admin": 1, "Power User": 2], multiple: true, selected: [1])
+      #=> <select id="user_roles" name="user[roles][]">
+          <option value="1" selected="selected" >Admin</option>
+          <option value="2">Power User</option>
+          </select>
+
   If you want to select an option that comes from the database,
   such as a manager for a given project, you may write:
 
@@ -799,6 +805,11 @@ defmodule Phoenix.HTML.Form do
 
   ## Options
 
+    * `multiple` - When set to any value other than `false` or `nil` the
+      generated select is a multiple select. Unless explicitly provided,
+      the name attribute has `[]` appended to it, in order to signal to
+      the params parser that the selected values should go in an array.
+
     * `:prompt` - an option to include at the top of the options with
       the given prompt text
 
@@ -817,12 +828,29 @@ defmodule Phoenix.HTML.Form do
       {prompt, opts} -> {content_tag(:option, prompt, value: ""), opts}
     end
 
-    opts =
-      opts
-      |> Keyword.put_new(:id, input_id(form, field))
-      |> Keyword.put_new(:name, input_name(form, field))
+    {multiple, opts} = case Keyword.pop(opts, :multiple) do
+      {nil, opts} -> {false, opts}
+      {false, opts} -> {false, opts}
+      {_, opts} -> {true, opts}
+    end
 
-    options = options_for_select(options, prefix, html_escape(selected))
+    opts = Keyword.put_new(opts, :id, input_id(form, field))
+
+    opts =
+      if multiple do
+        opts |> Keyword.put_new(:name, input_name(form, field) <> "[]")
+             |> Keyword.put(:multiple, "")
+      else
+        opts |> Keyword.put_new(:name, input_name(form, field))
+      end
+
+    options =
+      if multiple do
+        options |> options_for_select("", Enum.map(List.wrap(selected), &html_escape/1))
+      else
+        options |> options_for_select(prefix, html_escape(selected))
+      end
+
     content_tag(:select, options, opts)
   end
 
@@ -923,16 +951,12 @@ defmodule Phoenix.HTML.Form do
   All other options are forwarded to the underlying HTML tag.
   """
   def multiple_select(form, field, options, opts \\ []) do
-    {selected, opts} = selected(form, field, opts)
+    # TODO: Deprecate after backwards compatibility period; remove tests and update docs.
+    # IO.puts :stderr, "warning: `Phoenix.HTML.Form.multiple_select/4` is deprecated," <>
+    #                  "please use `select/4` with `multiple: true` option instead\n" <> Exception.format_stacktrace
 
-    opts =
-      opts
-      |> Keyword.put_new(:id, input_id(form, field))
-      |> Keyword.put_new(:name, input_name(form, field) <> "[]")
-      |> Keyword.put_new(:multiple, "")
-
-    options = options_for_select(options, "", Enum.map(List.wrap(selected), &html_escape/1))
-    content_tag(:select, options, opts)
+    opts = Keyword.put_new(opts, :multiple, "")
+    select(form, field, options, opts)
   end
 
   ## Datetime
