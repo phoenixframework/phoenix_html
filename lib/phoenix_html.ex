@@ -4,7 +4,7 @@ defmodule Phoenix.HTML do
 
   When used, it imports the given modules:
 
-    * `Phoenix.HTML`- functions to handle HTML safety;
+    * `Phoenix.HTML` - functions to handle HTML safety;
 
     * `Phoenix.HTML.Tag` - functions for generating HTML tags;
 
@@ -162,7 +162,7 @@ defmodule Phoenix.HTML do
   end
 
   @doc """
-  Escapes quotes (double and single), double backslashes and other
+  Escapes quotes (double and single), double backslashes and other.
 
   This function is useful in JavaScript responses when there is a need
   to escape html rendered from other templates, like in the following:

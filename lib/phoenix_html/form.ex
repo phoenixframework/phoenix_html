@@ -742,7 +742,7 @@ defmodule Phoenix.HTML.Form do
 
   If `options` is map or keyword list where the first element is a string,
   atom or integer and the second element is a list or a map, it is assumed
-  the key will be wrapped in an `<optroup>` and the value will be used to
+  the key will be wrapped in an `<optgroup>` and the value will be used to
   generate `<options>` nested under the group.
 
   ## Examples
@@ -901,7 +901,7 @@ defmodule Phoenix.HTML.Form do
 
       multiple_select(form, :roles, ["Admin": 1, "Power User": 2], selected: [1])
       #=> <select id="user_roles" name="user[roles][]">
-          <option value="1" selected="selected" >Admin</option>
+          <option value="1" selected="selected">Admin</option>
           <option value="2">Power User</option>
           </select>
 
