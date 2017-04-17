@@ -205,6 +205,12 @@ defmodule Phoenix.HTML.Tag do
         {true, opts}  -> Keyword.put(opts, :enctype, "multipart/form-data")
       end
 
+    opts =
+      case Keyword.pop(opts, :remote, false) do
+        {false, opts} -> opts
+        {true, opts} -> Keyword.put(opts, :"data-remote", "true")
+      end
+
     html_escape [tag(:form, [action: action] ++ opts), raw(extra)]
   end
 
