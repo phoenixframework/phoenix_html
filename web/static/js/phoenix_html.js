@@ -1,6 +1,6 @@
 function isLinkToSubmitParent(element) {
-  var isLinkTag = element.tagName === 'A';
-  var shouldSubmitParent = element.getAttribute('data-submit') === 'parent';
+  const isLinkTag = element.tagName === 'A';
+  const shouldSubmitParent = element.getAttribute('data-submit') === 'parent';
 
   return isLinkTag && shouldSubmitParent;
 }
@@ -18,7 +18,7 @@ function getClosestForm(element) {
 function didHandleSubmitLinkClick(element) {
   while (element && element.getAttribute) {
     if (isLinkToSubmitParent(element)) {
-      var message = element.getAttribute('data-confirm');
+      let message = element.getAttribute('data-confirm');
       if (message === null || confirm(message)) {
         getClosestForm(element).submit();
       }
