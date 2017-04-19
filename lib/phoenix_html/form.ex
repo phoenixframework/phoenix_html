@@ -59,6 +59,20 @@ defmodule Phoenix.HTML.Form do
   if the user had a default value for age set, it will
   automatically show up as selected in the form.
 
+  #### A note on `:errors`
+
+  If no action has been applied to the changeset, no errors are shown
+  on the form object even if the changeset has a non-empty `:errors` value.
+
+  This is useful for things like validation hints on form fields, e.g. an empty
+  changeset for a new form. That changeset isn't valid, but we don't want to
+  show errors until an actual user action has been performed.
+
+  Ecto automatically applies the action for you when you call
+  Repo.insert/update/delete, but if you want to show errors manually you can
+  also set the action yourself, either directly on the `Ecto.Changeset` struct
+  field or by using `Ecto.Changeset.apply_action/2`.
+
   ## With connection data
 
   `form_for/4` expects as first argument any data structure that
