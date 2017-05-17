@@ -80,7 +80,11 @@ defmodule Phoenix.HTML.Tag do
 
   defp tag_attrs([]), do: []
   defp tag_attrs(attrs) do
-    for {k, v} <- attrs do
+    merged_attrs = Enum.reduce(attrs, %{}, fn({k, v}, acc) ->
+      Map.update(acc, k, v, fn(current_value) -> [current_value, ' ', v] end)
+    end)
+
+    for {k, v} <- merged_attrs do
       [?\s, k, ?=, ?", attr_escape(v), ?"]
     end
   end

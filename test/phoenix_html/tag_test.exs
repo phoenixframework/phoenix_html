@@ -24,6 +24,9 @@ defmodule Phoenix.HTML.TagTest do
     assert tag(:input, data: [toggle: "dropdown"]) |> safe_to_string() ==
            ~s(<input data-toggle="dropdown">)
 
+    assert tag(:input, data: [toggle: "dropdown"], data: [my_attr: "blah"]) |> safe_to_string() ==
+      ~s(<input data-my-attr="blah" data-toggle="dropdown">)
+
     assert tag(:input, my_attr: "blah") |> safe_to_string() ==
            ~s(<input my-attr="blah">)
 
@@ -61,6 +64,9 @@ defmodule Phoenix.HTML.TagTest do
 
     assert content_tag(:p, [class: "dark"], do: "<Hello>") |> safe_to_string() ==
            "<p class=\"dark\">&lt;Hello&gt;</p>"
+
+    assert content_tag(:p, [class: "dark", class: "light"], do: "<Hello>") |> safe_to_string() ==
+      "<p class=\"dark light\">&lt;Hello&gt;</p>"
 
     assert content_tag(:p, raw "<Hello>") |> safe_to_string() ==
            "<p><Hello></p>"
