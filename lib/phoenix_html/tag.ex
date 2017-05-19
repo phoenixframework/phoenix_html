@@ -108,15 +108,10 @@ defmodule Phoenix.HTML.Tag do
   defp build_attrs(_tag, []), do: []
   defp build_attrs(tag, attrs), do: build_attrs(tag, attrs, %{})
 
-  defp build_attrs(_tag, [], acc) do
-    Enum.map(acc, fn
-      {k, v} when is_atom(k) -> {Atom.to_string(k), v}
-      {k, v} when is_bitstring(k) -> {k, v}
-    end)
-    |> Enum.sort |> tag_attrs
-  end
+  defp build_attrs(_tag, [], acc),
+    do: acc |> Enum.sort |> tag_attrs
   defp build_attrs(tag, [{k, v}|t], acc) when k in @tag_concat do
-    acc = Map.update(acc, k, v, fn(cv) -> [cv, ' ', v] end)
+    acc = Map.update(acc, dasherize(k), v, fn(cv) -> [cv, ?\s | v] end)
     build_attrs(tag, t, acc)
   end
   defp build_attrs(tag, [{k, v}|t], acc) when k in @tag_prefixes and is_list(v) do
@@ -138,7 +133,6 @@ defmodule Phoenix.HTML.Tag do
 
   defp dasherize(value) when is_atom(value),   do: dasherize(Atom.to_string(value))
   defp dasherize(value) when is_binary(value), do: String.replace(value, "_", "-")
-
 
   @doc ~S"""
   Generates a form tag.
