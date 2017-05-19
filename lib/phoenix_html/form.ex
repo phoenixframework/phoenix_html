@@ -1013,10 +1013,10 @@ defmodule Phoenix.HTML.Form do
 
       def my_datetime_select(form, field, opts \\ []) do
         builder = fn b ->
-          ~e"\""
+          ~e'''
           Date: <%= b.(:day, []) %> / <%= b.(:month, []) %> / <%= b.(:year, []) %>
           Time: <%= b.(:hour, []) %> : <%= b.(:minute, []) %>
-          "\""
+          '''
         end
 
         datetime_select(form, field, [builder: builder] ++ opts)
