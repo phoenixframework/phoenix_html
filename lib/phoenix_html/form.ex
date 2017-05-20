@@ -951,7 +951,7 @@ defmodule Phoenix.HTML.Form do
 
   ## Datetime
 
-  @doc ~S"""
+  @doc ~S'''
   Generates select tags for datetime.
 
   ## Examples
@@ -1013,10 +1013,10 @@ defmodule Phoenix.HTML.Form do
 
       def my_datetime_select(form, field, opts \\ []) do
         builder = fn b ->
-          ~e'''
+          ~e"""
           Date: <%= b.(:day, []) %> / <%= b.(:month, []) %> / <%= b.(:year, []) %>
           Time: <%= b.(:hour, []) %> : <%= b.(:minute, []) %>
-          '''
+          """
         end
 
         datetime_select(form, field, [builder: builder] ++ opts)
@@ -1042,7 +1042,7 @@ defmodule Phoenix.HTML.Form do
     * a tuple with four elements: `{hour, min, sec, usec}`
     * `nil`
 
-  """
+  '''
   def datetime_select(form, field, opts \\ []) do
     value = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
 
