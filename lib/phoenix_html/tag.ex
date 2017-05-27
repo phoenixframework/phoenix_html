@@ -1,6 +1,9 @@
 defmodule Phoenix.HTML.Tag do
   @moduledoc ~S"""
   Helpers related to producing HTML tags within templates.
+
+  Note the examples in this module use `safe_to_string/1`
+  imported from `Phoenix.HTML` for readability.
   """
 
   import Phoenix.HTML
@@ -13,10 +16,10 @@ defmodule Phoenix.HTML.Tag do
   @doc ~S"""
   Creates an HTML tag with the given name and options.
 
-      iex> tag(:br)
-      {:safe, [60, "br", [], 62]}
-      iex> tag(:input, type: "text", name: "user_id")
-      {:safe, [60, "input", [[32, "name", 61, 34, "user_id", 34], [32, "type", 61, 34, "text", 34]], 62]}
+      iex> safe_to_string tag(:br)
+      "<br>"
+      iex> safe_to_string tag(:input, type: "text", name: "user_id")
+      "<input name=\"user_id\" type=\"text\">"
 
   ## Data attributes
 
@@ -25,8 +28,8 @@ defmodule Phoenix.HTML.Tag do
   with data attributes' names and values as the first element
   in the tag's attributes keyword list:
 
-      iex> tag(:input, [{:data, [foo: "bar"]}, id: "some_id"])
-      {:safe, [60, "input", [[32, "data-foo", 61, 34, "bar", 34], [32, "id", 61, 34, "some_id", 34]], 62]}
+      iex> safe_to_string tag(:input, [data: [foo: "bar"], id: "some_id"])
+      "<input data-foo=\"bar\" id=\"some_id\">"
 
   ## Boolean values
 
@@ -34,10 +37,10 @@ defmodule Phoenix.HTML.Tag do
   is repeated when it is true, as expected in HTML, or
   the attribute is completely removed if it is false:
 
-      iex> tag(:audio, autoplay: true)
-      {:safe, [60, "audio", [[32, "autoplay", 61, 34, "autoplay", 34]], 62]}
-      iex> tag(:audio, autoplay: false)
-      {:safe, [60, "audio", [], 62]}
+      iex> safe_to_string tag(:audio, autoplay: true)
+      "<audio autoplay=\"autoplay\">"
+      iex> safe_to_string tag(:audio, autoplay: false)
+      "<audio>"
 
   If you want the boolean attribute to be sent as is,
   you can explicitly convert it to a string before.
@@ -52,18 +55,20 @@ defmodule Phoenix.HTML.Tag do
 
   See `Phoenix.HTML.Tag.tag/2` for more information and examples.
 
-      iex> content_tag(:p, "Hello")
-      {:safe, [60, "p", [], 62, "Hello", 60, 47, "p", 62]}
-      iex> content_tag(:p, "<Hello>", class: "test")
-      {:safe, [60, "p", [[32, "class", 61, 34, "test", 34]], 62, "&lt;Hello&gt;", 60, 47, "p", 62]}
+      iex> safe_to_string content_tag(:p, "Hello")
+      "<p>Hello</p>"
 
-      iex> content_tag :p, class: "test" do
+      iex> safe_to_string content_tag(:p, "<Hello>", class: "test")
+      "<p class=\"test\">&lt;Hello&gt;</p>"
+
+      iex> safe_to_string(content_tag :p, class: "test" do
       ...>   "Hello"
-      ...> end
-      {:safe, [60, "p", [[32, "class", 61, 34, "test", 34]], 62, "Hello", 60, 47, "p", 62]}
+      ...> end)
+      "<p class=\"test\">Hello</p>"
 
-      iex> content_tag(:option, "Display Value", [{:data, [foo: "bar"]}, value: "value"])     
-      {:safe, [60, "option", [[32, "data-foo", 61, 34, "bar", 34], [32, "value", 61, 34, "value", 34]], 62, "Display Value", 60, 47, "option", 62]}
+      iex> safe_to_string content_tag(:option, "Display Value", [{:data, [foo: "bar"]}, value: "value"])
+      "<option data-foo=\"bar\" value=\"value\">Display Value</option>"
+
   """
   def content_tag(name, [do: block]) when is_atom(name) do
     content_tag(name, block, [])
