@@ -50,6 +50,8 @@ defmodule Phoenix.HTML.Tag do
   @doc ~S"""
   Creates an HTML tag with given name, content, and attributes.
 
+  See `Phoenix.HTML.Tag.tag/2` for more information and examples.
+
       iex> content_tag(:p, "Hello")
       {:safe, [60, "p", [], 62, "Hello", 60, 47, "p", 62]}
       iex> content_tag(:p, "<Hello>", class: "test")
@@ -59,6 +61,9 @@ defmodule Phoenix.HTML.Tag do
       ...>   "Hello"
       ...> end
       {:safe, [60, "p", [[32, "class", 61, 34, "test", 34]], 62, "Hello", 60, 47, "p", 62]}
+
+      iex> content_tag(:option, "Display Value", [{:data, [foo: "bar"]}, value: "value"])     
+      {:safe, [60, "option", [[32, "data-foo", 61, 34, "bar", 34], [32, "value", 61, 34, "value", 34]], 62, "Display Value", 60, 47, "option", 62]}
   """
   def content_tag(name, [do: block]) when is_atom(name) do
     content_tag(name, block, [])
