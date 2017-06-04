@@ -1,41 +1,38 @@
-'use strict';
+"use strict";
 
-function isLinkToSubmitParent(element) {
-  var isLinkTag = element.tagName === 'A';
-  var shouldSubmitParent = element.getAttribute('data-submit') === 'parent';
+(function() {
+  function buildHiddenInput(name, value) {
+    var input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    return input;
+  }
 
-  return isLinkTag && shouldSubmitParent;
-}
-
-function getClosestForm(element) {
-  while (element && element !== document && element.nodeType === Node.ELEMENT_NODE) {
-    if (element.tagName === 'FORM') {
-      return element;
+  function handleLinkClick(link) {
+    var message = link.getAttribute("data-confirm");
+    if(message && !window.confirm(message)) {
+        return;
     }
-    element = element.parentNode;
-  }
-  return null;
-}
 
-function didHandleSubmitLinkClick(element) {
-  while (element && element.getAttribute) {
-    if (isLinkToSubmitParent(element)) {
-      var message = element.getAttribute('data-confirm');
-      if (message === null || confirm(message)) {
-        getClosestForm(element).submit();
-      }
-      return true;
-    } else {
-      element = element.parentNode;
+    var to = link.getAttribute("data-to"),
+        method = buildHiddenInput("_method", link.getAttribute("data-method")),
+        csrf = buildHiddenInput("_csrf_token", link.getAttribute("data-csrf")),
+        form = document.createElement("form");
+
+    form.method = "post";
+    form.action = to;
+    form.style.display = "hidden";
+
+    form.appendChild(csrf);
+    form.appendChild(method);
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  window.addEventListener("click", function(e) {
+    if(e.target && e.target.getAttribute("data-method")) {
+      handleLinkClick(e.target);
     }
-  }
-  return false;
-}
-
-window.addEventListener('click', function (event) {
-  if (event.target && didHandleSubmitLinkClick(event.target)) {
-    event.preventDefault();
-    return false;
-  }
-}, false);
-
+  }, false);
+})();

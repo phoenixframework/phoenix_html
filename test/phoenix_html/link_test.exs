@@ -8,21 +8,14 @@ defmodule Phoenix.HTML.LinkTest do
     csrf_token = Plug.CSRFProtection.get_csrf_token()
 
     assert safe_to_string(link("hello", to: "/world", method: :post)) ==
-           ~s[<form action="/world" class="link" method="post">] <>
-           ~s[<input name="_csrf_token" type="hidden" value="#{csrf_token}">] <>
-           ~s[<a data-submit="parent" href="#" rel="nofollow">hello</a>] <>
-           ~s[</form>]
+           ~s[<a data-csrf="#{csrf_token}" data-method="post" data-to="/world" href="#" rel="nofollow">hello</a>]
   end
 
   test "link with put/delete" do
     csrf_token = Plug.CSRFProtection.get_csrf_token()
 
-    assert safe_to_string(link("hello", to: "/world", method: :put, form: [class: "linkmethod"])) ==
-           ~s[<form action="/world" class="linkmethod" method="post">] <>
-           ~s[<input name="_method" type="hidden" value="put">] <>
-           ~s[<input name="_csrf_token" type="hidden" value="#{csrf_token}">] <>
-           ~s[<a data-submit="parent" href="#" rel="nofollow">hello</a>] <>
-           ~s[</form>]
+    assert safe_to_string(link("hello", to: "/world", method: :put)) ==
+           ~s[<a data-csrf="#{csrf_token}" data-method="put" data-to="/world" href="#" rel="nofollow">hello</a>]
   end
 
   test "link with :do contents" do
@@ -54,17 +47,12 @@ defmodule Phoenix.HTML.LinkTest do
     csrf_token = Plug.CSRFProtection.get_csrf_token()
 
     assert safe_to_string(button("hello", to: "/world")) ==
-           ~s[<form action="/world" class="button" method="post">] <>
-           ~s[<input name="_csrf_token" type="hidden" value="#{csrf_token}">] <>
-           ~s[<button type="submit">hello</button>] <>
-           ~s[</form>]
+          ~s[<button data-csrf="#{csrf_token}" data-method="post" data-to="/world">hello</button>]
   end
 
   test "button with get does not generate CSRF" do
     assert safe_to_string(button("hello", to: "/world", method: :get)) ==
-           ~s[<form action="/world" class="button" method="get">] <>
-           ~s[<button type="submit">hello</button>] <>
-           ~s[</form>]
+          ~s[<button data-method="get" data-to="/world">hello</button>]
   end
 
   test "button with do" do
@@ -76,19 +64,14 @@ defmodule Phoenix.HTML.LinkTest do
       end
     )
 
-    assert output == ~s[<form action="/world" class="button" method="post">] <>
-      ~s[<input name="_csrf_token" type="hidden" value="#{csrf_token}">] <>
-      ~s[<button class="small" type="submit"><span>Hi</span></button>] <>
-      ~s[</form>]
+    assert output ==
+           ~s[<button class="small" data-csrf="#{csrf_token}" data-method="post" data-to="/world"><span>Hi</span></button>]
   end
 
   test "button with class overrides default" do
     csrf_token = Plug.CSRFProtection.get_csrf_token()
 
-    assert safe_to_string(button("hello", to: "/world", form: [class: "btn rounded"], id: "btn")) ==
-           ~s[<form action="/world" class="btn rounded" method="post">] <>
-           ~s[<input name="_csrf_token" type="hidden" value="#{csrf_token}">] <>
-           ~s[<button id="btn" type="submit">hello</button>] <>
-           ~s[</form>]
+    assert safe_to_string(button("hello", to: "/world", class: "btn rounded", id: "btn")) ==
+           ~s[<button class="btn rounded" data-csrf="#{csrf_token}" data-method="post" data-to="/world" id="btn">hello</button>]
   end
 end
