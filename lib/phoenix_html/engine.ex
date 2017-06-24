@@ -16,7 +16,39 @@ defmodule Phoenix.HTML.Engine do
   def init(_opts), do: {:safe, ""}
 
   @doc false
-  def handle_body(body), do: body
+  def handle_body(body) do
+    compact_safe(body)
+  end
+
+  defp compact_safe({:safe, body}) when is_list(body) do
+    case compact_static(List.flatten(body)) do
+      [element] ->
+        {:safe, element}
+      list ->
+        {:safe, list}
+    end
+  end
+  defp compact_safe({:safe, other}) do
+    {:safe, other}
+  end
+  defp compact_safe(other) do
+    other
+  end
+
+  defp compact_static([binary1, binary2 | rest])
+       when is_binary(binary1) and is_binary(binary2) do
+    compact_static([binary1 <> binary2 | rest])
+  end
+  defp compact_static([{_, _, _} = ast | rest]) do
+    compacted = Macro.prewalk(ast, &compact_safe/1)
+    [compacted | compact_static(rest)]
+  end
+  defp compact_static([other | rest]) do
+    [other | compact_static(rest)]
+  end
+  defp compact_static([]) do
+    []
+  end
 
   @doc false
   def handle_text("", text) do # Required for Elixir < v1.3
@@ -25,7 +57,7 @@ defmodule Phoenix.HTML.Engine do
 
   def handle_text({:safe, buffer}, text) do
     quote do
-      {:safe, [unquote(buffer)|unquote(text)]}
+      {:safe, [unquote(buffer), unquote(text)]}
     end
   end
 
@@ -39,8 +71,7 @@ defmodule Phoenix.HTML.Engine do
     expr   = expr(expr)
 
     {:safe, quote do
-      tmp1 = unquote(buffer)
-      [tmp1|unquote(to_safe(expr, line))]
+      [unquote(buffer), unquote(to_safe(expr, line))]
      end}
   end
 
