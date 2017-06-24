@@ -129,6 +129,11 @@ defmodule Phoenix.HTML.FormTest do
            ~s(<textarea id="key" name="search[key][]">\nfoo</textarea>)
   end
 
+  test "textarea/3 with non-binary type" do
+    assert safe_form(&textarea(&1, :key, value: :atom_value)) ==
+           ~s(<textarea id="search_key" name="search[key]">\natom_value</textarea>)
+  end
+
   ## number_input/3
 
   test "number_input/3" do

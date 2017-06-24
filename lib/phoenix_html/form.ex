@@ -557,7 +557,7 @@ defmodule Phoenix.HTML.Form do
       |> Keyword.put_new(:name, input_name(form, field))
 
     {value, opts} = Keyword.pop(opts, :value, input_value(form, field) || "")
-    content_tag(:textarea, html_escape(["\n", value]), opts)
+    content_tag(:textarea, ["\n", html_escape(value)], opts)
   end
 
   @doc """
