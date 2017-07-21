@@ -30,7 +30,7 @@ defmodule PhoenixHtml.Mixfile do
     [maintainers: ["Chris McCord", "José Valim"],
      licenses: ["MIT"],
      links: %{github: "https://github.com/phoenixframework/phoenix_html"},
-     files: ~w(lib priv web) ++
-            ~w(brunch-config.js CHANGELOG.md LICENSE mix.exs package.json README.md)]
+     files: ~w(lib priv) ++
+            ~w(CHANGELOG.md LICENSE mix.exs package.json README.md)]
   end
 end
