@@ -55,10 +55,8 @@ defmodule Phoenix.HTML.Link do
 
   In order to support links where `:method` is not `:get`
   or use the above data attributes, `Phoenix.HTML` relies
-  on JavaScript. You can either load the ES5 version from
-  `priv/static/phoenix_html.js` or depend on the one at
-  `web/static/js/phoenix_html.js` written in ES6 directly from
-  your build tool.
+  on JavaScript. You can load `priv/static/phoenix_html.js`
+  into your build tool.
   """
   def link(text, opts)
 

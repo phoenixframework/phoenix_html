@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.10.0 (2017-07-21)
+
+* Enhancements
+  * Support custom attributes in options in select
+
+* Bug fixes
+  * Accept non-binary values in textarea's content
+  * Allow nested forms on the javascript side. This means "data-submit=parent" is no longer supported and instead "data-to" and "data-method" must be set
+
 ## v2.9.3 (2016-12-24)
 
 * Bug fixes
