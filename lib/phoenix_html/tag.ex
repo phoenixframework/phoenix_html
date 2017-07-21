@@ -234,11 +234,11 @@ defmodule Phoenix.HTML.Tag do
   end
 
   defp csrf_token_tag(opts, extra) do
-    case Keyword.pop(opts, :csrf_token, true) do
-      {true, opts} ->
-        {opts, extra <> ~s'<input name="#{@csrf_param}" type="hidden" value="#{get_csrf_token()}">'}
-      {false, opts} ->
-        {opts, extra}
+    {csrf_token?, opts} = Keyword.pop(opts, :csrf_token, true)
+    if csrf_token = csrf_token? && get_csrf_token() do
+      {opts, extra <> ~s'<input name="#{@csrf_param}" type="hidden" value="#{csrf_token}">'}
+    else
+      {opts, extra}
     end
   end
 
