@@ -18,6 +18,11 @@ defmodule Phoenix.HTML.LinkTest do
            ~s[<a data-csrf="#{csrf_token}" data-method="put" data-to="/world" href="#" rel="nofollow">hello</a>]
   end
 
+  test "link with put/delete without csrf_token" do
+    assert safe_to_string(link("hello", to: "/world", method: :put, csrf_token: false)) ==
+           ~s[<a data-method="put" data-to="/world" href="#" rel="nofollow">hello</a>]
+  end
+
   test "link with :do contents" do
     assert ~s[<a href="/hello"><p>world</p></a>] == safe_to_string(link to: "/hello" do
       Phoenix.HTML.Tag.content_tag :p, "world"
@@ -48,6 +53,11 @@ defmodule Phoenix.HTML.LinkTest do
 
     assert safe_to_string(button("hello", to: "/world")) ==
           ~s[<button data-csrf="#{csrf_token}" data-method="post" data-to="/world">hello</button>]
+  end
+
+  test "button with post without csrf_token" do
+    assert safe_to_string(button("hello", to: "/world", csrf_token: false)) ==
+          ~s[<button data-method="post" data-to="/world">hello</button>]
   end
 
   test "button with get does not generate CSRF" do

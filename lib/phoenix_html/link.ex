@@ -72,14 +72,14 @@ defmodule Phoenix.HTML.Link do
 
   def link(text, opts) do
     {to, opts} = pop_required_option!(opts, :to, "expected non-nil value for :to in link/2")
+    {csrf_data, opts} = csrf_data(opts)
     {method, opts} = Keyword.pop(opts, :method, :get)
 
     if method == :get do
       content_tag(:a, text, [href: to] ++ opts)
     else
       opts = Keyword.put_new(opts, :rel, "nofollow")
-      csrf_token = Plug.CSRFProtection.get_csrf_token()
-      content_tag(:a, text, [href: "#", data: [csrf: csrf_token, method: method, to: to]] ++ opts)
+      content_tag(:a, text, [href: "#", data: [method: method, to: to] ++ csrf_data] ++ opts)
     end
   end
 
@@ -89,7 +89,6 @@ defmodule Phoenix.HTML.Link do
   def link(opts) when is_list(opts) do
     error = "link/2 requires a text as first argument or contents in the :do block"
     {contents, opts} = pop_required_option!(opts, :do, error)
-
     link(contents, opts)
   end
 
@@ -121,12 +120,21 @@ defmodule Phoenix.HTML.Link do
 
   def button(text, opts) do
     {to, method, opts} = extract_button_options(opts)
+    {csrf_data, opts} = csrf_data(opts)
 
     if method == :get do
       content_tag(:button, text, [data: [method: method, to: to]] ++ opts)
     else
-      csrf_token = Plug.CSRFProtection.get_csrf_token()
-      content_tag(:button, text, [data: [csrf: csrf_token, method: method, to: to]] ++ opts)
+      content_tag(:button, text, [data: [method: method, to: to] ++ csrf_data] ++ opts)
+    end
+  end
+
+  defp csrf_data(opts) do
+    {csrf_token?, opts} = Keyword.pop(opts, :csrf_token, true)
+    if csrf_token = csrf_token? && Plug.CSRFProtection.get_csrf_token() do
+      {[csrf: csrf_token], opts}
+    else
+      {[], opts}
     end
   end
 
