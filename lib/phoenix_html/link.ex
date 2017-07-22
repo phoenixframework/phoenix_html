@@ -70,12 +70,13 @@ defmodule Phoenix.HTML.Link do
 
   def link(text, opts) do
     {to, opts} = pop_required_option!(opts, :to, "expected non-nil value for :to in link/2")
-    {csrf_data, opts} = csrf_data(opts)
     {method, opts} = Keyword.pop(opts, :method, :get)
 
     if method == :get do
+      opts = skip_csrf(opts)
       content_tag(:a, text, [href: to] ++ opts)
     else
+      {csrf_data, opts} = csrf_data(opts)
       opts = Keyword.put_new(opts, :rel, "nofollow")
       content_tag(:a, text, [href: "#", data: [method: method, to: to] ++ csrf_data] ++ opts)
     end
@@ -118,13 +119,18 @@ defmodule Phoenix.HTML.Link do
 
   def button(text, opts) do
     {to, method, opts} = extract_button_options(opts)
-    {csrf_data, opts} = csrf_data(opts)
 
     if method == :get do
+      opts = skip_csrf(opts)
       content_tag(:button, text, [data: [method: method, to: to]] ++ opts)
     else
+      {csrf_data, opts} = csrf_data(opts)
       content_tag(:button, text, [data: [method: method, to: to] ++ csrf_data] ++ opts)
     end
+  end
+
+  defp skip_csrf(opts) do
+    Keyword.delete(opts, :csrf_token)
   end
 
   defp csrf_data(opts) do
