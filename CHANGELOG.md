@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.10.1 (2017-07-22)
+
+* Bug fixes
+  * Only generate CSRF token if necessary
+
 ## v2.10.0 (2017-07-21)
 
 * Enhancements
