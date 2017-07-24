@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.10.2 (2017-07-24)
+
+* Bug fixes
+  * Traverse DOM elements up when handling data-method
+
 ## v2.10.1 (2017-07-22)
 
 * Bug fixes
