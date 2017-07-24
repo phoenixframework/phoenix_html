@@ -31,8 +31,16 @@
   }
 
   window.addEventListener("click", function(e) {
-    if(e.target && e.target.getAttribute("data-method")) {
-      handleLinkClick(e.target);
+    var element = e.target;
+
+    while (element && element.getAttribute) {
+      if(element.getAttribute("data-method")) {
+        handleLinkClick(element);
+        e.preventDefault();
+        return false;
+      } else {
+        element = element.parentNode;
+      }
     }
   }, false);
 })();
