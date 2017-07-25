@@ -57,6 +57,14 @@ defmodule Phoenix.HTML.Link do
   or use the above data attributes, `Phoenix.HTML` relies
   on JavaScript. You can load `priv/static/phoenix_html.js`
   into your build tool.
+
+  ## CSRF Protection
+
+  By default, CSRF tokens are generated through `Plug.CSRFProtection`. You
+  can customize the CSRF token generation by configuring your own MFA:
+
+      config :phoenix_html, csrf_token_generator: {MyGenerator, :get_token, []}
+
   """
   def link(text, opts)
 
@@ -135,11 +143,16 @@ defmodule Phoenix.HTML.Link do
 
   defp csrf_data(opts) do
     {csrf_token?, opts} = Keyword.pop(opts, :csrf_token, true)
-    if csrf_token = csrf_token? && Plug.CSRFProtection.get_csrf_token() do
+    if csrf_token = csrf_token? && get_csrf_token() do
       {[csrf: csrf_token], opts}
     else
       {[], opts}
     end
+  end
+
+  defp get_csrf_token do
+    {mod, fun, args} = Application.fetch_env!(:phoenix_html, :csrf_token_generator)
+    apply(mod, fun, args)
   end
 
   defp extract_button_options(opts) do

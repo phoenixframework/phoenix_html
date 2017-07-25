@@ -7,7 +7,6 @@ defmodule Phoenix.HTML.Tag do
   """
 
   import Phoenix.HTML
-  import Plug.CSRFProtection, only: [get_csrf_token: 0]
 
   @tag_prefixes [:aria, :data]
   @csrf_param "_csrf_token"
@@ -184,6 +183,14 @@ defmodule Phoenix.HTML.Tag do
   in your forms, to force those browsers to send the data in the proper
   encoding. This technique has been seen in the Rails web framework and
   reproduced here.
+
+  ## CSRF Protection
+
+  By default, CSRF tokens are generated through `Plug.CSRFProtection`. You
+  can customize the CSRF token generation by configuring your own MFA:
+
+      config :phoenix_html, csrf_token_generator: {MyGenerator, :get_token, []}
+
   """
   def form_tag(action, opts \\ [])
 
@@ -255,6 +262,11 @@ defmodule Phoenix.HTML.Tag do
   def csrf_meta_tag do
     tag :meta, charset: "UTF-8", name: "csrf-token", content: get_csrf_token(),
                'csrf-param': @csrf_param, 'method-param': @method_param
+  end
+
+  defp get_csrf_token do
+    {mod, fun, args} = Application.fetch_env!(:phoenix_html, :csrf_token_generator)
+    apply(mod, fun, args)
   end
 
   @doc """
