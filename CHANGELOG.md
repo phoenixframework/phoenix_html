@@ -17,7 +17,7 @@
 
 * Bug fixes
   * Accept non-binary values in textarea's content
-  * Allow nested forms on the javascript side. This means "data-submit=parent" is no longer supported and instead "data-to" and "data-method" must be set
+  * Allow nested forms on the javascript side. This means `link` and `button` no longer generate a child form and "data-submit=parent" is no longer supported. Instead "data-to" and "data-method" are set on the entities and the form is generated on the javascript side of things
 
 ## v2.9.3 (2016-12-24)
 
