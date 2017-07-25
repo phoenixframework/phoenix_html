@@ -63,33 +63,33 @@ defmodule Phoenix.HTML do
   @typedoc "May be safe or unsafe (i.e. it needs to be converted)"
   @type unsafe  :: Phoenix.HTML.Safe.t
 
-  @doc """
+  @doc ~s'''
   Provides `~e` sigil with HTML safe EEx syntax inside source files.
 
   Raises on attempts to interpolate with `\#{}`, so `~E` should be preferred.
 
-      iex> ~e"\""
+      iex> ~e"""
       ...> Hello <%= "world" %>
-      ...> "\""
-      {:safe, [[["" | "Hello "] | "world"] | "\\n"]}
+      ...> """
+      {:safe, "Hello world\\n"}
 
-  """
+  '''
   defmacro sigil_e(expr, opts) do
     handle_sigil(expr, opts, __CALLER__.line)
   end
 
-  @doc """
+  @doc ~s'''
   Provides `~E` sigil with HTML safe EEx syntax inside source files.
 
   Does not raise on attempts to interpolate with `\#{}`, but rather shows those
   characters literally, so it should be preferred over `~e`.
 
-      iex> ~E"\""
+      iex> ~E"""
       ...> Hello <%= "world" %>
-      ...> "\""
-      {:safe, [[["" | "Hello "] | "world"] | "\\n"]}
+      ...> """
+      {:safe, "Hello world\\n"}
 
-  """
+  '''
   defmacro sigil_E(expr, opts) do
     handle_sigil(expr, opts, __CALLER__.line)
   end
