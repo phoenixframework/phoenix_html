@@ -18,7 +18,8 @@ defmodule PhoenixHtml.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :plug]]
+    [applications: [:logger, :plug],
+     env: [csrf_token_generator: {Plug.CSRFProtection, :get_csrf_token, []}]]
   end
 
   defp deps do
