@@ -16,6 +16,12 @@ defmodule Phoenix.HTML.Engine do
   def init(_opts), do: {:safe, ""}
 
   @doc false
+  def handle_begin(_previous), do: {:safe, ""}
+
+  @doc false
+  def handle_end(quoted), do: quoted
+
+  @doc false
   def handle_body(body), do: body
 
   @doc false
