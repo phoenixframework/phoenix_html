@@ -20,7 +20,7 @@
         csrf = buildHiddenInput("_csrf_token", link.getAttribute("data-csrf")),
         form = document.createElement("form");
 
-    form.method = "post";
+    form.method = (link.getAttribute("data-method") === "get") ? "get" : "post";
     form.action = to;
     form.style.display = "hidden";
 
