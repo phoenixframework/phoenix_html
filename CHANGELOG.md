@@ -1,5 +1,13 @@
 # Changelog
 
+## v2.10.3 (2017-07-30)
+
+* Enhancements
+  * Allow specifying a custom CSRF token generator
+
+* Bug fixes
+  * Do not submit `method: :get` in buttons as "post"
+
 ## v2.10.2 (2017-07-24)
 
 * Bug fixes
@@ -17,7 +25,7 @@
 
 * Bug fixes
   * Accept non-binary values in textarea's content
-  * Allow nested forms on the javascript side. This means `link` and `button` no longer generate a child form and "data-submit=parent" is no longer supported. Instead "data-to" and "data-method" are set on the entities and the form is generated on the javascript side of things
+  * Allow nested forms on the javascript side. This means `link` and `button` no longer generate a child form such as the `:form` option has no effect and "data-submit=parent" is no longer supported. Instead "data-to" and "data-method" are set on the entities and the form is generated on the javascript side of things
 
 ## v2.9.3 (2016-12-24)
 

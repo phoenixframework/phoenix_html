@@ -126,7 +126,8 @@ defmodule Phoenix.HTML.Link do
   end
 
   def button(text, opts) do
-    {to, method, opts} = extract_button_options(opts)
+    {to, opts} = pop_required_option!(opts, :to, "option :to is required in button/2")
+    {method, opts} = Keyword.pop(opts, :method, :post)
 
     if method == :get do
       opts = skip_csrf(opts)
@@ -153,13 +154,6 @@ defmodule Phoenix.HTML.Link do
   defp get_csrf_token do
     {mod, fun, args} = Application.fetch_env!(:phoenix_html, :csrf_token_generator)
     apply(mod, fun, args)
-  end
-
-  defp extract_button_options(opts) do
-    {to, opts} = pop_required_option!(opts, :to, "option :to is required in button/2")
-    {method, opts} = Keyword.pop(opts, :method, :post)
-
-    {to, method, opts}
   end
 
   defp pop_required_option!(opts, key, error_message) do

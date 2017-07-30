@@ -25,7 +25,7 @@ defmodule Phoenix.HTML.Engine do
   def handle_body(body), do: body
 
   @doc false
-  def handle_text("", text) do # Required for Elixir < v1.5
+  def handle_text("", text) do # Required for Elixir < v1.5.1
     handle_text({:safe, ""}, text)
   end
 
@@ -36,7 +36,7 @@ defmodule Phoenix.HTML.Engine do
   end
 
   @doc false
-  def handle_expr("", marker, expr) do # Required for Elixir < v1.5
+  def handle_expr("", marker, expr) do # Required for Elixir < v1.5.1
     handle_expr({:safe, ""}, marker, expr)
   end
 
