@@ -1148,7 +1148,7 @@ defmodule Phoenix.HTML.Form do
   ]
 
   map = &Enum.map(&1, fn i ->
-    pre = if i < 9, do: "0"
+    pre = if i < 10, do: "0"
     {"#{pre}#{i}", i}
   end)
 
