@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.10.4 (2017-08-15)
+
+* Bug fixes
+  * Fix formatting of days in datetime_builder
+
 ## v2.10.3 (2017-07-30)
 
 * Enhancements
