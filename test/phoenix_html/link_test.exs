@@ -46,6 +46,11 @@ defmodule Phoenix.HTML.LinkTest do
     assert_raise ArgumentError, msg, fn ->
       link(to: "/hello-world")
     end
+
+    msg = "link/2 expects a valid URL or path"
+    assert_raise ArgumentError, msg, fn ->
+      link("foo", to: "javascript:alert(1)")
+    end
   end
 
   test "button with post (default)" do

@@ -66,6 +66,11 @@ defmodule Phoenix.HTML.Link do
       config :phoenix_html, csrf_token_generator: {MyGenerator, :get_token, []}
 
   """
+  @valid_uri_schemes ["http:", "https:", "ftp:", "ftps:", "mailto:",
+                      "news:", "irc:", "gopher:", "nntp:", "feed:",
+                      "telnet:", "mms:", "rtsp:", "svn:", "tel:", "fax:",
+                      "xmpp:"]
+
   def link(text, opts)
 
   def link(opts, do: contents) when is_list(opts) do
@@ -78,6 +83,11 @@ defmodule Phoenix.HTML.Link do
 
   def link(text, opts) do
     {to, opts} = pop_required_option!(opts, :to, "expected non-nil value for :to in link/2")
+
+    if invalid_destination?(to) do
+      raise ArgumentError, "link/2 expects a valid URL or path"
+    end
+
     {method, opts} = Keyword.pop(opts, :method, :get)
 
     if method == :get do
@@ -165,4 +175,11 @@ defmodule Phoenix.HTML.Link do
 
     {value, opts}
   end
+
+  defp invalid_destination?(to) when is_tuple(to), do: false
+
+  for scheme <- @valid_uri_schemes do
+    defp invalid_destination?(unquote(scheme) <> _), do: false
+  end
+  defp invalid_destination?(to), do: String.contains?(to, ":")
 end
