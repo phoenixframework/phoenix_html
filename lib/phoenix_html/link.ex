@@ -84,7 +84,7 @@ defmodule Phoenix.HTML.Link do
   def link(text, opts) do
     {to, opts} = pop_required_option!(opts, :to, "expected non-nil value for :to in link/2")
 
-    to = valid_destination(to)
+    to = valid_destination!(to)
 
     {method, opts} = Keyword.pop(opts, :method, :get)
 
@@ -137,7 +137,7 @@ defmodule Phoenix.HTML.Link do
     {to, opts} = pop_required_option!(opts, :to, "option :to is required in button/2")
     {method, opts} = Keyword.pop(opts, :method, :post)
 
-    to = valid_destination(to)
+    to = valid_destination!(to)
 
     if method == :get do
       opts = skip_csrf(opts)
@@ -176,7 +176,7 @@ defmodule Phoenix.HTML.Link do
     {value, opts}
   end
 
-  defp valid_destination(to) do
+  defp valid_destination!(to) do
     if invalid_destination?(to) do
       raise ArgumentError, """
       unsupported scheme given to link/2. In case you want to link to an
