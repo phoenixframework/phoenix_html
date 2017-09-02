@@ -31,6 +31,11 @@ defmodule Phoenix.HTML.LinkTest do
     assert safe_to_string(link(to: "/hello", do: "world")) == ~s[<a href="/hello">world</a>]
   end
 
+  test "link with scheme tuple" do
+    assert safe_to_string(link("foo", to: {:javascript, "javascript:alert(1)"})) ==
+           ~s[<a href="javascript:alert(1)">foo</a>]
+  end
+
   test "link with invalid args" do
     msg = "expected non-nil value for :to in link/2"
     assert_raise ArgumentError, msg, fn ->
@@ -47,9 +52,21 @@ defmodule Phoenix.HTML.LinkTest do
       link(to: "/hello-world")
     end
 
-    msg = "link/2 expects a valid URL or path"
+    msg = """
+          unsupported scheme given to link/2. In case you want to link to an
+          unknown or unsafe scheme, such as javascript, use a tuple: {:javascript, rest}
+          """
     assert_raise ArgumentError, msg, fn ->
       link("foo", to: "javascript:alert(1)")
+    end
+
+    assert_raise ArgumentError, msg, fn ->
+      link("foo", to: {:bitcoin, "javascript:alert(1)"})
+    end
+
+    input = Phoenix.HTML.html_escape("javascript:alert(1)")
+    assert_raise ArgumentError, msg, fn ->
+      link("foo", to: input)
     end
   end
 

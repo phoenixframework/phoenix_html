@@ -84,9 +84,7 @@ defmodule Phoenix.HTML.Link do
   def link(text, opts) do
     {to, opts} = pop_required_option!(opts, :to, "expected non-nil value for :to in link/2")
 
-    if invalid_destination?(to) do
-      raise ArgumentError, "link/2 expects a valid URL or path"
-    end
+    to = valid_destination(to)
 
     {method, opts} = Keyword.pop(opts, :method, :get)
 
@@ -139,6 +137,8 @@ defmodule Phoenix.HTML.Link do
     {to, opts} = pop_required_option!(opts, :to, "option :to is required in button/2")
     {method, opts} = Keyword.pop(opts, :method, :post)
 
+    to = valid_destination(to)
+
     if method == :get do
       opts = skip_csrf(opts)
       content_tag(:button, text, [data: [method: method, to: to]] ++ opts)
@@ -176,10 +176,31 @@ defmodule Phoenix.HTML.Link do
     {value, opts}
   end
 
-  defp invalid_destination?(to) when is_tuple(to), do: false
+  defp valid_destination(to) do
+    if invalid_destination?(to) do
+      raise ArgumentError, """
+      unsupported scheme given to link/2. In case you want to link to an
+      unknown or unsafe scheme, such as javascript, use a tuple: {:javascript, rest}
+      """
+    end
+
+    case to do
+      {_, dest} -> dest
+      dest -> dest
+    end
+  end
 
   for scheme <- @valid_uri_schemes do
     defp invalid_destination?(unquote(scheme) <> _), do: false
   end
-  defp invalid_destination?(to), do: String.contains?(to, ":")
+  defp invalid_destination?({:safe, to}) do
+    invalid_destination?(to)
+  end
+  defp invalid_destination?({scheme, to}) when is_atom(scheme) do
+    !String.starts_with?(to, "#{scheme}:")
+  end
+  defp invalid_destination?(to) when is_binary(to) do
+    String.contains?(to, ":")
+  end
+  defp invalid_destination?(_), do: true
 end
