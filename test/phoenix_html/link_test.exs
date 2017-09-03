@@ -106,4 +106,14 @@ defmodule Phoenix.HTML.LinkTest do
     assert safe_to_string(button("hello", to: "/world", class: "btn rounded", id: "btn")) ==
            ~s[<button class="btn rounded" data-csrf="#{csrf_token}" data-method="post" data-to="/world" id="btn">hello</button>]
   end
+
+  test "button with invalid args" do
+    msg = """
+          unsupported scheme given to button/2. In case you want to link to an
+          unknown or unsafe scheme, such as javascript, use a tuple: {:javascript, rest}
+          """
+    assert_raise ArgumentError, msg, fn ->
+      button("foo", to: "javascript:alert(1)", method: :get)
+    end
+  end
 end
