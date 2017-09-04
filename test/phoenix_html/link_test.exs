@@ -32,7 +32,7 @@ defmodule Phoenix.HTML.LinkTest do
   end
 
   test "link with scheme tuple" do
-    assert safe_to_string(link("foo", to: {:javascript, "javascript:alert(1)"})) ==
+    assert safe_to_string(link("foo", to: {:javascript, "alert(1)"})) ==
            ~s[<a href="javascript:alert(1)">foo</a>]
   end
 
