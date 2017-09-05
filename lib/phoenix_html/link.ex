@@ -66,6 +66,11 @@ defmodule Phoenix.HTML.Link do
       config :phoenix_html, csrf_token_generator: {MyGenerator, :get_token, []}
 
   """
+  @valid_uri_schemes ["http:", "https:", "ftp:", "ftps:", "mailto:",
+                      "news:", "irc:", "gopher:", "nntp:", "feed:",
+                      "telnet:", "mms:", "rtsp:", "svn:", "tel:", "fax:",
+                      "xmpp:"]
+
   def link(text, opts)
 
   def link(opts, do: contents) when is_list(opts) do
@@ -78,6 +83,9 @@ defmodule Phoenix.HTML.Link do
 
   def link(text, opts) do
     {to, opts} = pop_required_option!(opts, :to, "expected non-nil value for :to in link/2")
+
+    to = valid_destination!(to, "link/2")
+
     {method, opts} = Keyword.pop(opts, :method, :get)
 
     if method == :get do
@@ -129,6 +137,8 @@ defmodule Phoenix.HTML.Link do
     {to, opts} = pop_required_option!(opts, :to, "option :to is required in button/2")
     {method, opts} = Keyword.pop(opts, :method, :post)
 
+    to = valid_destination!(to, "button/2")
+
     if method == :get do
       opts = skip_csrf(opts)
       content_tag(:button, text, [data: [method: method, to: to]] ++ opts)
@@ -165,4 +175,33 @@ defmodule Phoenix.HTML.Link do
 
     {value, opts}
   end
+
+  defp valid_destination!(to, calling_func) do
+    if invalid_destination?(to) do
+      raise ArgumentError, """
+      unsupported scheme given to #{calling_func}. In case you want to link to an
+      unknown or unsafe scheme, such as javascript, use a tuple: {:javascript, rest}
+      """
+    end
+
+    valid_destination!(to)
+  end
+  defp valid_destination!({:safe, to}) do
+    {:safe, valid_destination!(to)}
+  end
+  defp valid_destination!({other, to}) when is_atom(other) do
+    [Atom.to_string(other), ?:, to]
+  end
+  defp valid_destination!(to), do: to
+
+  for scheme <- @valid_uri_schemes do
+    defp invalid_destination?(unquote(scheme) <> _), do: false
+  end
+  defp invalid_destination?({scheme, _}) when is_atom(scheme) do
+    false
+  end
+  defp invalid_destination?(to) when is_binary(to) do
+    String.contains?(to, ":")
+  end
+  defp invalid_destination?(_), do: true
 end

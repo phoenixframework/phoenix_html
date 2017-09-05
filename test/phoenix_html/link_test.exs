@@ -31,6 +31,17 @@ defmodule Phoenix.HTML.LinkTest do
     assert safe_to_string(link(to: "/hello", do: "world")) == ~s[<a href="/hello">world</a>]
   end
 
+  test "link with scheme tuple" do
+    assert safe_to_string(link("foo", to: {:javascript, "alert(1)"})) ==
+           ~s[<a href="javascript:alert(1)">foo</a>]
+
+    assert safe_to_string(link("foo", to: {:javascript, {:safe, "alert(1)"}})) ==
+           ~s[<a href="javascript:alert(1)">foo</a>]
+
+    assert safe_to_string(link("foo", to: {:safe, {:javascript, "alert(1)"}})) ==
+           ~s[<a href="javascript:alert(1)">foo</a>]
+  end
+
   test "link with invalid args" do
     msg = "expected non-nil value for :to in link/2"
     assert_raise ArgumentError, msg, fn ->
@@ -45,6 +56,14 @@ defmodule Phoenix.HTML.LinkTest do
     msg = "link/2 requires a text as first argument or contents in the :do block"
     assert_raise ArgumentError, msg, fn ->
       link(to: "/hello-world")
+    end
+
+    msg = """
+          unsupported scheme given to link/2. In case you want to link to an
+          unknown or unsafe scheme, such as javascript, use a tuple: {:javascript, rest}
+          """
+    assert_raise ArgumentError, msg, fn ->
+      link("foo", to: "javascript:alert(1)")
     end
   end
 
@@ -83,5 +102,15 @@ defmodule Phoenix.HTML.LinkTest do
 
     assert safe_to_string(button("hello", to: "/world", class: "btn rounded", id: "btn")) ==
            ~s[<button class="btn rounded" data-csrf="#{csrf_token}" data-method="post" data-to="/world" id="btn">hello</button>]
+  end
+
+  test "button with invalid args" do
+    msg = """
+          unsupported scheme given to button/2. In case you want to link to an
+          unknown or unsafe scheme, such as javascript, use a tuple: {:javascript, rest}
+          """
+    assert_raise ArgumentError, msg, fn ->
+      button("foo", to: "javascript:alert(1)", method: :get)
+    end
   end
 end
