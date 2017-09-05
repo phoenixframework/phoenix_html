@@ -176,32 +176,27 @@ defmodule Phoenix.HTML.Link do
     {value, opts}
   end
 
-  defp valid_destination!(to, calling_func) do
-    if invalid_destination?(to) do
-      raise ArgumentError, """
-      unsupported scheme given to #{calling_func}. In case you want to link to an
-      unknown or unsafe scheme, such as javascript, use a tuple: {:javascript, rest}
-      """
-    end
-
-    valid_destination!(to)
+  defp valid_destination!({:safe, to}, context) do
+    {:safe, valid_string_destination!(IO.iodata_to_binary(to), context)}
   end
-  defp valid_destination!({:safe, to}) do
-    {:safe, valid_destination!(to)}
-  end
-  defp valid_destination!({other, to}) when is_atom(other) do
+  defp valid_destination!({other, to}, _context) when is_atom(other) do
     [Atom.to_string(other), ?:, to]
   end
-  defp valid_destination!(to), do: to
+  defp valid_destination!(to, context) do
+    valid_string_destination!(IO.iodata_to_binary(to), context)
+  end
 
   for scheme <- @valid_uri_schemes do
-    defp invalid_destination?(unquote(scheme) <> _), do: false
+    defp valid_string_destination!(unquote(scheme) <> _ = string, _context), do: string
   end
-  defp invalid_destination?({scheme, _}) when is_atom(scheme) do
-    false
+  defp valid_string_destination!(to, context) do
+    if String.contains?(to, ":") do
+      raise ArgumentError, """
+      unsupported scheme given to #{context}. In case you want to link to an
+      unknown or unsafe scheme, such as javascript, use a tuple: {:javascript, rest}
+      """
+    else
+      to
+    end
   end
-  defp invalid_destination?(to) when is_binary(to) do
-    String.contains?(to, ":")
-  end
-  defp invalid_destination?(_), do: true
 end

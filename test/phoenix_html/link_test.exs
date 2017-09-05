@@ -35,10 +35,13 @@ defmodule Phoenix.HTML.LinkTest do
     assert safe_to_string(link("foo", to: {:javascript, "alert(1)"})) ==
            ~s[<a href="javascript:alert(1)">foo</a>]
 
+    assert safe_to_string(link("foo", to: {:javascript, 'alert(1)'})) ==
+           ~s[<a href="javascript:alert(1)">foo</a>]
+
     assert safe_to_string(link("foo", to: {:javascript, {:safe, "alert(1)"}})) ==
            ~s[<a href="javascript:alert(1)">foo</a>]
 
-    assert safe_to_string(link("foo", to: {:safe, {:javascript, "alert(1)"}})) ==
+    assert safe_to_string(link("foo", to: {:javascript, {:safe, 'alert(1)'}})) ==
            ~s[<a href="javascript:alert(1)">foo</a>]
   end
 
@@ -58,12 +61,16 @@ defmodule Phoenix.HTML.LinkTest do
       link(to: "/hello-world")
     end
 
-    msg = """
-          unsupported scheme given to link/2. In case you want to link to an
-          unknown or unsafe scheme, such as javascript, use a tuple: {:javascript, rest}
-          """
-    assert_raise ArgumentError, msg, fn ->
+    assert_raise ArgumentError, ~r"unsupported scheme given to link/2", fn ->
       link("foo", to: "javascript:alert(1)")
+    end
+
+    assert_raise ArgumentError, ~r"unsupported scheme given to link/2", fn ->
+      link("foo", to: {:safe, "javascript:alert(1)"})
+    end
+
+    assert_raise ArgumentError, ~r"unsupported scheme given to link/2", fn ->
+      link("foo", to: {:safe, 'javascript:alert(1)'})
     end
   end
 
