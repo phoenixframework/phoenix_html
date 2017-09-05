@@ -34,6 +34,12 @@ defmodule Phoenix.HTML.LinkTest do
   test "link with scheme tuple" do
     assert safe_to_string(link("foo", to: {:javascript, "alert(1)"})) ==
            ~s[<a href="javascript:alert(1)">foo</a>]
+
+    assert safe_to_string(link("foo", to: {:javascript, {:safe, "alert(1)"}})) ==
+           ~s[<a href="javascript:alert(1)">foo</a>]
+
+    assert safe_to_string(link("foo", to: {:safe, {:javascript, "alert(1)"}})) ==
+           ~s[<a href="javascript:alert(1)">foo</a>]
   end
 
   test "link with invalid args" do
@@ -58,15 +64,6 @@ defmodule Phoenix.HTML.LinkTest do
           """
     assert_raise ArgumentError, msg, fn ->
       link("foo", to: "javascript:alert(1)")
-    end
-
-    assert_raise ArgumentError, msg, fn ->
-      link("foo", to: {:bitcoin, "javascript:alert(1)"})
-    end
-
-    input = Phoenix.HTML.html_escape("javascript:alert(1)")
-    assert_raise ArgumentError, msg, fn ->
-      link("foo", to: input)
     end
   end
 

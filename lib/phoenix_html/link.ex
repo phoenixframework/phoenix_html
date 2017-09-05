@@ -184,18 +184,21 @@ defmodule Phoenix.HTML.Link do
       """
     end
 
-    case to do
-      {:safe, _} = dest -> dest
-      {scheme, dest} -> "#{scheme}:#{dest}"
-      dest -> dest
-    end
+    valid_destination!(to)
   end
+  defp valid_destination!({:safe, to}) do
+    {:safe, valid_destination!(to)}
+  end
+  defp valid_destination!({other, to}) when is_atom(other) do
+    [Atom.to_string(other), ?:, to]
+  end
+  defp valid_destination!(to), do: to
 
   for scheme <- @valid_uri_schemes do
     defp invalid_destination?(unquote(scheme) <> _), do: false
   end
-  defp invalid_destination?({scheme, to}) when is_atom(scheme) do
-    invalid_destination?(to)
+  defp invalid_destination?({scheme, _}) when is_atom(scheme) do
+    false
   end
   defp invalid_destination?(to) when is_binary(to) do
     String.contains?(to, ":")
