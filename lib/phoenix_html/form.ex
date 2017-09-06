@@ -742,7 +742,7 @@ defmodule Phoenix.HTML.Form do
   generate each respective `option`. The enumerable may have:
 
     * keyword lists - each keyword list is expected to have the keys
-      `:value` and `:label`. Additional keys such as `:disabled` may
+      `:key` and `:value`. Additional keys such as `:disabled` may
       be given to customize the option
 
     * two-item tuples - where the first element is an atom, string or
