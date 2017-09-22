@@ -528,7 +528,7 @@ defmodule Phoenix.HTML.Form do
   end
 
   @doc """
-  Generates a datetime input.
+  Generates a datetime-local input.
 
   Warning: this feature isn't available in all browsers.
   Check `http://caniuse.com/#feat=input-datetime` for further informations.

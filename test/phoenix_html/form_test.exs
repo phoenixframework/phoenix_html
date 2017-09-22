@@ -342,7 +342,7 @@ defmodule Phoenix.HTML.FormTest do
           ~s(<input id="key" name="search[key][]" type="date" value="2017-09-21">)
   end
 
-  ## datetime_local_input/3
+  ## datetime_input/3
 
   test "datetime_local_input/3" do
     assert safe_to_string(datetime_local_input(:search, :key)) ==
