@@ -536,8 +536,16 @@ defmodule Phoenix.HTML.Form do
   See `text_input/3` for example and docs.
   """
   def datetime_local_input(form, field, opts \\ []) do
+    opts = Keyword.replace(opts, :value, datetime_local_input_value(Keyword.get(opts, :value)))
     generic_input(:'datetime-local', form, field, opts)
   end
+
+  defp datetime_local_input_value(%{__struct__: NaiveDateTime} = value) do
+    str = to_string(value)
+    String.slice(str, 0..9) <> "T" <> String.slice(str, 11..15)
+  end
+
+  defp datetime_local_input_value(other), do: other
 
   @doc """
   Generates a time input.
@@ -548,8 +556,17 @@ defmodule Phoenix.HTML.Form do
   See `text_input/3` for example and docs.
   """
   def time_input(form, field, opts \\ []) do
+    opts = Keyword.replace(opts, :value, time_input_value(Keyword.get(opts, :value)))
     generic_input(:time, form, field, opts)
   end
+
+  defp time_input_value(%{__struct__: Time} = value) do
+    value
+    |> to_string
+    |> String.slice(0..4)
+  end
+
+  defp time_input_value(other), do: other
 
   defp generic_input(type, form, field, opts) when is_atom(field) and is_list(opts) do
     opts =
