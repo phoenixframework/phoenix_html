@@ -540,9 +540,9 @@ defmodule Phoenix.HTML.Form do
     generic_input(:'datetime-local', form, field, opts)
   end
 
-  defp datetime_local_input_value(%{__struct__: NaiveDateTime} = value) do
-    str = to_string(value)
-    String.slice(str, 0..9) <> "T" <> String.slice(str, 11..15)
+  defp datetime_local_input_value(%NaiveDateTime{} = value) do
+    <<date::10-binary, ?\s, hour_minute::5-binary, _rest::binary>> = NaiveDateTime.to_string(value)
+    [date, ?T, hour_minute]
   end
 
   defp datetime_local_input_value(other), do: other
@@ -560,7 +560,7 @@ defmodule Phoenix.HTML.Form do
     generic_input(:time, form, field, opts)
   end
 
-  defp time_input_value(%{__struct__: Time} = value) do
+  defp time_input_value(%Time{} = value) do
     value
     |> to_string
     |> String.slice(0..4)
