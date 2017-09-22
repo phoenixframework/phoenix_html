@@ -286,6 +286,13 @@ defmodule Phoenix.HTML.Tag do
       img_tag(static_path("logo.png"))
       <img src="logo.png?vsn=3456789">
 
+  To generate a path to an image hosted in your application "priv/static",
+  with the `@conn` endpoint, use `static_path/2` to get a URL with 
+  cache control parameters:
+  
+      img_tag(static_path(@conn, "/images/logo.png"))
+      <img src="logo.png?vsn=3456789">
+
   """
   def img_tag(src, opts \\ []) do
     tag(:img, Keyword.put_new(opts, :src, src))
