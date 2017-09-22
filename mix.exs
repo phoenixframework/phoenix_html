@@ -2,12 +2,12 @@ defmodule PhoenixHtml.Mixfile do
   use Mix.Project
 
   # Also change package.json version
-  @version "2.10.4"
+  @version "2.11.0-dev"
 
   def project do
     [app: :phoenix_html,
      version: @version,
-     elixir: "~> 1.0",
+     elixir: "~> 1.3",
      deps: deps(),
 
      name: "Phoenix.HTML",
