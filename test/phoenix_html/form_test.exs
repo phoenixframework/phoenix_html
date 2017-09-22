@@ -318,6 +318,60 @@ defmodule Phoenix.HTML.FormTest do
           ~s(<input id="key" name="search[key][]" type="range" value="foo">)
   end
 
+  ## date_input/3
+
+  test "date_input/3" do
+    assert safe_to_string(date_input(:search, :key)) ==
+          ~s(<input id="search_key" name="search[key]" type="date">)
+
+    assert safe_to_string(date_input(:search, :key, value: "foo", id: "key", name: "search[key][]")) ==
+          ~s(<input id="key" name="search[key][]" type="date" value="foo">)
+  end
+
+  test "date_input/3 with form" do
+    assert safe_form(&date_input(&1, :key)) ==
+          ~s(<input id="search_key" name="search[key]" type="date" value="value">)
+
+    assert safe_form(&date_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+          ~s(<input id="key" name="search[key][]" type="date" value="foo">)
+  end
+
+  ## datetime_input/3
+
+  test "datetime_local_input/3" do
+    assert safe_to_string(datetime_local_input(:search, :key)) ==
+          ~s(<input id="search_key" name="search[key]" type="datetime-local">)
+
+    assert safe_to_string(datetime_local_input(:search, :key, value: "foo", id: "key", name: "search[key][]")) ==
+          ~s(<input id="key" name="search[key][]" type="datetime-local" value="foo">)
+  end
+
+  test "datetime_local_input/3 with form" do
+    assert safe_form(&datetime_local_input(&1, :key)) ==
+          ~s(<input id="search_key" name="search[key]" type="datetime-local" value="value">)
+
+    assert safe_form(&datetime_local_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+          ~s(<input id="key" name="search[key][]" type="datetime-local" value="foo">)
+  end
+
+  ## time_input/3
+
+  test "time_input/3" do
+    assert safe_to_string(time_input(:search, :key)) ==
+          ~s(<input id="search_key" name="search[key]" type="time">)
+
+    assert safe_to_string(time_input(:search, :key, value: "foo", id: "key", name: "search[key][]")) ==
+          ~s(<input id="key" name="search[key][]" type="time" value="foo">)
+  end
+
+  test "time_input/3 with form" do
+    assert safe_form(&time_input(&1, :key)) ==
+          ~s(<input id="search_key" name="search[key]" type="time" value="value">)
+
+    assert safe_form(&time_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+          ~s(<input id="key" name="search[key][]" type="time" value="foo">)
+  end
+
   ## submit/2
 
   test "submit/2" do
