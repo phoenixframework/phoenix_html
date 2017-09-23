@@ -515,6 +515,69 @@ defmodule Phoenix.HTML.Form do
     generic_input(:range, form, field, opts)
   end
 
+  @doc """
+  Generates a date input.
+
+  Warning: this feature isn't available in all browsers.
+  Check `http://caniuse.com/#feat=input-datetime` for further informations.
+
+  See `text_input/3` for example and docs.
+  """
+  def date_input(form, field, opts \\ []) do
+    generic_input(:date, form, field, opts)
+  end
+
+  @doc """
+  Generates a datetime-local input.
+
+  Warning: this feature isn't available in all browsers.
+  Check `http://caniuse.com/#feat=input-datetime` for further informations.
+
+  See `text_input/3` for example and docs.
+  """
+  def datetime_local_input(form, field, opts \\ []) do
+    opts = case Keyword.fetch(opts, :value) do
+      {:ok, value} ->
+        Keyword.put(opts, :value, datetime_local_input_value(value))
+      :error ->
+        opts
+    end
+    generic_input(:'datetime-local', form, field, opts)
+  end
+
+  defp datetime_local_input_value(%NaiveDateTime{} = value) do
+    <<date::10-binary, ?\s, hour_minute::5-binary, _rest::binary>> = NaiveDateTime.to_string(value)
+    [date, ?T, hour_minute]
+  end
+
+  defp datetime_local_input_value(other), do: other
+
+  @doc """
+  Generates a time input.
+
+  Warning: this feature isn't available in all browsers.
+  Check `http://caniuse.com/#feat=input-datetime` for further informations.
+
+  See `text_input/3` for example and docs.
+  """
+  def time_input(form, field, opts \\ []) do
+    opts = case Keyword.fetch(opts, :value) do
+      {:ok, value} ->
+        Keyword.put(opts, :value, time_input_value(value))
+      :error ->
+        opts
+    end
+    generic_input(:time, form, field, opts)
+  end
+
+  defp time_input_value(%Time{} = value) do
+    value
+    |> to_string
+    |> String.slice(0..4)
+  end
+
+  defp time_input_value(other), do: other
+
   defp generic_input(type, form, field, opts) when is_atom(field) and is_list(opts) do
     opts =
       opts
