@@ -160,6 +160,12 @@ defmodule Phoenix.HTML.FormTest do
 
     assert safe_to_string(hidden_input(:search, :key, value: "foo", id: "key", name: "search[key][]")) ==
            ~s(<input id="key" name="search[key][]" type="hidden" value="foo">)
+
+    assert safe_to_string(hidden_input(:search, :key, value: true, id: "key", name: "search[key][]")) ==
+           ~s(<input id="key" name="search[key][]" type="hidden" value="true">)
+
+    assert safe_to_string(hidden_input(:search, :key, value: false, id: "key", name: "search[key][]")) ==
+           ~s(<input id="key" name="search[key][]" type="hidden" value="false">)
   end
 
   test "hidden_input/3 with form" do
