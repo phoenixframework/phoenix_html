@@ -25,6 +25,10 @@ defmodule Phoenix.HTMLTest do
     assert escape_javascript({:safe, ["'Single quote'"]}) == {:safe, "\\'Single quote\\'"}
   end
 
+  test "safe_to_string/1" do
+    assert safe_to_string({:safe, 'ünicode'}) == "ünicode"
+  end
+
   test "only accepts valid iodata" do
     assert Phoenix.HTML.Safe.to_iodata("foo") == "foo"
     assert Phoenix.HTML.Safe.to_iodata('foo') == 'foo'

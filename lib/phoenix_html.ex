@@ -159,9 +159,6 @@ defmodule Phoenix.HTML do
       iex> safe_to_string({:safe, ["o", 'k']})
       "ok"
 
-      iex> safe_to_string({:safe, 'ünicode'})
-      "ünicode"
-
       iex> safe_to_string("unsafe")
       ** (FunctionClauseError) no function clause matching in Phoenix.HTML.safe_to_string/1
   """
