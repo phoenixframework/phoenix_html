@@ -155,10 +155,19 @@ defmodule Phoenix.HTML do
 
   Fails if the result is not safe. In such cases, you can
   invoke `html_escape/1` or `raw/1` accordingly before.
+
+      iex> safe_to_string({:safe, ["o", 'k']})
+      "ok"
+
+      iex> safe_to_string({:safe, 'ünicode'})
+      "ünicode"
+
+      iex> safe_to_string("unsafe")
+      ** (FunctionClauseError) no function clause matching in Phoenix.HTML.safe_to_string/1
   """
   @spec safe_to_string(safe) :: String.t
   def safe_to_string({:safe, iodata}) do
-    IO.iodata_to_binary(iodata)
+    IO.chardata_to_string(iodata)
   end
 
   @doc """
