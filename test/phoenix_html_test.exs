@@ -23,6 +23,7 @@ defmodule Phoenix.HTMLTest do
     assert escape_javascript(<<0x2029::utf8>>) == "&#x2029;"
     assert escape_javascript({:safe, "'Single quote'"}) == {:safe, "\\'Single quote\\'"}
     assert escape_javascript({:safe, ["'Single quote'"]}) == {:safe, "\\'Single quote\\'"}
+    assert escape_javascript({:safe, 'ünicode'}) == {:safe, "ünicode"}
   end
 
   test "safe_to_string/1" do
