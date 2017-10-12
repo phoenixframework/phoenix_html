@@ -585,8 +585,12 @@ defmodule Phoenix.HTML.Form do
       |> Keyword.put_new(:id, input_id(form, field))
       |> Keyword.put_new(:name, input_name(form, field))
       |> Keyword.put_new(:value, input_value(form, field))
+      |> Keyword.update(:value, nil, &escape_value/1)
     tag(:input, opts)
   end
+
+  defp escape_value(nil), do: nil
+  defp escape_value(value), do: html_escape(value)
 
   @doc """
   Generates a textarea input.
