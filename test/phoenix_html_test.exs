@@ -6,8 +6,8 @@ defmodule Phoenix.HTMLTest do
 
   test "html_escape/1 entities" do
     assert html_escape("foo") == {:safe, "foo"}
-    assert html_escape("<foo>") == {:safe, "&lt;foo&gt;"}
-    assert html_escape("\" & \'") == {:safe, "&quot; &amp; &#39;"}
+    assert html_escape("<foo>") == {:safe, ["&lt;", "foo", "&gt;" | ""]}
+    assert html_escape("\" & \'") == {:safe, ["&quot;", " ", "&amp;", " ", "&#39;" | ""]}
   end
 
   test "escape_javascript/1" do

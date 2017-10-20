@@ -14,7 +14,7 @@ defmodule Phoenix.HTML.SafeTest do
   end
 
   test "impl for atoms" do
-    assert Safe.to_iodata(:'<foo>') == "&lt;foo&gt;"
+    assert Safe.to_iodata(:'<foo>') == ["&lt;", "foo", "&gt;" | ""]
   end
 
   test "impl for safe data" do
@@ -49,7 +49,8 @@ defmodule Phoenix.HTML.SafeTest do
       datetime = %DateTime{year: 2000, month: 1, day: 1, hour: 12, minute: 13, second: 14,
                            microsecond: {0, 0}, zone_abbr: "<H>", time_zone: "<Hello>",
                            std_offset: -1800, utc_offset: 3600}
-      assert Safe.to_iodata(datetime) == "2000-01-01 12:13:14+00:30 &lt;H&gt; &lt;Hello&gt;"
+      assert Safe.to_iodata(datetime) ==
+             ["2000-01-01 12:13:14+00:30 ", "&lt;", "H", "&gt;", " ", "&lt;", "Hello", "&gt;" | ""]
     end
   end
 end

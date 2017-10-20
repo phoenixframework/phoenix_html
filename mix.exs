@@ -23,7 +23,7 @@ defmodule PhoenixHtml.Mixfile do
   end
 
   defp deps do
-    [{:plug, "~> 1.0"},
+    [{:plug, "~> 1.4"},
      {:ex_doc, "~> 0.12", only: :docs}]
   end
 

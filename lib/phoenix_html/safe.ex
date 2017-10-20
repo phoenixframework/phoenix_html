@@ -17,7 +17,7 @@ end
 
 defimpl Phoenix.HTML.Safe, for: Atom do
   def to_iodata(nil),  do: ""
-  def to_iodata(atom), do: Plug.HTML.html_escape(Atom.to_string(atom))
+  def to_iodata(atom), do: Plug.HTML.html_escape_to_iodata(Atom.to_string(atom))
 end
 
 defimpl Phoenix.HTML.Safe, for: BitString do
@@ -40,7 +40,7 @@ defimpl Phoenix.HTML.Safe, for: DateTime do
   def to_iodata(data) do
     # Call escape in case someone can inject reserved
     # characters in the timezone or its abbreviation
-    Plug.HTML.html_escape(DateTime.to_string(data))
+    Plug.HTML.html_escape_to_iodata(DateTime.to_string(data))
   end
 end
 
@@ -69,7 +69,7 @@ defimpl Phoenix.HTML.Safe, for: List do
   end
 
   def to_iodata(h) when is_binary(h) do
-    Plug.HTML.html_escape(h)
+    Plug.HTML.html_escape_to_iodata(h)
   end
 
   def to_iodata({:safe, data}) do

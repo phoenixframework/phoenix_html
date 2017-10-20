@@ -127,7 +127,7 @@ defmodule Phoenix.HTML do
   Escapes the HTML entities in the given term, returning iodata.
 
       iex> html_escape("<hello>")
-      {:safe, "&lt;hello&gt;"}
+      {:safe, ["&lt;", "hello", "&gt;" | ""]}
 
       iex> html_escape('<hello>')
       {:safe, ["&lt;", 104, 101, 108, 108, 111, "&gt;"]}
@@ -144,7 +144,7 @@ defmodule Phoenix.HTML do
   def html_escape(nil),
     do: {:safe, ""}
   def html_escape(bin) when is_binary(bin),
-    do: {:safe, Plug.HTML.html_escape(bin)}
+    do: {:safe, Plug.HTML.html_escape_to_iodata(bin)}
   def html_escape(list) when is_list(list),
     do: {:safe, Phoenix.HTML.Safe.List.to_iodata(list)}
   def html_escape(other),

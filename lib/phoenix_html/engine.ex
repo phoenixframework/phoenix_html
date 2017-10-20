@@ -83,7 +83,7 @@ defmodule Phoenix.HTML.Engine do
     quote @anno do
       case unquote(expr) do
         {:safe, data} -> data
-        bin when is_binary(bin) -> Plug.HTML.html_escape(bin)
+        bin when is_binary(bin) -> Plug.HTML.html_escape_to_iodata(bin)
         other -> unquote(fallback)
       end
     end
