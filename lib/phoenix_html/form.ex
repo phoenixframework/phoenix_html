@@ -1045,8 +1045,8 @@ defmodule Phoenix.HTML.Form do
   `:second`. All options given to those keys will be forwarded to the
   underlying select. See `select/4` for more information.
 
-  To specify a list of months e.g. for localization give a list of
-  `{"Name", "number"}` for `:options` to the `:month` key:
+  For example, if you are using Phoenix with Gettext and you want to localize
+  the list of months, you can pass `:options` to the `:month` key:
 
       # Assuming form contains a User schema
       datetime_select form, :born_at, month: [
@@ -1065,6 +1065,29 @@ defmodule Phoenix.HTML.Form do
           {gettext("December"), "12"},
         ]
       ]
+  
+  You may even provide your own `localized_datetime_select/3` built on top of
+  `datetime_select/3`:
+  
+      defp localized_datetime_select(form, field, opts \\ []) do
+        opts =
+          Keyword.put(opts, :month, options: [
+            {gettext("January"), "1"},
+            {gettext("February"), "2"},
+            {gettext("March"), "3"},
+            {gettext("April"), "4"},
+            {gettext("May"), "5"},
+            {gettext("June"), "6"},
+            {gettext("July"), "7"},
+            {gettext("August"), "8"},
+            {gettext("September"), "9"},
+            {gettext("October"), "10"},
+            {gettext("November"), "11"},
+            {gettext("December"), "12"},
+          ])
+
+      datetime_select(form, field, opts)
+    end
 
   ## Options
 
