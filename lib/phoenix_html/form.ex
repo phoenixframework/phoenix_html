@@ -1045,6 +1045,27 @@ defmodule Phoenix.HTML.Form do
   `:second`. All options given to those keys will be forwarded to the
   underlying select. See `select/4` for more information.
 
+  To specify a list of months e.g. for localization give a list of
+  `{"Name", "number"}` for `:options` to the `:month` key:
+
+      # Assuming form contains a User schema
+      datetime_select form, :born_at, month: [
+        options: [
+          {gettext("January"), "1"},
+          {gettext("February"), "2"},
+          {gettext("March"), "3"},
+          {gettext("April"), "4"},
+          {gettext("May"), "5"},
+          {gettext("June"), "6"},
+          {gettext("July"), "7"},
+          {gettext("August"), "8"},
+          {gettext("September"), "9"},
+          {gettext("October"), "10"},
+          {gettext("November"), "11"},
+          {gettext("December"), "12"},
+        ]
+      ]
+
   ## Options
 
     * `:value` - the value used to select a given option.
