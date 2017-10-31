@@ -222,7 +222,7 @@ defmodule Phoenix.HTML.FormTest do
            ~s(<input id="key" name="search[key][]" type="file">)
 
     assert safe_to_string(file_input(:search, :key, multiple: true)) ==
-           ~s(<input id="search_key" multiple="multiple" name="search[key][]" type="file">)
+           ~s(<input multiple id="search_key" name="search[key][]" type="file">)
   end
 
   test "file_input/3 with form" do
@@ -516,7 +516,7 @@ defmodule Phoenix.HTML.FormTest do
                                                  [key: "Bar", value: "bar", disabled: true]])) ==
            ~s(<select id="search_key" name="search[key]">) <>
            ~s(<option value="foo">Foo</option>) <>
-           ~s(<option disabled="disabled" value="bar">Bar</option>) <>
+           ~s(<option disabled value="bar">Bar</option>) <>
            ~s(</select>)
 
     assert safe_to_string(select(:search, :key, [Foo: "foo", Bar: "bar"], prompt: "Choose your destiny")) ==
@@ -549,7 +549,7 @@ defmodule Phoenix.HTML.FormTest do
     assert safe_form(&select(&1, :key, [[value: "value", key: "Value", disabled: true],
                                         [value: "novalue", key: "No Value"]], selected: "novalue")) ==
            ~s(<select id="search_key" name="search[key]">) <>
-           ~s(<option disabled="disabled" selected="selected" value="value">Value</option>) <>
+           ~s(<option disabled selected="selected" value="value">Value</option>) <>
            ~s(<option value="novalue">No Value</option>) <>
            ~s(</select>)
 

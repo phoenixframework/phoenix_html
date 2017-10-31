@@ -36,8 +36,10 @@ defmodule Phoenix.HTML.Tag do
   is repeated when it is true, as expected in HTML, or
   the attribute is completely removed if it is false:
 
-      iex> safe_to_string tag(:audio, autoplay: true)
+      iex> safe_to_string tag(:audio, autoplay: "autoplay")
       "<audio autoplay=\"autoplay\">"
+      iex> safe_to_string tag(:audio, autoplay: true)
+      "<audio autoplay>"
       iex> safe_to_string tag(:audio, autoplay: false)
       "<audio>"
 
@@ -89,8 +91,11 @@ defmodule Phoenix.HTML.Tag do
 
   defp tag_attrs([]), do: []
   defp tag_attrs(attrs) do
-    for {k, v} <- attrs do
-      [?\s, k, ?=, ?", attr_escape(v), ?"]
+    for a <- attrs do
+      case a do
+        {k, v} -> [?\s, k, ?=, ?", attr_escape(v), ?"]
+        {k} -> [?\s, k]
+      end
     end
   end
 
@@ -122,8 +127,7 @@ defmodule Phoenix.HTML.Tag do
     build_attrs(tag, t, nested_attrs(dasherize(k), v, acc))
   end
   defp build_attrs(tag, [{k, true}|t], acc) do
-    k = dasherize(k)
-    build_attrs(tag, t, [{k, k}|acc])
+    build_attrs(tag, t, [{dasherize(k)}|acc])
   end
   defp build_attrs(tag, [{_, false}|t], acc) do
     build_attrs(tag, t, acc)
