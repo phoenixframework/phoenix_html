@@ -94,7 +94,7 @@ defmodule Phoenix.HTML.Tag do
     for a <- attrs do
       case a do
         {k, v} -> [?\s, k, ?=, ?", attr_escape(v), ?"]
-        {k} -> [?\s, k]
+        k -> [?\s, k]
       end
     end
   end
@@ -127,7 +127,7 @@ defmodule Phoenix.HTML.Tag do
     build_attrs(tag, t, nested_attrs(dasherize(k), v, acc))
   end
   defp build_attrs(tag, [{k, true}|t], acc) do
-    build_attrs(tag, t, [{dasherize(k)}|acc])
+    build_attrs(tag, t, [dasherize(k)|acc])
   end
   defp build_attrs(tag, [{_, false}|t], acc) do
     build_attrs(tag, t, acc)
