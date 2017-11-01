@@ -33,8 +33,11 @@ defmodule Phoenix.HTML.TagTest do
     assert tag(:input, data: [toggle: [target: "#parent", attr: "blah"]]) |> safe_to_string() ==
            ~s(<input data-toggle-attr="blah" data-toggle-target="#parent">)
 
-    assert tag(:audio, autoplay: true) |> safe_to_string() ==
+    assert tag(:audio, autoplay: "autoplay") |> safe_to_string() ==
            ~s(<audio autoplay="autoplay">)
+
+    assert tag(:audio, autoplay: true) |> safe_to_string() ==
+           ~s(<audio autoplay>)
 
     assert tag(:audio, autoplay: false) |> safe_to_string() ==
            ~s(<audio>)
@@ -89,6 +92,18 @@ defmodule Phoenix.HTML.TagTest do
 
     assert content_tag(:p, ["hello", ?\s, "world"]) |> safe_to_string() ==
            "<p>hello world</p>"
+
+    assert content_tag(:div, [autoplay: "autoplay"], do: "") |> safe_to_string() ==
+           ~s(<div autoplay="autoplay"></div>)
+
+    assert content_tag(:div, [autoplay: true], do: "") |> safe_to_string() ==
+           ~s(<div autoplay></div>)
+
+    assert content_tag(:div, [autoplay: false], do: "") |> safe_to_string() ==
+           ~s(<div></div>)
+
+    assert content_tag(:div, [autoplay: nil], do: "") |> safe_to_string() ==
+           ~s(<div></div>)
   end
 
   test "img_tag" do

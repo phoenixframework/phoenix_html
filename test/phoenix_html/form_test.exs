@@ -222,7 +222,7 @@ defmodule Phoenix.HTML.FormTest do
            ~s(<input id="key" name="search[key][]" type="file">)
 
     assert safe_to_string(file_input(:search, :key, multiple: true)) ==
-           ~s(<input id="search_key" multiple="multiple" name="search[key][]" type="file">)
+           ~s(<input id="search_key" name="search[key][]" type="file" multiple>)
   end
 
   test "file_input/3 with form" do
@@ -441,7 +441,7 @@ defmodule Phoenix.HTML.FormTest do
           ~s(<input id="search_key_admin" name="search[key]" type="radio" value="admin">)
 
     assert safe_to_string(radio_button(:search, :key, "admin", checked: true)) ==
-          ~s(<input checked="checked" id="search_key_admin" name="search[key]" type="radio" value="admin">)
+          ~s(<input id="search_key_admin" name="search[key]" type="radio" value="admin" checked>)
   end
 
   test "radio_button/4 with form" do
@@ -449,7 +449,7 @@ defmodule Phoenix.HTML.FormTest do
           ~s(<input id="search_key_admin" name="search[key]" type="radio" value="admin">)
 
     assert safe_form(&radio_button(&1, :key, :value)) ==
-          ~s(<input checked="checked" id="search_key_value" name="search[key]" type="radio" value="value">)
+          ~s(<input id="search_key_value" name="search[key]" type="radio" value="value" checked>)
 
     assert safe_form(&radio_button(&1, :key, :value, checked: false)) ==
           ~s(<input id="search_key_value" name="search[key]" type="radio" value="value">)
@@ -464,11 +464,11 @@ defmodule Phoenix.HTML.FormTest do
 
     assert safe_to_string(checkbox(:search, :key, value: "true")) ==
            ~s(<input name="search[key]" type="hidden" value="false">) <>
-           ~s(<input checked="checked" id="search_key" name="search[key]" type="checkbox" value="true">)
+           ~s(<input id="search_key" name="search[key]" type="checkbox" value="true" checked>)
 
     assert safe_to_string(checkbox(:search, :key, checked: true)) ==
            ~s(<input name="search[key]" type="hidden" value="false">) <>
-           ~s(<input checked="checked" id="search_key" name="search[key]" type="checkbox" value="true">)
+           ~s(<input id="search_key" name="search[key]" type="checkbox" value="true" checked>)
 
     assert safe_to_string(checkbox(:search, :key, value: "true", checked: false)) ==
            ~s(<input name="search[key]" type="hidden" value="false">) <>
@@ -480,7 +480,7 @@ defmodule Phoenix.HTML.FormTest do
 
     assert safe_to_string(checkbox(:search, :key, value: 1, checked_value: 1, unchecked_value: 0)) ==
            ~s(<input name="search[key]" type="hidden" value="0">) <>
-           ~s(<input checked="checked" id="search_key" name="search[key]" type="checkbox" value="1">)
+           ~s(<input id="search_key" name="search[key]" type="checkbox" value="1" checked>)
   end
 
   test "checkbox/3 with form" do
@@ -490,11 +490,11 @@ defmodule Phoenix.HTML.FormTest do
 
     assert safe_form(&checkbox(&1, :key, value: true)) ==
            ~s(<input name="search[key]" type="hidden" value="false">) <>
-           ~s(<input checked="checked" id="search_key" name="search[key]" type="checkbox" value="true">)
+           ~s(<input id="search_key" name="search[key]" type="checkbox" value="true" checked>)
 
     assert safe_form(&checkbox(&1, :key, checked_value: :value, unchecked_value: :novalue)) ==
            ~s(<input name="search[key]" type="hidden" value="novalue">) <>
-           ~s(<input checked="checked" id="search_key" name="search[key]" type="checkbox" value="value">)
+           ~s(<input id="search_key" name="search[key]" type="checkbox" value="value" checked>)
   end
 
   # select/4
@@ -516,7 +516,7 @@ defmodule Phoenix.HTML.FormTest do
                                                  [key: "Bar", value: "bar", disabled: true]])) ==
            ~s(<select id="search_key" name="search[key]">) <>
            ~s(<option value="foo">Foo</option>) <>
-           ~s(<option disabled="disabled" value="bar">Bar</option>) <>
+           ~s(<option value="bar" disabled>Bar</option>) <>
            ~s(</select>)
 
     assert safe_to_string(select(:search, :key, [Foo: "foo", Bar: "bar"], prompt: "Choose your destiny")) ==
@@ -527,42 +527,42 @@ defmodule Phoenix.HTML.FormTest do
            ~s(</select>)
 
     assert safe_to_string(select(:search, :key, ~w(foo bar), value: "foo")) =~
-           ~s(<option selected="selected" value="foo">foo</option>)
+           ~s(<option value="foo" selected>foo</option>)
 
     assert safe_to_string(select(:search, :key, ~w(foo bar), selected: "foo")) =~
-           ~s(<option selected="selected" value="foo">foo</option>)
+           ~s(<option value="foo" selected>foo</option>)
   end
 
   test "select/4 with form" do
     assert safe_form(&select(&1, :key, ~w(value novalue), selected: "novalue")) ==
            ~s(<select id="search_key" name="search[key]">) <>
-           ~s(<option selected="selected" value="value">value</option>) <>
+           ~s(<option value="value" selected>value</option>) <>
            ~s(<option value="novalue">novalue</option>) <>
            ~s(</select>)
 
     assert safe_form(&select(&1, :other, ~w(value novalue), selected: "novalue")) ==
            ~s(<select id="search_other" name="search[other]">) <>
            ~s(<option value="value">value</option>) <>
-           ~s(<option selected="selected" value="novalue">novalue</option>) <>
+           ~s(<option value="novalue" selected>novalue</option>) <>
            ~s(</select>)
 
     assert safe_form(&select(&1, :key, [[value: "value", key: "Value", disabled: true],
                                         [value: "novalue", key: "No Value"]], selected: "novalue")) ==
            ~s(<select id="search_key" name="search[key]">) <>
-           ~s(<option disabled="disabled" selected="selected" value="value">Value</option>) <>
+           ~s(<option value="value" disabled selected>Value</option>) <>
            ~s(<option value="novalue">No Value</option>) <>
            ~s(</select>)
 
     assert safe_form(&select(put_in(&1.data[:other], "value"), :other, ~w(value novalue), selected: "novalue")) ==
            ~s(<select id="search_other" name="search[other]">) <>
            ~s(<option value="value">value</option>) <>
-           ~s(<option selected="selected" value="novalue">novalue</option>) <>
+           ~s(<option value="novalue" selected>novalue</option>) <>
            ~s(</select>)
 
     assert safe_form(&select(&1, :key, ~w(value novalue), value: "novalue")) ==
            ~s(<select id="search_key" name="search[key]">) <>
            ~s(<option value="value">value</option>) <>
-           ~s(<option selected="selected" value="novalue">novalue</option>) <>
+           ~s(<option value="novalue" selected>novalue</option>) <>
            ~s(</select>)
   end
 
@@ -574,7 +574,7 @@ defmodule Phoenix.HTML.FormTest do
            ~s(<option value="baz">baz</option>) <>
            ~s(</optgroup>) <>
            ~s(<optgroup label="qux">) <>
-           ~s(<option selected="selected" value="qux">qux</option>) <>
+           ~s(<option value="qux" selected>qux</option>) <>
            ~s(<option value="quz">quz</option>) <>
            ~s(</optgroup>) <>
            ~s(</select>)
@@ -586,7 +586,7 @@ defmodule Phoenix.HTML.FormTest do
            ~s(<option value="Two">2</option>) <>
            ~s(</optgroup>) <>
            ~s(<optgroup label="qux">) <>
-           ~s(<option selected="selected" value="qux">qux</option>) <>
+           ~s(<option value="qux" selected>qux</option>) <>
            ~s(<option value="quz">quz</option>) <>
            ~s(</optgroup>) <>
            ~s(</select>)
@@ -598,7 +598,7 @@ defmodule Phoenix.HTML.FormTest do
            ~s(<option value="Two">2</option>) <>
            ~s(</optgroup>) <>
            ~s(<optgroup label="qux">) <>
-           ~s(<option selected="selected" value="qux">qux</option>) <>
+           ~s(<option value="qux" selected>qux</option>) <>
            ~s(<option value="quz">quz</option>) <>
            ~s(</optgroup>) <>
            ~s(</select>)
@@ -610,7 +610,7 @@ defmodule Phoenix.HTML.FormTest do
            ~s(<option value="Two">2</option>) <>
            ~s(</optgroup>) <>
            ~s(<optgroup label="qux">) <>
-           ~s(<option selected="selected" value="qux">qux</option>) <>
+           ~s(<option value="qux" selected>qux</option>) <>
            ~s(<option value="quz">quz</option>) <>
            ~s(</optgroup>) <>
            ~s(</select>)
@@ -632,13 +632,13 @@ defmodule Phoenix.HTML.FormTest do
            ~s(</select>)
 
     assert safe_to_string(multiple_select(:search, :key, ~w(foo bar), value: ["foo"])) =~
-           ~s(<option selected="selected" value="foo">foo</option>)
+           ~s(<option value="foo" selected>foo</option>)
 
     assert safe_to_string(multiple_select(:search, :key, [{"foo", "1"}, {"bar", "2"}], value: [1])) =~
-           ~s(<option selected="selected" value="1">foo</option>)
+           ~s(<option value="1" selected>foo</option>)
 
     assert safe_to_string(multiple_select(:search, :key, [{"foo", 1}, {"bar", 2}], selected: [1])) =~
-           ~s(<option selected="selected" value="1">foo</option>)
+           ~s(<option value="1" selected>foo</option>)
 
     assert safe_to_string(multiple_select(:search, :key, %{"foo" => [{"One", 1}, {"Two", 2}], "bar" => ~w(3 4)})) ==
            ~s(<select id="search_key" multiple="" name="search[key][]">) <>
@@ -656,33 +656,33 @@ defmodule Phoenix.HTML.FormTest do
   test "multiple_select/4 with form" do
     assert safe_form(&multiple_select(&1, :key, [{"foo", 1}, {"bar", 2}], value: [1], selected: [2])) ==
            ~s(<select id="search_key" multiple="" name="search[key][]">) <>
-           ~s(<option selected="selected" value="1">foo</option>) <>
+           ~s(<option value="1" selected>foo</option>) <>
            ~s(<option value="2">bar</option>) <>
            ~s(</select>)
 
     assert safe_form(&multiple_select(&1, :other, [{"foo", 1}, {"bar", 2}], selected: [2])) ==
            ~s(<select id="search_other" multiple="" name="search[other][]">) <>
            ~s(<option value="1">foo</option>) <>
-           ~s(<option selected="selected" value="2">bar</option>) <>
+           ~s(<option value="2" selected>bar</option>) <>
            ~s(</select>)
 
     assert safe_form(&multiple_select(&1, :key, [{"foo", 1}, {"bar", 2}], value: [2])) ==
            ~s(<select id="search_key" multiple="" name="search[key][]">) <>
            ~s(<option value="1">foo</option>) <>
-           ~s(<option selected="selected" value="2">bar</option>) <>
+           ~s(<option value="2" selected>bar</option>) <>
            ~s(</select>)
 
     assert safe_form(&multiple_select(&1, :key, ~w(value novalue), value: ["novalue"])) ==
            ~s(<select id="search_key" multiple="" name="search[key][]">) <>
            ~s(<option value="value">value</option>) <>
-           ~s(<option selected="selected" value="novalue">novalue</option>) <>
+           ~s(<option value="novalue" selected>novalue</option>) <>
            ~s(</select>)
 
     assert safe_form(&multiple_select(put_in(&1.params["key"], ["3"]), :key, [{"foo", 1}, {"bar", 2}, {"goo", 3}], selected: [2])) ==
           ~s(<select id="search_key" multiple="" name="search[key][]">) <>
           ~s(<option value="1">foo</option>) <>
           ~s(<option value="2">bar</option>) <>
-          ~s(<option selected="selected" value="3">goo</option>) <>
+          ~s(<option value="3" selected>goo</option>) <>
           ~s(</select>)
   end
 
@@ -695,21 +695,21 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<select id="search_datetime_day" name="search[datetime][day]">)
 
     content = safe_to_string(date_select(:search, :datetime, value: {2020, 04, 17}))
-    assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
-    assert content =~ ~s(<option selected="selected" value="4">April</option>)
-    assert content =~ ~s(<option selected="selected" value="17">17</option>)
+    assert content =~ ~s(<option value="2020" selected>2020</option>)
+    assert content =~ ~s(<option value="4" selected>April</option>)
+    assert content =~ ~s(<option value="17" selected>17</option>)
 
     content = safe_to_string(date_select(:search, :datetime,
                                                value: %{year: 2020, month: 04, day: 07}))
-    assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
-    assert content =~ ~s(<option selected="selected" value="4">April</option>)
-    assert content =~ ~s(<option selected="selected" value="7">07</option>)
+    assert content =~ ~s(<option value="2020" selected>2020</option>)
+    assert content =~ ~s(<option value="4" selected>April</option>)
+    assert content =~ ~s(<option value="7" selected>07</option>)
 
     content = safe_to_string(date_select(:search, :datetime,
                                                value: %{year: 2020, month: 04, day: 09}))
-    assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
-    assert content =~ ~s(<option selected="selected" value="4">April</option>)
-    assert content =~ ~s(<option selected="selected" value="9">09</option>)
+    assert content =~ ~s(<option value="2020" selected>2020</option>)
+    assert content =~ ~s(<option value="4" selected>April</option>)
+    assert content =~ ~s(<option value="9" selected>09</option>)
 
     content = safe_to_string(date_select(:search, :datetime, year: [prompt: "Year"],
                                                month: [prompt: "Month"], day: [prompt: "Day"]))
@@ -726,25 +726,25 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<select id="search_datetime_year" name="search[datetime][year]">)
     assert content =~ ~s(<select id="search_datetime_month" name="search[datetime][month]">)
     assert content =~ ~s(<select id="search_datetime_day" name="search[datetime][day]">)
-    assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
-    assert content =~ ~s(<option selected="selected" value="4">April</option>)
-    assert content =~ ~s(<option selected="selected" value="17">17</option>)
+    assert content =~ ~s(<option value="2020" selected>2020</option>)
+    assert content =~ ~s(<option value="4" selected>April</option>)
+    assert content =~ ~s(<option value="17" selected>17</option>)
     assert content =~ ~s(<option value="1">January</option><option value="2">February</option>)
 
     content = safe_form(&date_select(&1, :unknown, default: {2020, 9, 9}))
-    assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
-    assert content =~ ~s(<option selected="selected" value="9">September</option>)
-    assert content =~ ~s(<option selected="selected" value="9">09</option>)
+    assert content =~ ~s(<option value="2020" selected>2020</option>)
+    assert content =~ ~s(<option value="9" selected>September</option>)
+    assert content =~ ~s(<option value="9" selected>09</option>)
 
     content = safe_form(&date_select(&1, :unknown, default: {2020, 10, 13}))
-    assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
-    assert content =~ ~s(<option selected="selected" value="10">October</option>)
-    assert content =~ ~s(<option selected="selected" value="13">13</option>)
+    assert content =~ ~s(<option value="2020" selected>2020</option>)
+    assert content =~ ~s(<option value="10" selected>October</option>)
+    assert content =~ ~s(<option value="13" selected>13</option>)
 
     content = safe_form(&date_select(&1, :datetime, value: {2020, 10, 13}))
-    assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
-    assert content =~ ~s(<option selected="selected" value="10">October</option>)
-    assert content =~ ~s(<option selected="selected" value="13">13</option>)
+    assert content =~ ~s(<option value="2020" selected>2020</option>)
+    assert content =~ ~s(<option value="10" selected>October</option>)
+    assert content =~ ~s(<option value="13" selected>13</option>)
   end
 
   # time_select/4
@@ -761,25 +761,25 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<select id="search_datetime_second" name="search[datetime][second]">)
 
     content = safe_to_string(time_select(:search, :datetime, value: {2, 9, 9}, second: []))
-    assert content =~ ~s(<option selected="selected" value="2">02</option>)
-    assert content =~ ~s(<option selected="selected" value="9">09</option>)
-    assert content =~ ~s(<option selected="selected" value="9">09</option>)
+    assert content =~ ~s(<option value="2" selected>02</option>)
+    assert content =~ ~s(<option value="9" selected>09</option>)
+    assert content =~ ~s(<option value="9" selected>09</option>)
 
     content = safe_to_string(time_select(:search, :datetime, value: {2, 11, 13}, second: []))
-    assert content =~ ~s(<option selected="selected" value="2">02</option>)
-    assert content =~ ~s(<option selected="selected" value="11">11</option>)
-    assert content =~ ~s(<option selected="selected" value="13">13</option>)
+    assert content =~ ~s(<option value="2" selected>02</option>)
+    assert content =~ ~s(<option value="11" selected>11</option>)
+    assert content =~ ~s(<option value="13" selected>13</option>)
 
     content = safe_to_string(time_select(:search, :datetime, value: {2, 11, 13, 328904}, second: []))
-    assert content =~ ~s(<option selected="selected" value="2">02</option>)
-    assert content =~ ~s(<option selected="selected" value="11">11</option>)
-    assert content =~ ~s(<option selected="selected" value="13">13</option>)
+    assert content =~ ~s(<option value="2" selected>02</option>)
+    assert content =~ ~s(<option value="11" selected>11</option>)
+    assert content =~ ~s(<option value="13" selected>13</option>)
 
     content = safe_to_string(time_select(:search, :datetime,
                                       value: %{hour: 2, minute: 11, second: 13}, second: []))
-    assert content =~ ~s(<option selected="selected" value="2">02</option>)
-    assert content =~ ~s(<option selected="selected" value="11">11</option>)
-    assert content =~ ~s(<option selected="selected" value="13">13</option>)
+    assert content =~ ~s(<option value="2" selected>02</option>)
+    assert content =~ ~s(<option value="11" selected>11</option>)
+    assert content =~ ~s(<option value="13" selected>13</option>)
 
     content = safe_to_string(time_select(:search, :datetime, hour: [prompt: "Hour"],
                                                minute: [prompt: "Minute"], second: [prompt: "Second"]))
@@ -796,20 +796,20 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<select id="search_datetime_hour" name="search[datetime][hour]">)
     assert content =~ ~s(<select id="search_datetime_minute" name="search[datetime][minute]">)
     assert content =~ ~s(<select id="search_datetime_second" name="search[datetime][second]">)
-    assert content =~ ~s(<option selected="selected" value="2">02</option>)
-    assert content =~ ~s(<option selected="selected" value="11">11</option>)
-    assert content =~ ~s(<option selected="selected" value="13">13</option>)
+    assert content =~ ~s(<option value="2" selected>02</option>)
+    assert content =~ ~s(<option value="11" selected>11</option>)
+    assert content =~ ~s(<option value="13" selected>13</option>)
     assert content =~ ~s(<option value="1">01</option><option value="2">02</option>)
 
     content = safe_form(&time_select(&1, :unknown, default: {1, 2, 3}, second: []))
-    assert content =~ ~s(<option selected="selected" value="1">01</option>)
-    assert content =~ ~s(<option selected="selected" value="2">02</option>)
-    assert content =~ ~s(<option selected="selected" value="3">03</option>)
+    assert content =~ ~s(<option value="1" selected>01</option>)
+    assert content =~ ~s(<option value="2" selected>02</option>)
+    assert content =~ ~s(<option value="3" selected>03</option>)
 
     content = safe_form(&time_select(&1, :datetime, value: {1, 2, 3}, second: []))
-    assert content =~ ~s(<option selected="selected" value="1">01</option>)
-    assert content =~ ~s(<option selected="selected" value="2">02</option>)
-    assert content =~ ~s(<option selected="selected" value="3">03</option>)
+    assert content =~ ~s(<option value="1" selected>01</option>)
+    assert content =~ ~s(<option value="2" selected>02</option>)
+    assert content =~ ~s(<option value="3" selected>03</option>)
   end
 
   # datetime_select/4
@@ -833,30 +833,30 @@ defmodule Phoenix.HTML.FormTest do
 
     content = safe_to_string(datetime_select(:search, :datetime,
                                           value: {{2020, 9, 9}, {2, 11, 13}}, second: []))
-    assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
-    assert content =~ ~s(<option selected="selected" value="9">September</option>)
-    assert content =~ ~s(<option selected="selected" value="9">09</option>)
-    assert content =~ ~s(<option selected="selected" value="2">02</option>)
-    assert content =~ ~s(<option selected="selected" value="11">11</option>)
-    assert content =~ ~s(<option selected="selected" value="13">13</option>)
+    assert content =~ ~s(<option value="2020" selected>2020</option>)
+    assert content =~ ~s(<option value="9" selected>September</option>)
+    assert content =~ ~s(<option value="9" selected>09</option>)
+    assert content =~ ~s(<option value="2" selected>02</option>)
+    assert content =~ ~s(<option value="11" selected>11</option>)
+    assert content =~ ~s(<option value="13" selected>13</option>)
 
     content = safe_to_string(datetime_select(:search, :datetime,
                                           value: {{2020, 04, 17}, {2, 11, 13}}, second: []))
-    assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
-    assert content =~ ~s(<option selected="selected" value="4">April</option>)
-    assert content =~ ~s(<option selected="selected" value="17">17</option>)
-    assert content =~ ~s(<option selected="selected" value="2">02</option>)
-    assert content =~ ~s(<option selected="selected" value="11">11</option>)
-    assert content =~ ~s(<option selected="selected" value="13">13</option>)
+    assert content =~ ~s(<option value="2020" selected>2020</option>)
+    assert content =~ ~s(<option value="4" selected>April</option>)
+    assert content =~ ~s(<option value="17" selected>17</option>)
+    assert content =~ ~s(<option value="2" selected>02</option>)
+    assert content =~ ~s(<option value="11" selected>11</option>)
+    assert content =~ ~s(<option value="13" selected>13</option>)
 
     content = safe_to_string(datetime_select(:search, :datetime,
                                           value: {{2020, 04, 17}, {2, 11, 13, 328904}}, second: []))
-    assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
-    assert content =~ ~s(<option selected="selected" value="4">April</option>)
-    assert content =~ ~s(<option selected="selected" value="17">17</option>)
-    assert content =~ ~s(<option selected="selected" value="2">02</option>)
-    assert content =~ ~s(<option selected="selected" value="11">11</option>)
-    assert content =~ ~s(<option selected="selected" value="13">13</option>)
+    assert content =~ ~s(<option value="2020" selected>2020</option>)
+    assert content =~ ~s(<option value="4" selected>April</option>)
+    assert content =~ ~s(<option value="17" selected>17</option>)
+    assert content =~ ~s(<option value="2" selected>02</option>)
+    assert content =~ ~s(<option value="11" selected>11</option>)
+    assert content =~ ~s(<option value="13" selected>13</option>)
   end
 
   test "datetime_select/4 with form" do
@@ -864,40 +864,40 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<select id="search_datetime_year" name="search[datetime][year]">)
     assert content =~ ~s(<select id="search_datetime_month" name="search[datetime][month]">)
     assert content =~ ~s(<select id="search_datetime_day" name="search[datetime][day]">)
-    assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
-    assert content =~ ~s(<option selected="selected" value="4">April</option>)
-    assert content =~ ~s(<option selected="selected" value="17">17</option>)
+    assert content =~ ~s(<option value="2020" selected>2020</option>)
+    assert content =~ ~s(<option value="4" selected>April</option>)
+    assert content =~ ~s(<option value="17" selected>17</option>)
 
     assert content =~ ~s(<select id="search_datetime_hour" name="search[datetime][hour]">)
     assert content =~ ~s(<select id="search_datetime_minute" name="search[datetime][minute]">)
     assert content =~ ~s(<select id="search_datetime_second" name="search[datetime][second]">)
-    assert content =~ ~s(<option selected="selected" value="2">02</option>)
-    assert content =~ ~s(<option selected="selected" value="11">11</option>)
-    assert content =~ ~s(<option selected="selected" value="13">13</option>)
+    assert content =~ ~s(<option value="2" selected>02</option>)
+    assert content =~ ~s(<option value="11" selected>11</option>)
+    assert content =~ ~s(<option value="13" selected>13</option>)
 
     content = safe_form(&datetime_select(&1, :unknown, default: {{2020, 10, 9}, {1, 2, 3}}, second: []))
-    assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
-    assert content =~ ~s(<option selected="selected" value="10">October</option>)
-    assert content =~ ~s(<option selected="selected" value="9">09</option>)
-    assert content =~ ~s(<option selected="selected" value="1">01</option>)
-    assert content =~ ~s(<option selected="selected" value="2">02</option>)
-    assert content =~ ~s(<option selected="selected" value="3">03</option>)
+    assert content =~ ~s(<option value="2020" selected>2020</option>)
+    assert content =~ ~s(<option value="10" selected>October</option>)
+    assert content =~ ~s(<option value="9" selected>09</option>)
+    assert content =~ ~s(<option value="1" selected>01</option>)
+    assert content =~ ~s(<option value="2" selected>02</option>)
+    assert content =~ ~s(<option value="3" selected>03</option>)
 
     content = safe_form(&datetime_select(&1, :unknown, default: {{2020, 10, 13}, {1, 2, 3}}, second: []))
-    assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
-    assert content =~ ~s(<option selected="selected" value="10">October</option>)
-    assert content =~ ~s(<option selected="selected" value="13">13</option>)
-    assert content =~ ~s(<option selected="selected" value="1">01</option>)
-    assert content =~ ~s(<option selected="selected" value="2">02</option>)
-    assert content =~ ~s(<option selected="selected" value="3">03</option>)
+    assert content =~ ~s(<option value="2020" selected>2020</option>)
+    assert content =~ ~s(<option value="10" selected>October</option>)
+    assert content =~ ~s(<option value="13" selected>13</option>)
+    assert content =~ ~s(<option value="1" selected>01</option>)
+    assert content =~ ~s(<option value="2" selected>02</option>)
+    assert content =~ ~s(<option value="3" selected>03</option>)
 
     content = safe_form(&datetime_select(&1, :datetime, value: {{2020, 10, 13}, {1, 2, 3}}, second: []))
-    assert content =~ ~s(<option selected="selected" value="2020">2020</option>)
-    assert content =~ ~s(<option selected="selected" value="10">October</option>)
-    assert content =~ ~s(<option selected="selected" value="13">13</option>)
-    assert content =~ ~s(<option selected="selected" value="1">01</option>)
-    assert content =~ ~s(<option selected="selected" value="2">02</option>)
-    assert content =~ ~s(<option selected="selected" value="3">03</option>)
+    assert content =~ ~s(<option value="2020" selected>2020</option>)
+    assert content =~ ~s(<option value="10" selected>October</option>)
+    assert content =~ ~s(<option value="13" selected>13</option>)
+    assert content =~ ~s(<option value="1" selected>01</option>)
+    assert content =~ ~s(<option value="2" selected>02</option>)
+    assert content =~ ~s(<option value="3" selected>03</option>)
   end
 
   test "datetime_select/4 with builder" do
