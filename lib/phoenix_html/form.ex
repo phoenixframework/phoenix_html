@@ -738,11 +738,6 @@ defmodule Phoenix.HTML.Form do
         opts
       end
 
-    opts =
-      Keyword.update(opts, :checked, false, fn c ->
-        boolean_attribute("checked", c)
-      end)      
-
     tag(:input, [value: value] ++ opts)
   end
 
@@ -802,11 +797,6 @@ defmodule Phoenix.HTML.Form do
       else
         opts
       end
-
-    opts =
-      Keyword.update(opts, :checked, false, fn c ->
-        boolean_attribute("checked", c)
-      end)
 
     html_escape [tag(:input, name: Keyword.get(opts, :name), type: "hidden", value: unchecked_value),
                  tag(:input, [value: checked_value] ++ opts)]
@@ -970,9 +960,7 @@ defmodule Phoenix.HTML.Form do
         value == option_value
       end
 
-    selected_boolean_attribute = boolean_attribute("selected", selected)
-
-    opts = [value: option_value, selected: selected_boolean_attribute] ++ extra
+    opts = [value: option_value, selected: selected] ++ extra
     content_tag(:option, option_key, opts)
   end
 
@@ -1382,18 +1370,6 @@ defmodule Phoenix.HTML.Form do
   def label(form, field, opts, [do: block]) do
     opts = Keyword.put_new(opts, :for, input_id(form, field))
     content_tag(:label, opts, do: block)
-  end
-
-  # HTML5 boolean attributes are interpreted this way:
-  #   <checkbox checked="checked"> -> checked is true
-  #   <checkbox checked="">        -> checked is true
-  #   <checkbox checked>           -> checked is true
-  #   <checkbox>                   -> checked is false
-  defp boolean_attribute(name, value) do
-    case value do
-      true -> name
-      false -> false
-    end
   end
 
   # TODO: Remove me on 3.0
