@@ -49,15 +49,22 @@ end
 
 defimpl Phoenix.HTML.FormData, for: Plug.Conn do
   def to_form(conn, opts) do
-    {name, opts} = Keyword.pop(opts, :as)
-    name = to_string(name || warn_name(opts) || no_name_error!())
+    {name, params, opts} =
+      case Keyword.pop(opts, :as) do
+        {nil, opts} ->
+          {nil, conn.params, opts}
+
+        {name, opts} ->
+          name = to_string(name || warn_name(opts))
+          {name, Map.get(conn.params, name), opts}
+      end
 
     %Phoenix.HTML.Form{
       source: conn,
       impl: __MODULE__,
       id: name,
       name: name,
-      params: Map.get(conn.params, name) || %{},
+      params: params,
       options: opts,
       data: %{}
     }
@@ -123,11 +130,6 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
 
   def input_type(_conn, _form, _field), do: :text_input
   def input_validations(_conn, _form, _field), do: []
-
-  defp no_name_error! do
-    raise ArgumentError, "form_for/4 expects [as: NAME] to be given as option " <>
-                         "when used with @conn"
-  end
 
   defp warn_name(opts) do
     if name = Keyword.get(opts, :name) do
