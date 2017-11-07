@@ -56,7 +56,7 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
 
         {name, opts} ->
           name = to_string(name || warn_name(opts))
-          {name, Map.get(conn.params, name), opts}
+          {name, Map.get(conn.params, name) || %{}, opts}
       end
 
     %Phoenix.HTML.Form{
