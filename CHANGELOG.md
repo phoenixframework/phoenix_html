@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.10.5 (2017-11-08)
+
+* Enhancements
+  * Do not require the :as option in form_for
+
 ## v2.10.4 (2017-08-15)
 
 * Bug fixes
