@@ -55,7 +55,7 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
           {nil, conn.params, opts}
 
         {name, opts} ->
-          name = to_string(name || warn_name(opts))
+          name = to_string(name)
           {name, Map.get(conn.params, name) || %{}, opts}
       end
 
@@ -78,7 +78,7 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
     {id, opts}      = Keyword.pop(opts, :id)
 
     id     = to_string(id || form.id <> "_#{field}")
-    name   = to_string(name || warn_name(opts) || form.name <> "[#{field}]")
+    name   = to_string(name || form.name <> "[#{field}]")
     params = Map.get(form.params, Atom.to_string(field))
 
     cond do
@@ -130,12 +130,4 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
 
   def input_type(_conn, _form, _field), do: :text_input
   def input_validations(_conn, _form, _field), do: []
-
-  defp warn_name(opts) do
-    if name = Keyword.get(opts, :name) do
-      IO.write :stderr, "the :name option in form_for/inputs_for is deprecated, " <>
-                        "please use :as instead\n" <> Exception.format_stacktrace()
-      name
-    end
-  end
 end
