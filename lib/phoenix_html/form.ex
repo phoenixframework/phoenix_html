@@ -325,6 +325,8 @@ defmodule Phoenix.HTML.Form do
   The form should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
   """
+  def input_id(%{id: nil}, _field),
+    do: nil
   def input_id(%{id: id}, field),
     do: "#{id}_#{field}"
   def input_id(name, field) when is_atom(name),
@@ -336,6 +338,8 @@ defmodule Phoenix.HTML.Form do
   The form should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
   """
+  def input_name(%{name: nil}, field),
+    do: field
   def input_name(%{name: name}, field),
     do: "#{name}[#{field}]"
   def input_name(name, field) when is_atom(name),

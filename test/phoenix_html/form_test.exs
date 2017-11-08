@@ -79,6 +79,14 @@ defmodule Phoenix.HTML.FormTest do
     assert form =~ "<form"
   end
 
+  test "form_for/3 with no name" do
+    form = safe_to_string form_for(conn(), "/", fn f ->
+      text_input(f, :key)
+    end)
+
+    assert form =~ ~s(<input name="key" type="text">)
+  end
+
   ## text_input/3
 
   test "text_input/3" do
