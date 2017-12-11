@@ -61,8 +61,9 @@ defmodule Phoenix.HTML.Form do
 
   #### A note on `:errors`
 
-  If no action has been applied to the changeset, no errors are shown
-  on the form object even if the changeset has a non-empty `:errors` value.
+  If no action has been applied to the changeset or action was set to `:ignore`,
+  no errors are shown on the form object even if the changeset has a non-empty
+  `:errors` value.
 
   This is useful for things like validation hints on form fields, e.g. an empty
   changeset for a new form. That changeset isn't valid, but we don't want to
@@ -1069,10 +1070,10 @@ defmodule Phoenix.HTML.Form do
           {gettext("December"), "12"},
         ]
       ]
-  
+
   You may even provide your own `localized_datetime_select/3` built on top of
   `datetime_select/3`:
-  
+
       defp localized_datetime_select(form, field, opts \\ []) do
         opts =
           Keyword.put(opts, :month, options: [
