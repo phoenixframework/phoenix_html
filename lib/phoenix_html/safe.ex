@@ -21,7 +21,7 @@ defimpl Phoenix.HTML.Safe, for: Atom do
 end
 
 defimpl Phoenix.HTML.Safe, for: BitString do
-  defdelegate to_iodata(data), to: Plug.HTML, as: :html_escape
+  defdelegate to_iodata(data), to: Plug.HTML, as: :html_escape_to_iodata
 end
 
 defimpl Phoenix.HTML.Safe, for: Time do
@@ -89,7 +89,7 @@ end
 
 defimpl Phoenix.HTML.Safe, for: Float do
   def to_iodata(data) do
-    IO.iodata_to_binary(:io_lib_format.fwrite_g(data))
+    :io_lib_format.fwrite_g(data)
   end
 end
 

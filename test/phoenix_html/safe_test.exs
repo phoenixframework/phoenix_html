@@ -4,7 +4,7 @@ defmodule Phoenix.HTML.SafeTest do
   alias Phoenix.HTML.Safe
 
   test "impl for binaries" do
-    assert Safe.to_iodata("<foo>") == "&lt;foo&gt;"
+    assert Safe.to_iodata("<foo>") == ["&lt;", "foo", "&gt;" | ""]
   end
 
   test "impl for io data" do
@@ -19,7 +19,7 @@ defmodule Phoenix.HTML.SafeTest do
 
   test "impl for safe data" do
     assert Safe.to_iodata(1) == "1"
-    assert Safe.to_iodata(1.0) == "1.0"
+    assert Safe.to_iodata(1.0) == '1.0'
     assert Safe.to_iodata({:safe, "<foo>"}) == "<foo>"
   end
 
