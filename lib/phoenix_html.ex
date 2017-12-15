@@ -68,10 +68,11 @@ defmodule Phoenix.HTML do
 
   Raises on attempts to interpolate with `\#{}`, so `~E` should be preferred.
 
-      iex> ~e"\""
-      ...> Hello <%= "world" %>
+      iex> {:safe, data} = ~e"\""
+      ...> Hello, <%= "world" %>
       ...> "\""
-      {:safe, [[["" | "Hello "] | "world"] | "\\n"]}
+      iex> IO.iodata_to_binary(data)
+      "Hello, world\\n"
 
   """
   defmacro sigil_e(expr, opts) do
@@ -84,10 +85,11 @@ defmodule Phoenix.HTML do
   Does not raise on attempts to interpolate with `\#{}`, but rather shows those
   characters literally, so it should be preferred over `~e`.
 
-      iex> ~E"\""
-      ...> Hello <%= "world" %>
+      iex> {:safe, data} = ~E"\""
+      ...> Hello, <%= "world" %>
       ...> "\""
-      {:safe, [[["" | "Hello "] | "world"] | "\\n"]}
+      iex> IO.iodata_to_binary(data)
+      "Hello, world\\n"
 
   """
   defmacro sigil_E(expr, opts) do

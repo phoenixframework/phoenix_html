@@ -23,6 +23,10 @@ defmodule Phoenix.HTML.EngineTest do
     end
   end
 
+  test "evaluates expressions in the right order" do
+    assert eval("<% a = 1 %><% a = 2 %><%= a %>", %{}) == "2"
+  end
+
   defp eval(string, assigns) do
     {:safe, io} =
       EEx.eval_string(string, [assigns: assigns],
