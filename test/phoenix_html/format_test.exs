@@ -11,8 +11,8 @@ defmodule Phoenix.HTML.FormatTest do
       format("""
       Hello,
 
-      Please come see me.
-
+      Please come see me.\r
+      \r
       Regards,
       The boss.
       """)
@@ -51,7 +51,7 @@ defmodule Phoenix.HTML.FormatTest do
     formatted =
       format("""
       Hello,
-      This is dog,
+      This is dog,\r
       How can I help you?
 
 
@@ -68,7 +68,7 @@ defmodule Phoenix.HTML.FormatTest do
     formatted =
       format("""
       Hello,
-      This is dog,
+      This is dog,\r
       How can I help you?
 
 

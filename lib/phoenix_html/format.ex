@@ -39,6 +39,7 @@ defmodule Phoenix.HTML.Format do
 
     string
     |> maybe_html_escape(escape?)
+    |> String.replace("\r", "")
     |> String.split("\n\n", trim: true)
     |> Enum.filter(&not_blank?/1)
     |> Enum.map(&wrap_paragraph(&1, wrapper_tag, attributes, insert_brs?))
