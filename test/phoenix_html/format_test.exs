@@ -11,18 +11,30 @@ defmodule Phoenix.HTML.FormatTest do
       format("""
       Hello,
 
-      Please come see me.\r
-      \r
+      Please come see me.
+
       Regards,
-      The boss.
+      The Boss.
       """)
 
     assert formatted == """
     <p>Hello,</p>
     <p>Please come see me.</p>
     <p>Regards,<br>
-    The boss.</p>
+    The Boss.</p>
     """
+  end
+
+  test "wraps paragraphs with carriage returns" do
+    formatted =
+      format("Hello,\r\n\r\nPlease come see me.\r\n\r\nRegards,\r\nThe Boss.")
+
+    assert formatted == """
+      <p>Hello,</p>
+      <p>Please come see me.</p>
+      <p>Regards,<br>
+      The Boss.</p>
+      """
   end
 
   test "escapes html" do
@@ -51,7 +63,7 @@ defmodule Phoenix.HTML.FormatTest do
     formatted =
       format("""
       Hello,
-      This is dog,\r
+      This is dog,
       How can I help you?
 
 
@@ -64,11 +76,22 @@ defmodule Phoenix.HTML.FormatTest do
     """
   end
 
+  test "adds brs with carriage return" do
+    formatted =
+      format("Hello,\r\nThis is dog,\r\nHow can I help you?\r\n\r\n\r\n")
+
+    assert formatted == """
+    <p>Hello,<br>
+    This is dog,<br>
+    How can I help you?</p>
+    """
+  end
+
   test "doesnt add brs" do
     formatted =
       format("""
       Hello,
-      This is dog,\r
+      This is dog,
       How can I help you?
 
 
