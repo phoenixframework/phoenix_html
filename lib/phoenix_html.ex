@@ -182,6 +182,8 @@ defmodule Phoenix.HTML do
     do: escape_javascript(t, <<acc::binary, "\\u2028">>)
   defp escape_javascript(<<0x2029::utf8, t::binary>>, acc),
     do: escape_javascript(t, <<acc::binary, "\\u2029">>)
+  defp escape_javascript(<<0::utf8, t::binary>>, acc),
+    do: escape_javascript(t, <<acc::binary, "\\u0000">>)
   defp escape_javascript(<<"</", t::binary>>, acc),
     do: escape_javascript(t, <<acc::binary, ?<, ?\\, ?/>>)
   defp escape_javascript(<<"\r\n", t::binary>>, acc),

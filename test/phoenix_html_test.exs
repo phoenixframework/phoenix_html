@@ -21,6 +21,7 @@ defmodule Phoenix.HTMLTest do
     assert escape_javascript("</close>") == "<\\/close>"
     assert escape_javascript("Line separator\u2028") == "Line separator\\u2028"
     assert escape_javascript("Paragraph separator\u2029") == "Paragraph separator\\u2029"
+    assert escape_javascript("Null character\u0000") == "Null character\\u0000"
     assert escape_javascript({:safe, "'Single quote'"}) == {:safe, "\\'Single quote\\'"}
     assert escape_javascript({:safe, ["'Single quote'"]}) == {:safe, "\\'Single quote\\'"}
   end
