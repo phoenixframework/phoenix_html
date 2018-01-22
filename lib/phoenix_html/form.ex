@@ -333,6 +333,16 @@ defmodule Phoenix.HTML.Form do
   def input_id(name, field) when is_atom(name),
     do: "#{name}_#{field}"
 
+
+  @doc """
+  Returns an id of a corresponding form field and value attached to it.
+  Useful for radio buttons and inputs like multiselect checkboxes.
+  """
+  def input_id(name, field, value) do
+    value_id = String.replace(value, ~r/\W/u, "_")
+    input_id(name, field) <> "_" <> value_id
+  end
+
   @doc """
   Returns a name of a corresponding form field.
 
@@ -733,7 +743,7 @@ defmodule Phoenix.HTML.Form do
     opts =
       opts
       |> Keyword.put_new(:type, "radio")
-      |> Keyword.put_new(:id, input_id(form, field) <> "_" <> elem(value, 1))
+      |> Keyword.put_new(:id, input_id(form, field, elem(value, 1)))
       |> Keyword.put_new(:name, input_name(form, field))
 
     opts =
