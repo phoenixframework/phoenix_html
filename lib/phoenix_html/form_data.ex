@@ -23,27 +23,27 @@ defprotocol Phoenix.HTML.FormData do
   and it must be stored in the underlying struct, with any
   custom field removed.
   """
-  @spec to_form(t, Phoenix.HTML.Form.t, atom, Keyword.t) :: Phoenix.HTML.Form.t
+  @spec to_form(t, Phoenix.HTML.Form.t, atom | String.t, Keyword.t) :: Phoenix.HTML.Form.t
   def to_form(data, form, field, options)
 
   @doc """
   Returns the value for the given field.
   """
-  @spec input_value(t, Phoenix.HTML.Form.t, atom) :: term
+  @spec input_value(t, Phoenix.HTML.Form.t, atom | String.t) :: term
   def input_value(data, form, field)
 
   @doc """
   Returns the HTML5 validations that would apply to
   the given field.
   """
-  @spec input_validations(t, Phoenix.HTML.Form.t, atom) :: Keyword.t
+  @spec input_validations(t, Phoenix.HTML.Form.t, atom | String.t) :: Keyword.t
   def input_validations(data, form, field)
 
   @doc """
   Receives the given field and returns its input type (:text_input,
   :select, etc). Returns `nil` if the type is unknown.
   """
-  @spec input_type(t, Phoenix.HTML.Form.t, atom) :: atom | nil
+  @spec input_type(t, Phoenix.HTML.Form.t, atom | String.t) :: atom | nil
   def input_type(data, form, field)
 end
 
@@ -79,7 +79,7 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
 
     id     = to_string(id || form.id <> "_#{field}")
     name   = to_string(name || form.name <> "[#{field}]")
-    params = Map.get(form.params, Atom.to_string(field))
+    params = Map.get(form.params, to_string(field))
 
     cond do
       # cardinality: one
@@ -120,7 +120,7 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
   end
 
   def input_value(_conn, %{data: data, params: params}, field) do
-    case Map.fetch(params, Atom.to_string(field)) do
+    case Map.fetch(params, to_string(field)) do
       {:ok, value} ->
         value
       :error ->

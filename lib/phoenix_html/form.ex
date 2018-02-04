@@ -185,9 +185,11 @@ defmodule Phoenix.HTML.Form do
   defstruct source: nil, impl: nil, id: nil, name: nil, data: nil,
             hidden: [], params: %{}, errors: [], options: [], index: nil
 
-  @type t :: %Form{source: Phoenix.HTML.FormData.t, name: String.t, data: %{atom => term},
-                   params: %{binary => term}, hidden: Keyword.t, options: Keyword.t,
-                   errors: Keyword.t, impl: module, id: String.t, index: nil | non_neg_integer}
+  @type t :: %Form{source: Phoenix.HTML.FormData.t, name: String.t, 
+                   data: %{atom => term} | %{String.t => term}, 
+                   params: %{binary => term}, hidden: Keyword.t, options: Keyword.t, 
+                   errors: Keyword.t, impl: module, id: String.t, 
+                   index: nil | non_neg_integer}
 
   @doc """
   Converts an attribute/form field into its humanize version.
@@ -278,7 +280,7 @@ defmodule Phoenix.HTML.Form do
       sent through the form.
 
   """
-  @spec inputs_for(t, atom, Keyword.t, (t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
+  @spec inputs_for(t, atom | String.t, Keyword.t, (t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
   def inputs_for(%{impl: impl} = form, field, options \\ [], fun) do
     options =
       form.options
@@ -303,12 +305,13 @@ defmodule Phoenix.HTML.Form do
   fallback to parameters and finally fallback to the default
   struct/map value.
   """
-  def input_value(%{source: source, impl: impl} = form, field) when is_atom(field) do
+  @spec input_value(t | atom, atom | String.t) :: term
+  def input_value(%{source: source, impl: impl} = form, field) do
     try do
       impl.input_value(source, form, field)
     rescue
       UndefinedFunctionError ->
-        case Map.fetch(form.params, Atom.to_string(field)) do
+        case Map.fetch(form.params, to_string(field)) do
           {:ok, value} ->
             value
           :error ->
@@ -326,6 +329,7 @@ defmodule Phoenix.HTML.Form do
   The form should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
   """
+  @spec input_id(t | atom, atom | String.t) :: String.t
   def input_id(%{id: nil}, _field),
     do: nil
   def input_id(%{id: id}, field),
@@ -338,6 +342,7 @@ defmodule Phoenix.HTML.Form do
   Returns an id of a corresponding form field and value attached to it.
   Useful for radio buttons and inputs like multiselect checkboxes.
   """
+  @spec input_id(t | atom, atom | String.t, String.t) :: String.t
   def input_id(name, field, value) when is_atom(value) do
     input_id(name, field, Atom.to_string(value))
   end
@@ -353,6 +358,7 @@ defmodule Phoenix.HTML.Form do
   The form should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
   """
+  @spec input_name(t | atom, atom | String.t) :: String.t
   def input_name(%{name: nil}, field),
     do: field
   def input_name(%{name: name}, field),
@@ -364,7 +370,7 @@ defmodule Phoenix.HTML.Form do
   Returns the HTML5 validations that would apply to
   the given field.
   """
-  @spec input_validations(t, atom) :: Keyword.t
+  @spec input_validations(t, atom | String.t) :: Keyword.t
   def input_validations(%{source: source, impl: impl} = form, field) do
     # TODO: Remove me on 3.0
     try do
@@ -395,7 +401,7 @@ defmodule Phoenix.HTML.Form do
         "password" => :password_input}
 
   """
-  @spec input_type(t, atom) :: atom
+  @spec input_type(t, atom | String.t) :: atom
   def input_type(%{impl: impl, source: source} = form, field, mapping \\ @mapping) do
     type =
       # TODO: Remove me on 3.0
@@ -406,7 +412,7 @@ defmodule Phoenix.HTML.Form do
       end
 
     if type == :text_input do
-      field = Atom.to_string(field)
+      field = to_string(field)
       Enum.find_value(mapping, type, fn {k, v} ->
         String.contains?(field, k) && v
       end)
@@ -597,7 +603,7 @@ defmodule Phoenix.HTML.Form do
 
   defp time_input_value(other), do: other
 
-  defp generic_input(type, form, field, opts) when is_atom(field) and is_list(opts) do
+  defp generic_input(type, form, field, opts) when is_list(opts) do
     opts =
       opts
       |> Keyword.put_new(:type, type)
@@ -933,7 +939,7 @@ defmodule Phoenix.HTML.Form do
     if value != nil do
       {value, opts}
     else
-      param = Atom.to_string(field)
+      param = to_string(field)
 
       case form do
         %{params: %{^param => sent}} ->
