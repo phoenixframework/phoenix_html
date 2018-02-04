@@ -185,11 +185,12 @@ defmodule Phoenix.HTML.Form do
   defstruct source: nil, impl: nil, id: nil, name: nil, data: nil,
             hidden: [], params: %{}, errors: [], options: [], index: nil
 
-  @type t :: %Form{source: Phoenix.HTML.FormData.t, name: String.t, 
-                   data: %{atom => term} | %{String.t => term}, 
-                   params: %{binary => term}, hidden: Keyword.t, options: Keyword.t, 
-                   errors: Keyword.t, impl: module, id: String.t, 
-                   index: nil | non_neg_integer}
+  @type t :: %Form{source: Phoenix.HTML.FormData.t, name: String.t,
+                   data: %{field => term}, params: %{binary => term},
+                   hidden: Keyword.t, options: Keyword.t, errors: Keyword.t,
+                   impl: module, id: String.t, index: nil | non_neg_integer}
+
+  @type field :: atom | String.t
 
   @doc """
   Converts an attribute/form field into its humanize version.
@@ -280,8 +281,8 @@ defmodule Phoenix.HTML.Form do
       sent through the form.
 
   """
-  @spec inputs_for(t, atom | String.t, Keyword.t, (t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
-  def inputs_for(%{impl: impl} = form, field, options \\ [], fun) do
+  @spec inputs_for(t, field, Keyword.t, (t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
+  def inputs_for(%{impl: impl} = form, field, options \\ [], fun) when is_atom(field) or is_binary(field) do
     options =
       form.options
       |> Keyword.take([:multipart])
@@ -305,8 +306,8 @@ defmodule Phoenix.HTML.Form do
   fallback to parameters and finally fallback to the default
   struct/map value.
   """
-  @spec input_value(t | atom, atom | String.t) :: term
-  def input_value(%{source: source, impl: impl} = form, field) do
+  @spec input_value(t | atom, field) :: term
+  def input_value(%{source: source, impl: impl} = form, field) when is_atom(field) or is_binary(field) do
     try do
       impl.input_value(source, form, field)
     rescue
@@ -329,12 +330,12 @@ defmodule Phoenix.HTML.Form do
   The form should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
   """
-  @spec input_id(t | atom, atom | String.t) :: String.t
+  @spec input_id(t | atom, field) :: String.t
   def input_id(%{id: nil}, _field),
     do: nil
-  def input_id(%{id: id}, field),
+  def input_id(%{id: id}, field) when is_atom(field) or is_binary(field),
     do: "#{id}_#{field}"
-  def input_id(name, field) when is_atom(name),
+  def input_id(name, field) when is_atom(name) and is_atom(field) or is_binary(field),
     do: "#{name}_#{field}"
 
 
@@ -342,7 +343,7 @@ defmodule Phoenix.HTML.Form do
   Returns an id of a corresponding form field and value attached to it.
   Useful for radio buttons and inputs like multiselect checkboxes.
   """
-  @spec input_id(t | atom, atom | String.t, String.t) :: String.t
+  @spec input_id(t | atom, field, String.t | atom) :: String.t
   def input_id(name, field, value) when is_atom(value) do
     input_id(name, field, Atom.to_string(value))
   end
@@ -358,20 +359,20 @@ defmodule Phoenix.HTML.Form do
   The form should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
   """
-  @spec input_name(t | atom, atom | String.t) :: String.t
+  @spec input_name(t | atom, field) :: String.t
   def input_name(%{name: nil}, field),
     do: field
-  def input_name(%{name: name}, field),
+  def input_name(%{name: name}, field) when is_atom(field) or is_binary(field),
     do: "#{name}[#{field}]"
-  def input_name(name, field) when is_atom(name),
+  def input_name(name, field) when is_atom(name) and is_atom(field) or is_binary(field),
     do: "#{name}[#{field}]"
 
   @doc """
   Returns the HTML5 validations that would apply to
   the given field.
   """
-  @spec input_validations(t, atom | String.t) :: Keyword.t
-  def input_validations(%{source: source, impl: impl} = form, field) do
+  @spec input_validations(t, field) :: Keyword.t
+  def input_validations(%{source: source, impl: impl} = form, field) when is_atom(field) or is_binary(field) do
     # TODO: Remove me on 3.0
     try do
       impl.input_validations(source, form, field)
@@ -401,8 +402,8 @@ defmodule Phoenix.HTML.Form do
         "password" => :password_input}
 
   """
-  @spec input_type(t, atom | String.t) :: atom
-  def input_type(%{impl: impl, source: source} = form, field, mapping \\ @mapping) do
+  @spec input_type(t, field) :: atom
+  def input_type(%{impl: impl, source: source} = form, field, mapping \\ @mapping) when is_atom(field) or is_binary(field) do
     type =
       # TODO: Remove me on 3.0
       try do
@@ -603,7 +604,7 @@ defmodule Phoenix.HTML.Form do
 
   defp time_input_value(other), do: other
 
-  defp generic_input(type, form, field, opts) when is_list(opts) do
+  defp generic_input(type, form, field, opts) when is_list(opts) and (is_atom(field) or is_binary(field)) do
     opts =
       opts
       |> Keyword.put_new(:type, type)
@@ -915,7 +916,7 @@ defmodule Phoenix.HTML.Form do
 
   All other options are forwarded to the underlying HTML tag.
   """
-  def select(form, field, options, opts \\ []) do
+  def select(form, field, options, opts \\ []) when is_atom(field) or is_binary(field) do
     {selected, opts} = selected(form, field, opts) || []
 
     {prefix, opts} = case Keyword.pop(opts, :prompt) do
