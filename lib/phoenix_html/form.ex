@@ -338,7 +338,11 @@ defmodule Phoenix.HTML.Form do
   Returns an id of a corresponding form field and value attached to it.
   Useful for radio buttons and inputs like multiselect checkboxes.
   """
-  def input_id(name, field, value) do
+  def input_id(name, field, value) when is_atom(value) do
+    input_id(name, field, Atom.to_string(value))
+  end
+
+  def input_id(name, field, value) when is_binary(value) do
     value_id = String.replace(value, ~r/\W/u, "_")
     input_id(name, field) <> "_" <> value_id
   end
@@ -738,22 +742,22 @@ defmodule Phoenix.HTML.Form do
   All options are simply forwarded to the underlying HTML tag.
   """
   def radio_button(form, field, value, opts \\ []) do
-    value = html_escape(value)
+    escaped_value = html_escape(value)
 
     opts =
       opts
       |> Keyword.put_new(:type, "radio")
-      |> Keyword.put_new(:id, input_id(form, field, elem(value, 1)))
+      |> Keyword.put_new(:id, input_id(form, field, value))
       |> Keyword.put_new(:name, input_name(form, field))
 
     opts =
-      if value == html_escape(input_value(form, field)) do
+      if escaped_value == html_escape(input_value(form, field)) do
         Keyword.put_new(opts, :checked, true)
       else
         opts
       end
 
-    tag(:input, [value: value] ++ opts)
+    tag(:input, [value: escaped_value] ++ opts)
   end
 
   @doc """

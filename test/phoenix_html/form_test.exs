@@ -453,6 +453,9 @@ defmodule Phoenix.HTML.FormTest do
 
     assert safe_to_string(radio_button(:search, :key, "value with spaces")) ==
           ~s(<input id="search_key_value_with_spaces" name="search[key]" type="radio" value="value with spaces">)
+
+    assert safe_to_string(radio_button(:search, :key, "F✓o]o%b+a'R")) ==
+          ~s(<input id="search_key_F_o_o_b_a_R" name="search[key]" type="radio" value="F✓o]o%b+a&#39;R">)
   end
 
   test "radio_button/4 with form" do
