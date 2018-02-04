@@ -312,7 +312,7 @@ defmodule Phoenix.HTML.Form do
       impl.input_value(source, form, field)
     rescue
       UndefinedFunctionError ->
-        case Map.fetch(form.params, to_string(field)) do
+        case Map.fetch(form.params, field_to_string(field)) do
           {:ok, value} ->
             value
           :error ->
@@ -413,7 +413,7 @@ defmodule Phoenix.HTML.Form do
       end
 
     if type == :text_input do
-      field = to_string(field)
+      field = field_to_string(field)
       Enum.find_value(mapping, type, fn {k, v} ->
         String.contains?(field, k) && v
       end)
@@ -940,7 +940,7 @@ defmodule Phoenix.HTML.Form do
     if value != nil do
       {value, opts}
     else
-      param = to_string(field)
+      param = field_to_string(field)
 
       case form do
         %{params: %{^param => sent}} ->
@@ -1397,6 +1397,10 @@ defmodule Phoenix.HTML.Form do
     opts = Keyword.put_new(opts, :for, input_id(form, field))
     content_tag(:label, opts, do: block)
   end
+
+  # Normalize field name to string version
+  defp field_to_string(field) when is_atom(field), do: Atom.to_string(field)
+  defp field_to_string(field) when is_binary(field), do: field
 
   # TODO: Remove me on 3.0
 

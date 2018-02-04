@@ -79,7 +79,7 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
 
     id     = to_string(id || form.id <> "_#{field}")
     name   = to_string(name || form.name <> "[#{field}]")
-    params = Map.get(form.params, to_string(field))
+    params = Map.get(form.params, field_to_string(field))
 
     cond do
       # cardinality: one
@@ -120,7 +120,7 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
   end
 
   def input_value(_conn, %{data: data, params: params}, field) when is_atom(field) or is_binary(field) do
-    case Map.fetch(params, to_string(field)) do
+    case Map.fetch(params, field_to_string(field)) do
       {:ok, value} ->
         value
       :error ->
@@ -130,4 +130,8 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
 
   def input_type(_conn, _form, _field), do: :text_input
   def input_validations(_conn, _form, _field), do: []
+
+  # Normalize field name to string version
+  defp field_to_string(field) when is_atom(field), do: Atom.to_string(field)
+  defp field_to_string(field) when is_binary(field), do: field
 end
