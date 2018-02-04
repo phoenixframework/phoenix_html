@@ -991,6 +991,7 @@ defmodule Phoenix.HTML.FormTest do
 
   test "input_value/2 with form" do
     assert safe_form(&input_value(&1, :key)) == "value"
+    assert safe_form(&input_value(&1, "key")) == "value"
   end
 
   test "input_value/2 with form and data" do
@@ -998,6 +999,12 @@ defmodule Phoenix.HTML.FormTest do
     assert safe_form(&input_value(put_in(&1.data[:no_key], "original"), :no_key)) == "original"
     safe_form(fn f ->
         assert input_value(put_in(f.data[:alt_key], "original"), :alt_key) == nil
+        ""
+    end)
+    assert safe_form(&input_value(put_in(&1.data["key"], "original"), "key")) == "value"
+    assert safe_form(&input_value(put_in(&1.data["no_key"], "original"), "no_key")) == "original"
+    safe_form(fn f ->
+        assert input_value(put_in(f.data["alt_key"], "original"), "alt_key") == nil
         ""
     end)
   end

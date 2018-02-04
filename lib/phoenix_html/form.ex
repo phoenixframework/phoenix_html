@@ -185,9 +185,12 @@ defmodule Phoenix.HTML.Form do
   defstruct source: nil, impl: nil, id: nil, name: nil, data: nil,
             hidden: [], params: %{}, errors: [], options: [], index: nil
 
-  @type t :: %Form{source: Phoenix.HTML.FormData.t, name: String.t, data: %{atom => term},
-                   params: %{binary => term}, hidden: Keyword.t, options: Keyword.t,
-                   errors: Keyword.t, impl: module, id: String.t, index: nil | non_neg_integer}
+  @type t :: %Form{source: Phoenix.HTML.FormData.t, name: String.t,
+                   data: %{field => term}, params: %{binary => term},
+                   hidden: Keyword.t, options: Keyword.t, errors: Keyword.t,
+                   impl: module, id: String.t, index: nil | non_neg_integer}
+
+  @type field :: atom | String.t
 
   @doc """
   Converts an attribute/form field into its humanize version.
@@ -278,8 +281,8 @@ defmodule Phoenix.HTML.Form do
       sent through the form.
 
   """
-  @spec inputs_for(t, atom, Keyword.t, (t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
-  def inputs_for(%{impl: impl} = form, field, options \\ [], fun) do
+  @spec inputs_for(t, field, Keyword.t, (t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
+  def inputs_for(%{impl: impl} = form, field, options \\ [], fun) when is_atom(field) or is_binary(field) do
     options =
       form.options
       |> Keyword.take([:multipart])
@@ -303,12 +306,13 @@ defmodule Phoenix.HTML.Form do
   fallback to parameters and finally fallback to the default
   struct/map value.
   """
-  def input_value(%{source: source, impl: impl} = form, field) when is_atom(field) do
+  @spec input_value(t | atom, field) :: term
+  def input_value(%{source: source, impl: impl} = form, field) when is_atom(field) or is_binary(field) do
     try do
       impl.input_value(source, form, field)
     rescue
       UndefinedFunctionError ->
-        case Map.fetch(form.params, Atom.to_string(field)) do
+        case Map.fetch(form.params, field_to_string(field)) do
           {:ok, value} ->
             value
           :error ->
@@ -326,11 +330,12 @@ defmodule Phoenix.HTML.Form do
   The form should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
   """
+  @spec input_id(t | atom, field) :: String.t
   def input_id(%{id: nil}, _field),
     do: nil
-  def input_id(%{id: id}, field),
+  def input_id(%{id: id}, field) when is_atom(field) or is_binary(field),
     do: "#{id}_#{field}"
-  def input_id(name, field) when is_atom(name),
+  def input_id(name, field) when is_atom(name) and is_atom(field) or is_binary(field),
     do: "#{name}_#{field}"
 
 
@@ -338,6 +343,7 @@ defmodule Phoenix.HTML.Form do
   Returns an id of a corresponding form field and value attached to it.
   Useful for radio buttons and inputs like multiselect checkboxes.
   """
+  @spec input_id(t | atom, field, String.t | atom) :: String.t
   def input_id(name, field, value) when is_atom(value) do
     input_id(name, field, Atom.to_string(value))
   end
@@ -353,19 +359,20 @@ defmodule Phoenix.HTML.Form do
   The form should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
   """
+  @spec input_name(t | atom, field) :: String.t
   def input_name(%{name: nil}, field),
     do: field
-  def input_name(%{name: name}, field),
+  def input_name(%{name: name}, field) when is_atom(field) or is_binary(field),
     do: "#{name}[#{field}]"
-  def input_name(name, field) when is_atom(name),
+  def input_name(name, field) when is_atom(name) and is_atom(field) or is_binary(field),
     do: "#{name}[#{field}]"
 
   @doc """
   Returns the HTML5 validations that would apply to
   the given field.
   """
-  @spec input_validations(t, atom) :: Keyword.t
-  def input_validations(%{source: source, impl: impl} = form, field) do
+  @spec input_validations(t, field) :: Keyword.t
+  def input_validations(%{source: source, impl: impl} = form, field) when is_atom(field) or is_binary(field) do
     # TODO: Remove me on 3.0
     try do
       impl.input_validations(source, form, field)
@@ -395,8 +402,8 @@ defmodule Phoenix.HTML.Form do
         "password" => :password_input}
 
   """
-  @spec input_type(t, atom) :: atom
-  def input_type(%{impl: impl, source: source} = form, field, mapping \\ @mapping) do
+  @spec input_type(t, field) :: atom
+  def input_type(%{impl: impl, source: source} = form, field, mapping \\ @mapping) when is_atom(field) or is_binary(field) do
     type =
       # TODO: Remove me on 3.0
       try do
@@ -406,7 +413,7 @@ defmodule Phoenix.HTML.Form do
       end
 
     if type == :text_input do
-      field = Atom.to_string(field)
+      field = field_to_string(field)
       Enum.find_value(mapping, type, fn {k, v} ->
         String.contains?(field, k) && v
       end)
@@ -597,7 +604,7 @@ defmodule Phoenix.HTML.Form do
 
   defp time_input_value(other), do: other
 
-  defp generic_input(type, form, field, opts) when is_atom(field) and is_list(opts) do
+  defp generic_input(type, form, field, opts) when is_list(opts) and (is_atom(field) or is_binary(field)) do
     opts =
       opts
       |> Keyword.put_new(:type, type)
@@ -909,7 +916,7 @@ defmodule Phoenix.HTML.Form do
 
   All other options are forwarded to the underlying HTML tag.
   """
-  def select(form, field, options, opts \\ []) do
+  def select(form, field, options, opts \\ []) when is_atom(field) or is_binary(field) do
     {selected, opts} = selected(form, field, opts) || []
 
     {prefix, opts} = case Keyword.pop(opts, :prompt) do
@@ -933,7 +940,7 @@ defmodule Phoenix.HTML.Form do
     if value != nil do
       {value, opts}
     else
-      param = Atom.to_string(field)
+      param = field_to_string(field)
 
       case form do
         %{params: %{^param => sent}} ->
@@ -1390,6 +1397,10 @@ defmodule Phoenix.HTML.Form do
     opts = Keyword.put_new(opts, :for, input_id(form, field))
     content_tag(:label, opts, do: block)
   end
+
+  # Normalize field name to string version
+  defp field_to_string(field) when is_atom(field), do: Atom.to_string(field)
+  defp field_to_string(field) when is_binary(field), do: field
 
   # TODO: Remove me on 3.0
 
