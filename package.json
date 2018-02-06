@@ -4,5 +4,5 @@
   "main": "./priv/static/phoenix_html.js",
   "repository": {
   },
-  "files": ["LICENSE.md", "package.json", "priv/static/phoenix_html.js"]
+  "files": ["README.md", "LICENSE.md", "package.json", "priv/static/phoenix_html.js"]
 }
