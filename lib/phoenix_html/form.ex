@@ -182,15 +182,31 @@ defmodule Phoenix.HTML.Form do
     * `:errors` - a keyword list of errors that associated with
       the form
   """
-  defstruct source: nil, impl: nil, id: nil, name: nil, data: nil,
-            hidden: [], params: %{}, errors: [], options: [], index: nil
+  defstruct source: nil,
+            impl: nil,
+            id: nil,
+            name: nil,
+            data: nil,
+            hidden: [],
+            params: %{},
+            errors: [],
+            options: [],
+            index: nil
 
-  @type t :: %Form{source: Phoenix.HTML.FormData.t, name: String.t,
-                   data: %{field => term}, params: %{binary => term},
-                   hidden: Keyword.t, options: Keyword.t, errors: Keyword.t,
-                   impl: module, id: String.t, index: nil | non_neg_integer}
+  @type t :: %Form{
+          source: Phoenix.HTML.FormData.t(),
+          name: String.t(),
+          data: %{field => term},
+          params: %{binary => term},
+          hidden: Keyword.t(),
+          options: Keyword.t(),
+          errors: Keyword.t(),
+          impl: module,
+          id: String.t(),
+          index: nil | non_neg_integer
+        }
 
-  @type field :: atom | String.t
+  @type field :: atom | String.t()
 
   @doc """
   Converts an attribute/form field into its humanize version.
@@ -203,8 +219,8 @@ defmodule Phoenix.HTML.Form do
       "User"
 
   """
-  def humanize(atom) when is_atom(atom),
-    do: humanize(Atom.to_string(atom))
+  def humanize(atom) when is_atom(atom), do: humanize(Atom.to_string(atom))
+
   def humanize(bin) when is_binary(bin) do
     bin =
       if String.ends_with?(bin, "_id") do
@@ -213,7 +229,7 @@ defmodule Phoenix.HTML.Form do
         bin
       end
 
-    bin |> String.replace("_", " ") |> String.capitalize
+    bin |> String.replace("_", " ") |> String.capitalize()
   end
 
   @doc """
@@ -250,11 +266,11 @@ defmodule Phoenix.HTML.Form do
   See `Phoenix.HTML.Tag.form_tag/2` for more information on the
   options above.
   """
-  @spec form_for(Phoenix.HTML.FormData.t, String.t,
-                 Keyword.t, (t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
+  @spec form_for(Phoenix.HTML.FormData.t(), String.t(), Keyword.t(), (t -> Phoenix.HTML.unsafe())) ::
+          Phoenix.HTML.safe()
   def form_for(form_data, action, options \\ [], fun) when is_function(fun, 1) do
     form = Phoenix.HTML.FormData.to_form(form_data, options)
-    html_escape [form_tag(action, form.options), fun.(form), raw("</form>")]
+    html_escape([form_tag(action, form.options), fun.(form), raw("</form>")])
   end
 
   @doc """
@@ -281,8 +297,9 @@ defmodule Phoenix.HTML.Form do
       sent through the form.
 
   """
-  @spec inputs_for(t, field, Keyword.t, (t -> Phoenix.HTML.unsafe)) :: Phoenix.HTML.safe
-  def inputs_for(%{impl: impl} = form, field, options \\ [], fun) when is_atom(field) or is_binary(field) do
+  @spec inputs_for(t, field, Keyword.t(), (t -> Phoenix.HTML.unsafe())) :: Phoenix.HTML.safe()
+  def inputs_for(%{impl: impl} = form, field, options \\ [], fun)
+      when is_atom(field) or is_binary(field) do
     options =
       form.options
       |> Keyword.take([:multipart])
@@ -290,10 +307,12 @@ defmodule Phoenix.HTML.Form do
 
     forms = impl.to_form(form.source, form, field, options)
 
-    html_escape Enum.map(forms, fn form ->
-      hidden = Enum.map(form.hidden, fn {k, v} -> hidden_input(form, k, value: v) end)
-      [hidden, fun.(form)]
-    end)
+    html_escape(
+      Enum.map(forms, fn form ->
+        hidden = Enum.map(form.hidden, fn {k, v} -> hidden_input(form, k, value: v) end)
+        [hidden, fun.(form)]
+      end)
+    )
   end
 
   @doc """
@@ -307,7 +326,8 @@ defmodule Phoenix.HTML.Form do
   struct/map value.
   """
   @spec input_value(t | atom, field) :: term
-  def input_value(%{source: source, impl: impl} = form, field) when is_atom(field) or is_binary(field) do
+  def input_value(%{source: source, impl: impl} = form, field)
+      when is_atom(field) or is_binary(field) do
     try do
       impl.input_value(source, form, field)
     rescue
@@ -315,14 +335,14 @@ defmodule Phoenix.HTML.Form do
         case Map.fetch(form.params, field_to_string(field)) do
           {:ok, value} ->
             value
+
           :error ->
             Map.get(form.data, field)
         end
     end
   end
 
-  def input_value(name, _field) when is_atom(name),
-    do: nil
+  def input_value(name, _field) when is_atom(name), do: nil
 
   @doc """
   Returns an id of a corresponding form field.
@@ -330,20 +350,18 @@ defmodule Phoenix.HTML.Form do
   The form should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
   """
-  @spec input_id(t | atom, field) :: String.t
-  def input_id(%{id: nil}, _field),
-    do: nil
-  def input_id(%{id: id}, field) when is_atom(field) or is_binary(field),
-    do: "#{id}_#{field}"
-  def input_id(name, field) when is_atom(name) and is_atom(field) or is_binary(field),
-    do: "#{name}_#{field}"
+  @spec input_id(t | atom, field) :: String.t()
+  def input_id(%{id: nil}, _field), do: nil
+  def input_id(%{id: id}, field) when is_atom(field) or is_binary(field), do: "#{id}_#{field}"
 
+  def input_id(name, field) when (is_atom(name) and is_atom(field)) or is_binary(field),
+    do: "#{name}_#{field}"
 
   @doc """
   Returns an id of a corresponding form field and value attached to it.
   Useful for radio buttons and inputs like multiselect checkboxes.
   """
-  @spec input_id(t | atom, field, String.t | atom) :: String.t
+  @spec input_id(t | atom, field, String.t() | atom) :: String.t()
   def input_id(name, field, value) when is_atom(value) do
     input_id(name, field, Atom.to_string(value))
   end
@@ -359,20 +377,22 @@ defmodule Phoenix.HTML.Form do
   The form should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
   """
-  @spec input_name(t | atom, field) :: String.t
-  def input_name(%{name: nil}, field),
-    do: to_string(field)
+  @spec input_name(t | atom, field) :: String.t()
+  def input_name(%{name: nil}, field), do: to_string(field)
+
   def input_name(%{name: name}, field) when is_atom(field) or is_binary(field),
     do: "#{name}[#{field}]"
-  def input_name(name, field) when is_atom(name) and is_atom(field) or is_binary(field),
+
+  def input_name(name, field) when (is_atom(name) and is_atom(field)) or is_binary(field),
     do: "#{name}[#{field}]"
 
   @doc """
   Returns the HTML5 validations that would apply to
   the given field.
   """
-  @spec input_validations(t, field) :: Keyword.t
-  def input_validations(%{source: source, impl: impl} = form, field) when is_atom(field) or is_binary(field) do
+  @spec input_validations(t, field) :: Keyword.t()
+  def input_validations(%{source: source, impl: impl} = form, field)
+      when is_atom(field) or is_binary(field) do
     # TODO: Remove me on 3.0
     try do
       impl.input_validations(source, form, field)
@@ -382,9 +402,9 @@ defmodule Phoenix.HTML.Form do
   end
 
   @mapping %{
-    "url"      => :url_input,
-    "email"    => :email_input,
-    "search"   => :search_input,
+    "url" => :url_input,
+    "email" => :email_input,
+    "search" => :search_input,
     "password" => :password_input
   }
 
@@ -403,9 +423,10 @@ defmodule Phoenix.HTML.Form do
 
   """
   @spec input_type(t, field) :: atom
-  def input_type(%{impl: impl, source: source} = form, field, mapping \\ @mapping) when is_atom(field) or is_binary(field) do
+  def input_type(%{impl: impl, source: source} = form, field, mapping \\ @mapping)
+      when is_atom(field) or is_binary(field) do
+    # TODO: Remove me on 3.0
     type =
-      # TODO: Remove me on 3.0
       try do
         impl.input_type(source, form, field)
       rescue
@@ -414,6 +435,7 @@ defmodule Phoenix.HTML.Form do
 
     if type == :text_input do
       field = field_to_string(field)
+
       Enum.find_value(mapping, type, fn {k, v} ->
         String.contains?(field, k) && v
       end)
@@ -490,6 +512,7 @@ defmodule Phoenix.HTML.Form do
       |> Keyword.put_new(:type, "password")
       |> Keyword.put_new(:id, input_id(form, field))
       |> Keyword.put_new(:name, input_name(form, field))
+
     tag(:input, opts)
   end
 
@@ -562,17 +585,22 @@ defmodule Phoenix.HTML.Form do
   See `text_input/3` for example and docs.
   """
   def datetime_local_input(form, field, opts \\ []) do
-    opts = case Keyword.fetch(opts, :value) do
-      {:ok, value} ->
-        Keyword.put(opts, :value, datetime_local_input_value(value))
-      :error ->
-        opts
-    end
-    generic_input(:'datetime-local', form, field, opts)
+    opts =
+      case Keyword.fetch(opts, :value) do
+        {:ok, value} ->
+          Keyword.put(opts, :value, datetime_local_input_value(value))
+
+        :error ->
+          opts
+      end
+
+    generic_input(:"datetime-local", form, field, opts)
   end
 
   defp datetime_local_input_value(%NaiveDateTime{} = value) do
-    <<date::10-binary, ?\s, hour_minute::5-binary, _rest::binary>> = NaiveDateTime.to_string(value)
+    <<date::10-binary, ?\s, hour_minute::5-binary, _rest::binary>> =
+      NaiveDateTime.to_string(value)
+
     [date, ?T, hour_minute]
   end
 
@@ -587,12 +615,15 @@ defmodule Phoenix.HTML.Form do
   See `text_input/3` for example and docs.
   """
   def time_input(form, field, opts \\ []) do
-    opts = case Keyword.fetch(opts, :value) do
-      {:ok, value} ->
-        Keyword.put(opts, :value, time_input_value(value))
-      :error ->
-        opts
-    end
+    opts =
+      case Keyword.fetch(opts, :value) do
+        {:ok, value} ->
+          Keyword.put(opts, :value, time_input_value(value))
+
+        :error ->
+          opts
+      end
+
     generic_input(:time, form, field, opts)
   end
 
@@ -604,7 +635,8 @@ defmodule Phoenix.HTML.Form do
 
   defp time_input_value(other), do: other
 
-  defp generic_input(type, form, field, opts) when is_list(opts) and (is_atom(field) or is_binary(field)) do
+  defp generic_input(type, form, field, opts)
+       when is_list(opts) and (is_atom(field) or is_binary(field)) do
     opts =
       opts
       |> Keyword.put_new(:type, type)
@@ -612,6 +644,7 @@ defmodule Phoenix.HTML.Form do
       |> Keyword.put_new(:name, input_name(form, field))
       |> Keyword.put_new(:value, input_value(form, field))
       |> Keyword.update!(:value, &escape_value/1)
+
     tag(:input, opts)
   end
 
@@ -663,8 +696,9 @@ defmodule Phoenix.HTML.Form do
   """
   def file_input(form, field, opts \\ []) do
     if match?(%Form{}, form) and !form.options[:multipart] do
-      raise ArgumentError, "file_input/3 requires the enclosing form_for/4 " <>
-                           "to be configured with multipart: true"
+      raise ArgumentError,
+            "file_input/3 requires the enclosing form_for/4 " <>
+              "to be configured with multipart: true"
     end
 
     opts =
@@ -675,7 +709,7 @@ defmodule Phoenix.HTML.Form do
 
     opts =
       if opts[:multiple] do
-        Keyword.update!(opts, :name, &("#{&1}[]"))
+        Keyword.update!(opts, :name, &"#{&1}[]")
       else
         opts
       end
@@ -697,6 +731,7 @@ defmodule Phoenix.HTML.Form do
   def submit([do: _] = block_option), do: submit([], block_option)
 
   def submit(_, opts \\ [])
+
   def submit(opts, [do: _] = block_option) do
     opts = Keyword.put_new(opts, :type, "submit")
 
@@ -729,6 +764,7 @@ defmodule Phoenix.HTML.Form do
       opts
       |> Keyword.put_new(:type, "reset")
       |> Keyword.put_new(:value, value)
+
     tag(:input, opts)
   end
 
@@ -806,15 +842,15 @@ defmodule Phoenix.HTML.Form do
       |> Keyword.put_new(:id, input_id(form, field))
       |> Keyword.put_new(:name, input_name(form, field))
 
-    {value, opts}           = Keyword.pop(opts, :value, input_value(form, field))
-    {checked_value, opts}   = Keyword.pop(opts, :checked_value, true)
+    {value, opts} = Keyword.pop(opts, :value, input_value(form, field))
+    {checked_value, opts} = Keyword.pop(opts, :checked_value, true)
     {unchecked_value, opts} = Keyword.pop(opts, :unchecked_value, false)
 
     # We html escape all values to be sure we are comparing
     # apples to apples. After all we may have true in the data
     # but "true" in the params and both need to match.
-    value           = html_escape(value)
-    checked_value   = html_escape(checked_value)
+    value = html_escape(value)
+    checked_value = html_escape(checked_value)
     unchecked_value = html_escape(unchecked_value)
 
     opts =
@@ -824,8 +860,10 @@ defmodule Phoenix.HTML.Form do
         opts
       end
 
-    html_escape [tag(:input, name: Keyword.get(opts, :name), type: "hidden", value: unchecked_value),
-                 tag(:input, [value: checked_value] ++ opts)]
+    html_escape([
+      tag(:input, name: Keyword.get(opts, :name), type: "hidden", value: unchecked_value),
+      tag(:input, [value: checked_value] ++ opts)
+    ])
   end
 
   @doc """
@@ -919,10 +957,11 @@ defmodule Phoenix.HTML.Form do
   def select(form, field, options, opts \\ []) when is_atom(field) or is_binary(field) do
     {selected, opts} = selected(form, field, opts) || []
 
-    {prefix, opts} = case Keyword.pop(opts, :prompt) do
-      {nil, opts}    -> {raw(""), opts}
-      {prompt, opts} -> {content_tag(:option, prompt, value: ""), opts}
-    end
+    {prefix, opts} =
+      case Keyword.pop(opts, :prompt) do
+        {nil, opts} -> {raw(""), opts}
+        {prompt, opts} -> {content_tag(:option, prompt, value: ""), opts}
+      end
 
     opts =
       opts
@@ -945,6 +984,7 @@ defmodule Phoenix.HTML.Form do
       case form do
         %{params: %{^param => sent}} ->
           {sent, opts}
+
         _ ->
           {selected || input_value(form, field), opts}
       end
@@ -952,31 +992,38 @@ defmodule Phoenix.HTML.Form do
   end
 
   defp options_for_select(values, options, value) do
-    Enum.reduce values, options, fn
+    Enum.reduce(values, options, fn
       {option_key, option_value}, acc ->
         [acc | option(option_key, option_value, [], value)]
+
       options, acc when is_list(options) ->
         {option_key, options} = Keyword.pop(options, :key)
-        option_key || raise ArgumentError,
-                            "expected :key key when building <option> from keyword list: #{inspect options}"
+
+        option_key ||
+          raise ArgumentError,
+                "expected :key key when building <option> from keyword list: #{inspect(options)}"
 
         {option_value, options} = Keyword.pop(options, :value)
-        option_value || raise ArgumentError,
-                              "expected :value key when building <option> from keyword list: #{inspect options}"
+
+        option_value ||
+          raise ArgumentError,
+                "expected :value key when building <option> from keyword list: #{inspect(options)}"
 
         [acc | option(option_key, option_value, options, value)]
+
       option, acc ->
         [acc | option(option, option, [], value)]
-    end
+    end)
   end
 
-  defp option(group_label, group_values, [], value) when is_list(group_values) or is_map(group_values) do
+  defp option(group_label, group_values, [], value)
+       when is_list(group_values) or is_map(group_values) do
     section_options = options_for_select(group_values, [], value)
     content_tag(:optgroup, section_options, label: group_label)
   end
 
   defp option(option_key, option_value, extra, value) do
-    option_key   = html_escape(option_key)
+    option_key = html_escape(option_key)
     option_value = html_escape(option_value)
 
     selected =
@@ -1184,11 +1231,12 @@ defmodule Phoenix.HTML.Form do
     value = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
 
     builder =
-      Keyword.get(opts, :builder) || fn b ->
-        date = date_builder(b, opts)
-        time = time_builder(b, opts)
-        html_escape [date, raw(" &mdash; "), time]
-      end
+      Keyword.get(opts, :builder) ||
+        fn b ->
+          date = date_builder(b, opts)
+          time = time_builder(b, opts)
+          html_escape([date, raw(" &mdash; "), time])
+        end
 
     builder.(datetime_builder(form, field, date_value(value), time_value(value), opts))
   end
@@ -1199,29 +1247,26 @@ defmodule Phoenix.HTML.Form do
   Check `datetime_select/3` for more information on options and supported values.
   """
   def date_select(form, field, opts \\ []) do
-    value   = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
+    value = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
     builder = Keyword.get(opts, :builder) || &date_builder(&1, opts)
     builder.(datetime_builder(form, field, date_value(value), nil, opts))
   end
 
   defp date_builder(b, _opts) do
-    html_escape [b.(:year, []), raw(" / "), b.(:month, []), raw(" / "), b.(:day, [])]
+    html_escape([b.(:year, []), raw(" / "), b.(:month, []), raw(" / "), b.(:day, [])])
   end
 
   defp date_value(%{"year" => year, "month" => month, "day" => day}),
     do: %{year: year, month: month, day: day}
+
   defp date_value(%{year: year, month: month, day: day}),
     do: %{year: year, month: month, day: day}
 
-  defp date_value({{year, month, day}, _}),
-    do: %{year: year, month: month, day: day}
-  defp date_value({year, month, day}),
-    do: %{year: year, month: month, day: day}
+  defp date_value({{year, month, day}, _}), do: %{year: year, month: month, day: day}
+  defp date_value({year, month, day}), do: %{year: year, month: month, day: day}
 
-  defp date_value(nil),
-    do: %{year: nil, month: nil, day: nil}
-  defp date_value(other),
-    do: raise(ArgumentError, "unrecognized date #{inspect other}")
+  defp date_value(nil), do: %{year: nil, month: nil, day: nil}
+  defp date_value(other), do: raise(ArgumentError, "unrecognized date #{inspect(other)}")
 
   @doc """
   Generates select tags for time.
@@ -1229,16 +1274,16 @@ defmodule Phoenix.HTML.Form do
   Check `datetime_select/3` for more information on options and supported values.
   """
   def time_select(form, field, opts \\ []) do
-    value   = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
+    value = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
     builder = Keyword.get(opts, :builder) || &time_builder(&1, opts)
     builder.(datetime_builder(form, field, nil, time_value(value), opts))
   end
 
   defp time_builder(b, opts) do
-    time = html_escape [b.(:hour, []), raw(" : "), b.(:minute, [])]
+    time = html_escape([b.(:hour, []), raw(" : "), b.(:minute, [])])
 
     if Keyword.get(opts, :second) do
-      html_escape [time, raw(" : "), b.(:second, [])]
+      html_escape([time, raw(" : "), b.(:second, [])])
     else
       time
     end
@@ -1246,28 +1291,24 @@ defmodule Phoenix.HTML.Form do
 
   defp time_value(%{"hour" => hour, "minute" => min} = map),
     do: %{hour: hour, minute: min, second: Map.get(map, "second", 0)}
+
   defp time_value(%{hour: hour, minute: min} = map),
     do: %{hour: hour, minute: min, second: Map.get(map, :second, 0)}
 
   # Backwards compatibility with Ecto v1.1 versions
   defp time_value(%{"hour" => hour, "min" => min} = map),
     do: %{hour: hour, minute: min, second: Map.get(map, "sec", 0)}
+
   defp time_value(%{hour: hour, min: min} = map),
     do: %{hour: hour, minute: min, second: Map.get(map, :sec, 0)}
 
-  defp time_value({_, {hour, min, sec, _msec}}),
-    do: %{hour: hour, minute: min, second: sec}
-  defp time_value({hour, min, sec, _mseg}),
-    do: %{hour: hour, minute: min, second: sec}
-  defp time_value({_, {hour, min, sec}}),
-    do: %{hour: hour, minute: min, second: sec}
-  defp time_value({hour, min, sec}),
-    do: %{hour: hour, minute: min, second: sec}
+  defp time_value({_, {hour, min, sec, _msec}}), do: %{hour: hour, minute: min, second: sec}
+  defp time_value({hour, min, sec, _mseg}), do: %{hour: hour, minute: min, second: sec}
+  defp time_value({_, {hour, min, sec}}), do: %{hour: hour, minute: min, second: sec}
+  defp time_value({hour, min, sec}), do: %{hour: hour, minute: min, second: sec}
 
-  defp time_value(nil),
-    do: %{hour: nil, minute: nil, second: nil}
-  defp time_value(other),
-    do: raise(ArgumentError, "unrecognized time #{inspect other}")
+  defp time_value(nil), do: %{hour: nil, minute: nil, second: nil}
+  defp time_value(other), do: raise(ArgumentError, "unrecognized time #{inspect(other)}")
 
   @months [
     {"January", "1"},
@@ -1281,39 +1322,48 @@ defmodule Phoenix.HTML.Form do
     {"September", "9"},
     {"October", "10"},
     {"November", "11"},
-    {"December", "12"},
+    {"December", "12"}
   ]
 
-  map = &Enum.map(&1, fn i ->
-    pre = if i < 10, do: "0"
-    {"#{pre}#{i}", i}
-  end)
+  map =
+    &Enum.map(&1, fn i ->
+      pre = if i < 10, do: "0"
+      {"#{pre}#{i}", i}
+    end)
 
-  @days   map.(1..31)
-  @hours  map.(0..23)
+  @days map.(1..31)
+  @hours map.(0..23)
   @minsec map.(0..59)
 
   defp datetime_builder(form, field, date, time, parent) do
-    id   = Keyword.get(parent, :id, input_id(form, field))
+    id = Keyword.get(parent, :id, input_id(form, field))
     name = Keyword.get(parent, :name, input_name(form, field))
 
     fn
       :year, opts when date != nil ->
-        {year, _, _}  = :erlang.date()
-        {value, opts} = datetime_options(:year, year-5..year+5, id, name, parent, date, opts)
+        {year, _, _} = :erlang.date()
+
+        {value, opts} =
+          datetime_options(:year, (year - 5)..(year + 5), id, name, parent, date, opts)
+
         select(:datetime, :year, value, opts)
+
       :month, opts when date != nil ->
         {value, opts} = datetime_options(:month, @months, id, name, parent, date, opts)
         select(:datetime, :month, value, opts)
+
       :day, opts when date != nil ->
         {value, opts} = datetime_options(:day, @days, id, name, parent, date, opts)
         select(:datetime, :day, value, opts)
+
       :hour, opts when time != nil ->
         {value, opts} = datetime_options(:hour, @hours, id, name, parent, time, opts)
         select(:datetime, :hour, value, opts)
+
       :minute, opts when time != nil ->
         {value, opts} = datetime_options(:minute, @minsec, id, name, parent, time, opts)
         select(:datetime, :minute, value, opts)
+
       :second, opts when time != nil ->
         {value, opts} = datetime_options(:second, @minsec, id, name, parent, time, opts)
         select(:datetime, :second, value, opts)
@@ -1321,16 +1371,16 @@ defmodule Phoenix.HTML.Form do
   end
 
   defp datetime_options(type, values, id, name, parent, datetime, opts) do
-    opts = Keyword.merge Keyword.get(parent, type, []), opts
+    opts = Keyword.merge(Keyword.get(parent, type, []), opts)
     suff = Atom.to_string(type)
 
     {value, opts} = Keyword.pop(opts, :options, values)
 
     {value,
-      opts
-      |> Keyword.put_new(:id, id <> "_" <> suff)
-      |> Keyword.put_new(:name, name <> "[" <> suff <> "]")
-      |> Keyword.put_new(:value, Map.get(datetime, type))}
+     opts
+     |> Keyword.put_new(:id, id <> "_" <> suff)
+     |> Keyword.put_new(:name, name <> "[" <> suff <> "]")
+     |> Keyword.put_new(:value, Map.get(datetime, type))}
   end
 
   @doc """
@@ -1379,9 +1429,11 @@ defmodule Phoenix.HTML.Form do
   def label(form, field, text) when is_binary(text) do
     label(form, field, text, [])
   end
-  def label(form, field, [do: block]) do
+
+  def label(form, field, do: block) do
     label(form, field, [], do: block)
   end
+
   def label(form, field, opts) when is_list(opts) do
     label(form, field, humanize(field), opts)
   end
@@ -1393,7 +1445,8 @@ defmodule Phoenix.HTML.Form do
     opts = Keyword.put_new(opts, :for, input_id(form, field))
     content_tag(:label, text, opts)
   end
-  def label(form, field, opts, [do: block]) do
+
+  def label(form, field, opts, do: block) do
     opts = Keyword.put_new(opts, :for, input_id(form, field))
     content_tag(:label, opts, do: block)
   end
