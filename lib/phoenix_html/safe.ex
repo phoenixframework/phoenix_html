@@ -16,7 +16,7 @@ defprotocol Phoenix.HTML.Safe do
 end
 
 defimpl Phoenix.HTML.Safe, for: Atom do
-  def to_iodata(nil),  do: ""
+  def to_iodata(nil), do: ""
   def to_iodata(atom), do: Plug.HTML.html_escape_to_iodata(Atom.to_string(atom))
 end
 
@@ -45,8 +45,8 @@ defimpl Phoenix.HTML.Safe, for: DateTime do
 end
 
 defimpl Phoenix.HTML.Safe, for: List do
-  def to_iodata([h|t]) do
-    [to_iodata(h)|to_iodata(t)]
+  def to_iodata([h | t]) do
+    [to_iodata(h) | to_iodata(t)]
   end
 
   def to_iodata([]) do
@@ -62,10 +62,11 @@ defimpl Phoenix.HTML.Safe, for: List do
   def to_iodata(h) when is_integer(h) and h <= 255 do
     h
   end
+
   def to_iodata(h) when is_integer(h) do
     raise ArgumentError,
-      "lists in Phoenix.HTML templates only support iodata, and not chardata. Integers may only represent bytes. " <>
-      "It's likely you meant to pass a string with double quotes instead of a char list with single quotes."
+          "lists in Phoenix.HTML templates only support iodata, and not chardata. Integers may only represent bytes. " <>
+            "It's likely you meant to pass a string with double quotes instead of a char list with single quotes."
   end
 
   def to_iodata(h) when is_binary(h) do
@@ -78,8 +79,8 @@ defimpl Phoenix.HTML.Safe, for: List do
 
   def to_iodata(other) do
     raise ArgumentError,
-      "lists in Phoenix.HTML and templates may only contain integers representing bytes, binaries or other lists, " <>
-      "got invalid entry: #{inspect other}"
+          "lists in Phoenix.HTML and templates may only contain integers representing bytes, binaries or other lists, " <>
+            "got invalid entry: #{inspect(other)}"
   end
 end
 
@@ -95,9 +96,5 @@ end
 
 defimpl Phoenix.HTML.Safe, for: Tuple do
   def to_iodata({:safe, data}), do: data
-  def to_iodata(value) do
-    raise Protocol.UndefinedError,
-      protocol: @protocol,
-      value: value
-  end
+  def to_iodata(value), do: raise(Protocol.UndefinedError, protocol: @protocol, value: value)
 end

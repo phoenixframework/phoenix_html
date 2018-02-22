@@ -30,11 +30,11 @@ defmodule Phoenix.HTML.Format do
     * `:insert_brs` - if `true` insert `<br>` for single line breaks (default: `true`)
 
   """
-  @spec text_to_html(Phoenix.HTML.unsafe, Keyword.t) :: Phoenix.HTML.safe
+  @spec text_to_html(Phoenix.HTML.unsafe(), Keyword.t()) :: Phoenix.HTML.safe()
   def text_to_html(string, opts \\ []) do
-    escape?     = Keyword.get(opts, :escape, true)
+    escape? = Keyword.get(opts, :escape, true)
     wrapper_tag = Keyword.get(opts, :wrapper_tag, :p)
-    attributes  = Keyword.get(opts, :attributes, [])
+    attributes = Keyword.get(opts, :attributes, [])
     insert_brs? = Keyword.get(opts, :insert_brs, true)
 
     string
@@ -42,17 +42,17 @@ defmodule Phoenix.HTML.Format do
     |> String.split(["\n\n", "\r\n\r\n"], trim: true)
     |> Enum.filter(&not_blank?/1)
     |> Enum.map(&wrap_paragraph(&1, wrapper_tag, attributes, insert_brs?))
-    |> Phoenix.HTML.html_escape
+    |> Phoenix.HTML.html_escape()
   end
 
-  defp maybe_html_escape(string, true),  do: Plug.HTML.html_escape(string)
+  defp maybe_html_escape(string, true), do: Plug.HTML.html_escape(string)
   defp maybe_html_escape(string, false), do: string
 
   defp not_blank?("\r\n" <> rest), do: not_blank?(rest)
-  defp not_blank?("\n" <> rest),   do: not_blank?(rest)
-  defp not_blank?(" " <> rest),    do: not_blank?(rest)
-  defp not_blank?(""),             do: false
-  defp not_blank?(_),              do: true
+  defp not_blank?("\n" <> rest), do: not_blank?(rest)
+  defp not_blank?(" " <> rest), do: not_blank?(rest)
+  defp not_blank?(""), do: false
+  defp not_blank?(_), do: true
 
   defp wrap_paragraph(text, tag, attributes, insert_brs?) do
     [Phoenix.HTML.Tag.content_tag(tag, insert_brs(text, insert_brs?), attributes), ?\n]
@@ -62,7 +62,7 @@ defmodule Phoenix.HTML.Format do
     text
     |> split_lines()
     |> Enum.intersperse(?\s)
-    |> Phoenix.HTML.raw
+    |> Phoenix.HTML.raw()
   end
 
   defp insert_brs(text, true) do

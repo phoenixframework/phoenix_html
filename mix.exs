@@ -23,7 +23,7 @@ defmodule PhoenixHtml.Mixfile do
   end
 
   defp deps do
-    [{:plug, "~> 1.4"},
+    [{:plug, "~> 1.5-rc", github: "elixir-plug/plug"},
      {:ex_doc, "~> 0.12", only: :docs}]
   end
 

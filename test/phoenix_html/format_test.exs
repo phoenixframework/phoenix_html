@@ -18,23 +18,22 @@ defmodule Phoenix.HTML.FormatTest do
       """)
 
     assert formatted == """
-    <p>Hello,</p>
-    <p>Please come see me.</p>
-    <p>Regards,<br>
-    The Boss.</p>
-    """
+           <p>Hello,</p>
+           <p>Please come see me.</p>
+           <p>Regards,<br>
+           The Boss.</p>
+           """
   end
 
   test "wraps paragraphs with carriage returns" do
-    formatted =
-      format("Hello,\r\n\r\nPlease come see me.\r\n\r\nRegards,\r\nThe Boss.")
+    formatted = format("Hello,\r\n\r\nPlease come see me.\r\n\r\nRegards,\r\nThe Boss.")
 
     assert formatted == """
-      <p>Hello,</p>
-      <p>Please come see me.</p>
-      <p>Regards,<br>
-      The Boss.</p>
-      """
+           <p>Hello,</p>
+           <p>Please come see me.</p>
+           <p>Regards,<br>
+           The Boss.</p>
+           """
   end
 
   test "escapes html" do
@@ -44,19 +43,22 @@ defmodule Phoenix.HTML.FormatTest do
       """)
 
     assert formatted == """
-    <p>&lt;script&gt;&lt;/script&gt;</p>
-    """
+           <p>&lt;script&gt;&lt;/script&gt;</p>
+           """
   end
 
   test "skips escaping html" do
     formatted =
-      format("""
-      <script></script>
-      """, escape: false)
+      format(
+        """
+        <script></script>
+        """,
+        escape: false
+      )
 
     assert formatted == """
-    <p><script></script></p>
-    """
+           <p><script></script></p>
+           """
   end
 
   test "adds brs" do
@@ -70,36 +72,38 @@ defmodule Phoenix.HTML.FormatTest do
       """)
 
     assert formatted == """
-    <p>Hello,<br>
-    This is dog,<br>
-    How can I help you?</p>
-    """
+           <p>Hello,<br>
+           This is dog,<br>
+           How can I help you?</p>
+           """
   end
 
   test "adds brs with carriage return" do
-    formatted =
-      format("Hello,\r\nThis is dog,\r\nHow can I help you?\r\n\r\n\r\n")
+    formatted = format("Hello,\r\nThis is dog,\r\nHow can I help you?\r\n\r\n\r\n")
 
     assert formatted == """
-    <p>Hello,<br>
-    This is dog,<br>
-    How can I help you?</p>
-    """
+           <p>Hello,<br>
+           This is dog,<br>
+           How can I help you?</p>
+           """
   end
 
   test "doesnt add brs" do
     formatted =
-      format("""
-      Hello,
-      This is dog,
-      How can I help you?
+      format(
+        """
+        Hello,
+        This is dog,
+        How can I help you?
 
 
-      """, insert_brs: false)
+        """,
+        insert_brs: false
+      )
 
     assert formatted == """
-    <p>Hello, This is dog, How can I help you?</p>
-    """
+           <p>Hello, This is dog, How can I help you?</p>
+           """
   end
 
   defp format(text, opts \\ []) do

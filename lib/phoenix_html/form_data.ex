@@ -11,7 +11,7 @@ defprotocol Phoenix.HTML.FormData do
   and it must be stored in the underlying struct, with any
   custom field removed.
   """
-  @spec to_form(t, Keyword.t) :: Phoenix.HTML.Form.t
+  @spec to_form(t, Keyword.t()) :: Phoenix.HTML.Form.t()
   def to_form(data, options)
 
   @doc """
@@ -23,27 +23,28 @@ defprotocol Phoenix.HTML.FormData do
   and it must be stored in the underlying struct, with any
   custom field removed.
   """
-  @spec to_form(t, Phoenix.HTML.Form.t, Phoenix.HTML.Form.field, Keyword.t) :: Phoenix.HTML.Form.t
+  @spec to_form(t, Phoenix.HTML.Form.t(), Phoenix.HTML.Form.field(), Keyword.t()) ::
+          Phoenix.HTML.Form.t()
   def to_form(data, form, field, options)
 
   @doc """
   Returns the value for the given field.
   """
-  @spec input_value(t, Phoenix.HTML.Form.t, Phoenix.HTML.Form.field) :: term
+  @spec input_value(t, Phoenix.HTML.Form.t(), Phoenix.HTML.Form.field()) :: term
   def input_value(data, form, field)
 
   @doc """
   Returns the HTML5 validations that would apply to
   the given field.
   """
-  @spec input_validations(t, Phoenix.HTML.Form.t, Phoenix.HTML.Form.field) :: Keyword.t
+  @spec input_validations(t, Phoenix.HTML.Form.t(), Phoenix.HTML.Form.field()) :: Keyword.t()
   def input_validations(data, form, field)
 
   @doc """
   Receives the given field and returns its input type (:text_input,
   :select, etc). Returns `nil` if the type is unknown.
   """
-  @spec input_type(t, Phoenix.HTML.Form.t, Phoenix.HTML.Form.field) :: atom | nil
+  @spec input_type(t, Phoenix.HTML.Form.t(), Phoenix.HTML.Form.field()) :: atom | nil
   def input_type(data, form, field)
 end
 
@@ -73,25 +74,28 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
   def to_form(conn, form, field, opts) when is_atom(field) or is_binary(field) do
     {default, opts} = Keyword.pop(opts, :default, %{})
     {prepend, opts} = Keyword.pop(opts, :prepend, [])
-    {append, opts}  = Keyword.pop(opts, :append, [])
-    {name, opts}    = Keyword.pop(opts, :as)
-    {id, opts}      = Keyword.pop(opts, :id)
+    {append, opts} = Keyword.pop(opts, :append, [])
+    {name, opts} = Keyword.pop(opts, :as)
+    {id, opts} = Keyword.pop(opts, :id)
 
-    id     = to_string(id || form.id <> "_#{field}")
-    name   = to_string(name || form.name <> "[#{field}]")
+    id = to_string(id || form.id <> "_#{field}")
+    name = to_string(name || form.name <> "[#{field}]")
     params = Map.get(form.params, field_to_string(field))
 
     cond do
       # cardinality: one
       is_map(default) ->
-        [%Phoenix.HTML.Form{
-          source: conn,
-          impl: __MODULE__,
-          id: id,
-          name: name,
-          data: default,
-          params: params || %{},
-          options: opts}]
+        [
+          %Phoenix.HTML.Form{
+            source: conn,
+            impl: __MODULE__,
+            id: id,
+            name: name,
+            data: default,
+            params: params || %{},
+            options: opts
+          }
+        ]
 
       # cardinality: many
       is_list(default) ->
@@ -106,6 +110,7 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
 
         for {{data, params}, index} <- Enum.with_index(entries) do
           index_string = Integer.to_string(index)
+
           %Phoenix.HTML.Form{
             source: conn,
             impl: __MODULE__,
@@ -114,15 +119,18 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
             name: name <> "[" <> index_string <> "]",
             data: data,
             params: params,
-            options: opts}
+            options: opts
+          }
         end
     end
   end
 
-  def input_value(_conn, %{data: data, params: params}, field) when is_atom(field) or is_binary(field) do
+  def input_value(_conn, %{data: data, params: params}, field)
+      when is_atom(field) or is_binary(field) do
     case Map.fetch(params, field_to_string(field)) do
       {:ok, value} ->
         value
+
       :error ->
         Map.get(data, field)
     end

@@ -14,7 +14,7 @@ defmodule Phoenix.HTML.SafeTest do
   end
 
   test "impl for atoms" do
-    assert Safe.to_iodata(:'<foo>') == ["&lt;", "foo", "&gt;" | ""]
+    assert Safe.to_iodata(:"<foo>") == [[[] | "&lt;"], "foo" | "&gt;"]
   end
 
   test "impl for safe data" do
@@ -29,28 +29,40 @@ defmodule Phoenix.HTML.SafeTest do
     end
   end
 
-  if Code.ensure_loaded?(Calendar) do
-    test "impl for Time" do
-      {:ok, time} = Time.new(12, 13, 14)
-      assert Safe.to_iodata(time) == "12:13:14"
-    end
+  test "impl for Time" do
+    {:ok, time} = Time.new(12, 13, 14)
+    assert Safe.to_iodata(time) == "12:13:14"
+  end
 
-    test "impl for Date" do
-      {:ok, date} = Date.new(2000, 1, 1)
-      assert Safe.to_iodata(date) == "2000-01-01"
-    end
+  test "impl for Date" do
+    {:ok, date} = Date.new(2000, 1, 1)
+    assert Safe.to_iodata(date) == "2000-01-01"
+  end
 
-    test "impl for NaiveDateTime" do
-      {:ok, datetime} = NaiveDateTime.new(2000, 1, 1, 12, 13, 14)
-      assert Safe.to_iodata(datetime) == "2000-01-01 12:13:14"
-    end
+  test "impl for NaiveDateTime" do
+    {:ok, datetime} = NaiveDateTime.new(2000, 1, 1, 12, 13, 14)
+    assert Safe.to_iodata(datetime) == "2000-01-01 12:13:14"
+  end
 
-    test "impl for DateTime" do
-      datetime = %DateTime{year: 2000, month: 1, day: 1, hour: 12, minute: 13, second: 14,
-                           microsecond: {0, 0}, zone_abbr: "<H>", time_zone: "<Hello>",
-                           std_offset: -1800, utc_offset: 3600}
-      assert Safe.to_iodata(datetime) ==
-             ["2000-01-01 12:13:14+00:30 ", "&lt;", "H", "&gt;", " ", "&lt;", "Hello", "&gt;" | ""]
-    end
+  test "impl for DateTime" do
+    datetime = %DateTime{
+      year: 2000,
+      month: 1,
+      day: 1,
+      hour: 12,
+      minute: 13,
+      second: 14,
+      microsecond: {0, 0},
+      zone_abbr: "<H>",
+      time_zone: "<Hello>",
+      std_offset: -1800,
+      utc_offset: 3600
+    }
+
+    assert Safe.to_iodata(datetime) ==
+             [
+               [[[[], "2000-01-01 12:13:14+00:30 " | "&lt;"], "H" | "&gt;"], " " | "&lt;"],
+               "Hello" | "&gt;"
+             ]
   end
 end

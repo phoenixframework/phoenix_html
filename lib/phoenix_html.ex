@@ -58,10 +58,10 @@ defmodule Phoenix.HTML do
   end
 
   @typedoc "Guaranteed to be safe"
-  @type safe    :: {:safe, iodata}
+  @type safe :: {:safe, iodata}
 
   @typedoc "May be safe or unsafe (i.e. it needs to be converted)"
-  @type unsafe  :: Phoenix.HTML.Safe.t
+  @type unsafe :: Phoenix.HTML.Safe.t()
 
   @doc """
   Provides `~e` sigil with HTML safe EEx syntax inside source files.
@@ -99,9 +99,10 @@ defmodule Phoenix.HTML do
   end
 
   defp handle_sigil(_, _, _) do
-    raise ArgumentError, "interpolation not allowed in ~e sigil. " <>
-                         "Remove the interpolation, use <%= %> to insert values, " <>
-                         "or use ~E to show the interpolation literally"
+    raise ArgumentError,
+          "interpolation not allowed in ~e sigil. " <>
+            "Remove the interpolation, use <%= %> to insert values, " <>
+            "or use ~E to show the interpolation literally"
   end
 
   @doc """
@@ -127,7 +128,7 @@ defmodule Phoenix.HTML do
   Escapes the HTML entities in the given term, returning iodata.
 
       iex> html_escape("<hello>")
-      {:safe, ["&lt;", "hello", "&gt;" | ""]}
+      {:safe, [[[] | "&lt;"], "hello" | "&gt;"]}
 
       iex> html_escape('<hello>')
       {:safe, ["&lt;", 104, 101, 108, 108, 111, "&gt;"]}
@@ -137,18 +138,14 @@ defmodule Phoenix.HTML do
 
       iex> html_escape({:safe, "<hello>"})
       {:safe, "<hello>"}
+
   """
   @spec html_escape(unsafe) :: safe
-  def html_escape({:safe, _} = safe),
-    do: safe
-  def html_escape(nil),
-    do: {:safe, ""}
-  def html_escape(bin) when is_binary(bin),
-    do: {:safe, Plug.HTML.html_escape_to_iodata(bin)}
-  def html_escape(list) when is_list(list),
-    do: {:safe, Phoenix.HTML.Safe.List.to_iodata(list)}
-  def html_escape(other),
-    do: {:safe, Phoenix.HTML.Safe.to_iodata(other)}
+  def html_escape({:safe, _} = safe), do: safe
+  def html_escape(nil), do: {:safe, ""}
+  def html_escape(bin) when is_binary(bin), do: {:safe, Plug.HTML.html_escape_to_iodata(bin)}
+  def html_escape(list) when is_list(list), do: {:safe, Phoenix.HTML.Safe.List.to_iodata(list)}
+  def html_escape(other), do: {:safe, Phoenix.HTML.Safe.to_iodata(other)}
 
   @doc """
   Converts a safe result into a string.
@@ -156,7 +153,7 @@ defmodule Phoenix.HTML do
   Fails if the result is not safe. In such cases, you can
   invoke `html_escape/1` or `raw/1` accordingly before.
   """
-  @spec safe_to_string(safe) :: String.t
+  @spec safe_to_string(safe) :: String.t()
   def safe_to_string({:safe, iodata}) do
     IO.iodata_to_binary(iodata)
   end
@@ -169,9 +166,9 @@ defmodule Phoenix.HTML do
 
       $("#container").append("<%= escape_javascript(render("post.html", post: @post)) %>");
   """
-  @spec escape_javascript(binary | safe) :: String.t
+  @spec escape_javascript(binary | safe) :: String.t()
   def escape_javascript({:safe, data}) do
-    {:safe, data |> IO.iodata_to_binary |> escape_javascript}
+    {:safe, data |> IO.iodata_to_binary() |> escape_javascript}
   end
 
   def escape_javascript(data) when is_binary(data) do
@@ -180,20 +177,25 @@ defmodule Phoenix.HTML do
 
   defp escape_javascript(<<0x2028::utf8, t::binary>>, acc),
     do: escape_javascript(t, <<acc::binary, "\\u2028">>)
+
   defp escape_javascript(<<0x2029::utf8, t::binary>>, acc),
     do: escape_javascript(t, <<acc::binary, "\\u2029">>)
+
   defp escape_javascript(<<0::utf8, t::binary>>, acc),
     do: escape_javascript(t, <<acc::binary, "\\u0000">>)
+
   defp escape_javascript(<<"</", t::binary>>, acc),
     do: escape_javascript(t, <<acc::binary, ?<, ?\\, ?/>>)
+
   defp escape_javascript(<<"\r\n", t::binary>>, acc),
     do: escape_javascript(t, <<acc::binary, ?\\, ?n>>)
+
   defp escape_javascript(<<h, t::binary>>, acc) when h in [?", ?', ?\\],
     do: escape_javascript(t, <<acc::binary, ?\\, h>>)
+
   defp escape_javascript(<<h, t::binary>>, acc) when h in [?\r, ?\n],
     do: escape_javascript(t, <<acc::binary, ?\\, ?n>>)
-  defp escape_javascript(<<h, t::binary>>, acc),
-    do: escape_javascript(t, <<acc::binary, h>>)
-  defp escape_javascript(<<>>, acc),
-    do: acc
+
+  defp escape_javascript(<<h, t::binary>>, acc), do: escape_javascript(t, <<acc::binary, h>>)
+  defp escape_javascript(<<>>, acc), do: acc
 end

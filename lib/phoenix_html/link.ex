@@ -66,10 +66,25 @@ defmodule Phoenix.HTML.Link do
       config :phoenix_html, csrf_token_generator: {MyGenerator, :get_token, []}
 
   """
-  @valid_uri_schemes ["http:", "https:", "ftp:", "ftps:", "mailto:",
-                      "news:", "irc:", "gopher:", "nntp:", "feed:",
-                      "telnet:", "mms:", "rtsp:", "svn:", "tel:", "fax:",
-                      "xmpp:"]
+  @valid_uri_schemes [
+    "http:",
+    "https:",
+    "ftp:",
+    "ftps:",
+    "mailto:",
+    "news:",
+    "irc:",
+    "gopher:",
+    "nntp:",
+    "feed:",
+    "telnet:",
+    "mms:",
+    "rtsp:",
+    "svn:",
+    "tel:",
+    "fax:",
+    "xmpp:"
+  ]
 
   def link(text, opts)
 
@@ -129,7 +144,7 @@ defmodule Phoenix.HTML.Link do
 
   All other options are forwarded to the underlying button input.
   """
-  def button(opts, [do: contents]) do
+  def button(opts, do: contents) do
     button(contents, opts)
   end
 
@@ -154,6 +169,7 @@ defmodule Phoenix.HTML.Link do
 
   defp csrf_data(opts) do
     {csrf_token?, opts} = Keyword.pop(opts, :csrf_token, true)
+
     if csrf_token = csrf_token? && get_csrf_token() do
       {[csrf: csrf_token], opts}
     else
@@ -179,9 +195,11 @@ defmodule Phoenix.HTML.Link do
   defp valid_destination!({:safe, to}, context) do
     {:safe, valid_string_destination!(IO.iodata_to_binary(to), context)}
   end
+
   defp valid_destination!({other, to}, _context) when is_atom(other) do
     [Atom.to_string(other), ?:, to]
   end
+
   defp valid_destination!(to, context) do
     valid_string_destination!(IO.iodata_to_binary(to), context)
   end
@@ -189,6 +207,7 @@ defmodule Phoenix.HTML.Link do
   for scheme <- @valid_uri_schemes do
     defp valid_string_destination!(unquote(scheme) <> _ = string, _context), do: string
   end
+
   defp valid_string_destination!(to, context) do
     if String.contains?(to, ":") do
       raise ArgumentError, """

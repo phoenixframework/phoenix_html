@@ -18,15 +18,17 @@ defmodule Phoenix.HTML.EngineTest do
   end
 
   test "raises ArgumentError for missing assigns" do
-    assert_raise ArgumentError, ~r/assign @foo not available in eex template.*Available assigns: \[:bar\]/s, fn ->
-      eval(@template, %{bar: "baz"})
-    end
+    assert_raise ArgumentError,
+                 ~r/assign @foo not available in eex template.*Available assigns: \[:bar\]/s,
+                 fn ->
+                   eval(@template, %{bar: "baz"})
+                 end
   end
 
   defp eval(string, assigns) do
     {:safe, io} =
-      EEx.eval_string(string, [assigns: assigns],
-                      file: __ENV__.file, engine: Phoenix.HTML.Engine)
+      EEx.eval_string(string, [assigns: assigns], file: __ENV__.file, engine: Phoenix.HTML.Engine)
+
     IO.iodata_to_binary(io)
   end
 end
