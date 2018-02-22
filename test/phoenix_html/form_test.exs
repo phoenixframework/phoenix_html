@@ -9,11 +9,11 @@ defmodule Phoenix.HTML.FormTest do
   A function that executes `form_for/4` and
   extracts its inner contents for assertion.
   """
-  def safe_form(fun, opts \\ []) do
+  def safe_form(fun, opts \\ [as: :search]) do
     mark = "--PLACEHOLDER--"
 
     contents =
-      safe_to_string form_for(conn(), "/", [as: :search] ++ opts, fn f ->
+      safe_to_string form_for(conn(), "/", opts, fn f ->
         html_escape [mark, fun.(f), mark]
       end)
 
@@ -238,7 +238,7 @@ defmodule Phoenix.HTML.FormTest do
       safe_form(&file_input(&1, :key))
     end
 
-    assert safe_form(&file_input(&1, :key), multipart: true) ==
+    assert safe_form(&file_input(&1, :key), multipart: true, as: :search) ==
           ~s(<input id="search_key" name="search[key]" type="file">)
   end
 
@@ -694,6 +694,39 @@ defmodule Phoenix.HTML.FormTest do
 
     assert safe_form(&multiple_select(put_in(&1.params["key"], ["3"]), :key, [{"foo", 1}, {"bar", 2}, {"goo", 3}], selected: [2])) ==
           ~s(<select id="search_key" multiple="" name="search[key][]">) <>
+          ~s(<option value="1">foo</option>) <>
+          ~s(<option value="2">bar</option>) <>
+          ~s(<option value="3" selected>goo</option>) <>
+          ~s(</select>)
+  end
+
+  test "multiple_select/4 with unnamed form" do
+    assert safe_form(&multiple_select(&1, :key, [{"foo", 1}, {"bar", 2}], value: [1], selected: [2]), []) ==
+           ~s(<select multiple="" name="key[]">) <>
+           ~s(<option value="1" selected>foo</option>) <>
+           ~s(<option value="2">bar</option>) <>
+           ~s(</select>)
+
+    assert safe_form(&multiple_select(&1, :other, [{"foo", 1}, {"bar", 2}], selected: [2]), []) ==
+           ~s(<select multiple="" name="other[]">) <>
+           ~s(<option value="1">foo</option>) <>
+           ~s(<option value="2" selected>bar</option>) <>
+           ~s(</select>)
+
+    assert safe_form(&multiple_select(&1, :key, [{"foo", 1}, {"bar", 2}], value: [2]), []) ==
+           ~s(<select multiple="" name="key[]">) <>
+           ~s(<option value="1">foo</option>) <>
+           ~s(<option value="2" selected>bar</option>) <>
+           ~s(</select>)
+
+    assert safe_form(&multiple_select(&1, :key, ~w(value novalue), value: ["novalue"]), []) ==
+           ~s(<select multiple="" name="key[]">) <>
+           ~s(<option value="value">value</option>) <>
+           ~s(<option value="novalue" selected>novalue</option>) <>
+           ~s(</select>)
+
+    assert safe_form(&multiple_select(put_in(&1.params["key"], ["3"]), :key, [{"foo", 1}, {"bar", 2}, {"goo", 3}], selected: [2]), []) ==
+          ~s(<select multiple="" name="key[]">) <>
           ~s(<option value="1">foo</option>) <>
           ~s(<option value="2">bar</option>) <>
           ~s(<option value="3" selected>goo</option>) <>
