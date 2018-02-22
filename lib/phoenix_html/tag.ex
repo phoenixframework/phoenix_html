@@ -193,11 +193,7 @@ defmodule Phoenix.HTML.Tag do
 
   ## CSRF Protection
 
-  By default, CSRF tokens are generated through `Plug.CSRFProtection`. You
-  can customize the CSRF token generation by configuring your own MFA:
-
-      config :phoenix_html, csrf_token_generator: {MyGenerator, :get_token, []}
-
+  By default, CSRF tokens are generated through `Plug.CSRFProtection`.
   """
   def form_tag(action, opts \\ [])
 
@@ -208,16 +204,21 @@ defmodule Phoenix.HTML.Tag do
   def form_tag(action, opts) when is_list(opts) do
     {:safe, method} = html_escape(Keyword.get(opts, :method, "post"))
 
-    {opts, extra} =
+    {extra, opts} =
       case method do
         "get" ->
-          {opts, ""}
+          {"", opts}
 
         "post" ->
-          csrf_token_tag(Keyword.put(opts, :method, "post"), "")
+          csrf_token_tag(
+            action,
+            Keyword.put(opts, :method, "post"),
+            ""
+          )
 
         _ ->
           csrf_token_tag(
+            action,
             Keyword.put(opts, :method, "post"),
             ~s'<input name="#{@method_param}" type="hidden" value="#{method}">'
           )
@@ -257,13 +258,17 @@ defmodule Phoenix.HTML.Tag do
     html_escape([form_tag(action, options), block, raw("</form>")])
   end
 
-  defp csrf_token_tag(opts, extra) do
-    {csrf_token?, opts} = Keyword.pop(opts, :csrf_token, true)
+  defp csrf_token_tag(to, opts, extra) do
+    case Keyword.pop(opts, :csrf_token, true) do
+      {csrf_token, opts} when is_binary(csrf_token) ->
+        {extra <> ~s'<input name="#{@csrf_param}" type="hidden" value="#{csrf_token}">', opts}
 
-    if csrf_token = csrf_token? && get_csrf_token() do
-      {opts, extra <> ~s'<input name="#{@csrf_param}" type="hidden" value="#{csrf_token}">'}
-    else
-      {opts, extra}
+      {true, opts} ->
+        csrf_token = Plug.CSRFProtection.get_csrf_token_for(to)
+        {extra <> ~s'<input name="#{@csrf_param}" type="hidden" value="#{csrf_token}">', opts}
+
+      {false, opts} ->
+        {extra, opts}
     end
   end
 
@@ -282,15 +287,10 @@ defmodule Phoenix.HTML.Tag do
       :meta,
       charset: "UTF-8",
       name: "csrf-token",
-      content: get_csrf_token(),
+      content: Plug.CSRFProtection.get_csrf_token(),
       "csrf-param": @csrf_param,
       "method-param": @method_param
     )
-  end
-
-  defp get_csrf_token do
-    {mod, fun, args} = Application.fetch_env!(:phoenix_html, :csrf_token_generator)
-    apply(mod, fun, args)
   end
 
   @doc """

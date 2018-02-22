@@ -60,11 +60,7 @@ defmodule Phoenix.HTML.Link do
 
   ## CSRF Protection
 
-  By default, CSRF tokens are generated through `Plug.CSRFProtection`. You
-  can customize the CSRF token generation by configuring your own MFA:
-
-      config :phoenix_html, csrf_token_generator: {MyGenerator, :get_token, []}
-
+  By default, CSRF tokens are generated through `Plug.CSRFProtection`.
   """
   @valid_uri_schemes [
     "http:",
@@ -98,16 +94,14 @@ defmodule Phoenix.HTML.Link do
 
   def link(text, opts) do
     {to, opts} = pop_required_option!(opts, :to, "expected non-nil value for :to in link/2")
-
     to = valid_destination!(to, "link/2")
-
     {method, opts} = Keyword.pop(opts, :method, :get)
 
     if method == :get do
       opts = skip_csrf(opts)
       content_tag(:a, text, [href: to] ++ opts)
     else
-      {csrf_data, opts} = csrf_data(opts)
+      {csrf_data, opts} = csrf_data(to, opts)
       opts = Keyword.put_new(opts, :rel, "nofollow")
       content_tag(:a, text, [href: "#", data: [method: method, to: to] ++ csrf_data] ++ opts)
     end
@@ -158,7 +152,7 @@ defmodule Phoenix.HTML.Link do
       opts = skip_csrf(opts)
       content_tag(:button, text, [data: [method: method, to: to]] ++ opts)
     else
-      {csrf_data, opts} = csrf_data(opts)
+      {csrf_data, opts} = csrf_data(to, opts)
       content_tag(:button, text, [data: [method: method, to: to] ++ csrf_data] ++ opts)
     end
   end
@@ -167,19 +161,17 @@ defmodule Phoenix.HTML.Link do
     Keyword.delete(opts, :csrf_token)
   end
 
-  defp csrf_data(opts) do
-    {csrf_token?, opts} = Keyword.pop(opts, :csrf_token, true)
+  defp csrf_data(to, opts) do
+    case Keyword.pop(opts, :csrf_token, true) do
+      {csrf, opts} when is_binary(csrf) ->
+        {[csrf: csrf], opts}
 
-    if csrf_token = csrf_token? && get_csrf_token() do
-      {[csrf: csrf_token], opts}
-    else
-      {[], opts}
+      {true, opts} ->
+        {[csrf: Plug.CSRFProtection.get_csrf_token_for(to)], opts}
+
+      {false, opts} ->
+        {[], opts}
     end
-  end
-
-  defp get_csrf_token do
-    {mod, fun, args} = Application.fetch_env!(:phoenix_html, :csrf_token_generator)
-    apply(mod, fun, args)
   end
 
   defp pop_required_option!(opts, key, error_message) do

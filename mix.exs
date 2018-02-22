@@ -22,14 +22,14 @@ defmodule PhoenixHtml.Mixfile do
   end
 
   def application do
-    [
-      applications: [:logger, :plug],
-      env: [csrf_token_generator: {Plug.CSRFProtection, :get_csrf_token, []}]
-    ]
+    [applications: [:logger, :plug]]
   end
 
   defp deps do
-    [{:plug, "~> 1.5-rc", github: "elixir-plug/plug"}, {:ex_doc, "~> 0.12", only: :docs}]
+    [
+      {:plug, "~> 1.5-rc", github: "elixir-plug/plug"},
+      {:ex_doc, "~> 0.12", only: :docs}
+    ]
   end
 
   defp package do
