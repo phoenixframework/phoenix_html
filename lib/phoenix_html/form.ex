@@ -361,7 +361,7 @@ defmodule Phoenix.HTML.Form do
   """
   @spec input_name(t | atom, field) :: String.t
   def input_name(%{name: nil}, field),
-    do: field
+    do: to_string(field)
   def input_name(%{name: name}, field) when is_atom(field) or is_binary(field),
     do: "#{name}[#{field}]"
   def input_name(name, field) when is_atom(name) and is_atom(field) or is_binary(field),
