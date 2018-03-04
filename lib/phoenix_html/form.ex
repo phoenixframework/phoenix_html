@@ -147,6 +147,21 @@ defmodule Phoenix.HTML.Form do
   collections. When working with collections, `:prepend` and
   `:append` can be used to add entries to the collection
   stored in the changeset.
+
+  ## CSRF protection
+
+  The form generates a CSRF token by default. Your application should
+  check this token on the server to avoid attackers from making requests
+  on your server in behalf of other users. Phoenix by default checks
+  this token.
+
+  When posting a form with a host in its address, such as "//host.com/path"
+  instead of only "/path", Phoenix will include the host signature in the
+  token and validate the token only if the accessed host is the same as
+  the host in the token. This is to avoid tokens from leaking to third
+  party applications. If this behaviour is problematic, you can generate
+  a non-host specific token with `Plug.CSRFProtection.get_csrf_token/0` and
+  pass it to the form generator via the `:csrf_token` option.
   """
 
   alias Phoenix.HTML.Form
