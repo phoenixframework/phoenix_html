@@ -2,7 +2,7 @@ defmodule PhoenixHtml.Mixfile do
   use Mix.Project
 
   # Also change package.json version
-  @version "2.11.0-dev"
+  @version "2.11.0"
 
   def project do
     [
@@ -27,8 +27,8 @@ defmodule PhoenixHtml.Mixfile do
 
   defp deps do
     [
-      {:plug, "~> 1.5-rc", github: "elixir-plug/plug"},
-      {:ex_doc, "~> 0.12", only: :docs}
+      {:plug, "~> 1.5"},
+      {:ex_doc, "~> 0.18", only: :docs}
     ]
   end
 
@@ -37,7 +37,7 @@ defmodule PhoenixHtml.Mixfile do
       maintainers: ["Chris McCord", "José Valim"],
       licenses: ["MIT"],
       links: %{github: "https://github.com/phoenixframework/phoenix_html"},
-      files: ~w(lib priv) ++ ~w(CHANGELOG.md LICENSE mix.exs package.json README.md)
+      files: ~w(lib priv CHANGELOG.md LICENSE mix.exs package.json README.md)
     ]
   end
 end

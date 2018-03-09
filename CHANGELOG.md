@@ -1,6 +1,6 @@
 # Changelog
 
-## v2.11.0-dev
+## v2.11.0 (2018-03-09)
 
 * Enhancements
   * Add date, datetime-local and time input types
@@ -8,9 +8,10 @@
   * Support carriage return in `text_to_html`
   * Add support for HTML5 boolean attributes to `content_tag` and `tag`
   * Improve performance by relying on `html_safe_to_iodata/1`
+  * Protect against CSRF tokens leaking across hosts when the POST URL is dynamic
 
 * Bug fixes
-  * Guarantee input_name/2 always returns strings
+  * Guarantee `input_name/2` always returns strings
   * Improve handling of uncommon whitespace and null in `escape_javascript`
   * Escape value attribute so it is never treated as a boolean
 
