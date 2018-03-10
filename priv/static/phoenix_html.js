@@ -18,11 +18,14 @@
     var to = link.getAttribute("data-to"),
         method = buildHiddenInput("_method", link.getAttribute("data-method")),
         csrf = buildHiddenInput("_csrf_token", link.getAttribute("data-csrf")),
-        form = document.createElement("form");
+        form = document.createElement("form"),
+        target = link.getAttribute("target");
 
     form.method = (link.getAttribute("data-method") === "get") ? "get" : "post";
     form.action = to;
     form.style.display = "hidden";
+
+    if (target) form.target = target;
 
     form.appendChild(csrf);
     form.appendChild(method);
