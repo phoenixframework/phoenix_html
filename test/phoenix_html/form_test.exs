@@ -1138,43 +1138,53 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(Sec: <select class="sec" id="sec" name="search[datetime][second]">)
   end
 
-  ## label/4
+  describe "label" do
+    test "with block" do
+      assert safe_to_string(
+               label do
+                 "Block"
+               end
+             ) == ~s(<label>Block</label>)
 
-  test "label/4" do
-    assert safe_to_string(label(:search, :key, "Search")) ==
-             ~s(<label for="search_key">Search</label>)
+      assert safe_to_string(
+               label class: "foo" do
+                 "Block"
+               end
+             ) == ~s(<label class="foo">Block</label>)
+    end
 
-    assert safe_to_string(label(:search, :key, "Search", for: "test_key")) ==
-             ~s(<label for="test_key">Search</label>)
-  end
+    test "with field but no content" do
+      assert safe_to_string(label(:search, :key)) == ~s(<label for="search_key">Key</label>)
 
-  test "label/4 with form" do
-    assert safe_form(&label(&1, :key, "Search")) == ~s(<label for="search_key">Search</label>)
+      assert safe_to_string(label(:search, :key, for: "test_key")) ==
+               ~s(<label for="test_key">Key</label>)
 
-    assert safe_form(&label(&1, :key, "Search", for: "test_key")) ==
-             ~s(<label for="test_key">Search</label>)
-  end
+      assert safe_to_string(label(:search, :key, for: "test_key", class: "foo")) ==
+               ~s(<label class="foo" for="test_key">Key</label>)
+    end
 
-  test "label/4 with default value" do
-    assert safe_to_string(label(:search, :key)) == ~s(<label for="search_key">Key</label>)
+    test "with field and inline content" do
+      assert safe_to_string(label(:search, :key, "Search")) ==
+               ~s(<label for="search_key">Search</label>)
 
-    assert safe_to_string(label(:search, :key, for: "test_key")) ==
-             ~s(<label for="test_key">Key</label>)
-  end
+      assert safe_to_string(label(:search, :key, "Search", for: "test_key")) ==
+               ~s(<label for="test_key">Search</label>)
 
-  test "label/4 with form and default value" do
-    assert safe_form(&label(&1, :key)) == ~s(<label for="search_key">Key</label>)
+      assert safe_form(&label(&1, :key, "Search")) == ~s(<label for="search_key">Search</label>)
 
-    assert safe_form(&label(&1, :key, for: "test_key")) == ~s(<label for="test_key">Key</label>)
-  end
+      assert safe_form(&label(&1, :key, "Search", for: "test_key")) ==
+               ~s(<label for="test_key">Search</label>)
 
-  test "label/4 with a block" do
-    assert safe_form(&label(&1, :key, [class: "test-label"], do: "Hello")) ==
-             ~s(<label class="test-label" for="search_key">Hello</label>)
-  end
+      assert safe_form(&label(&1, :key, "Search", for: "test_key", class: "foo")) ==
+               ~s(<label class="foo" for="test_key">Search</label>)
+    end
 
-  test "label/3 with a block" do
-    assert safe_form(&label(&1, :key, do: "Hello")) == ~s(<label for="search_key">Hello</label>)
+    test "with field and block content" do
+      assert safe_form(&label(&1, :key, do: "Hello")) == ~s(<label for="search_key">Hello</label>)
+
+      assert safe_form(&label(&1, :key, [class: "test-label"], do: "Hello")) ==
+               ~s(<label class="test-label" for="search_key">Hello</label>)
+    end
   end
 
   ## input_value/2

@@ -367,10 +367,14 @@ defmodule Phoenix.HTML.Form do
   """
   @spec input_id(t | atom, field) :: String.t()
   def input_id(%{id: nil}, _field), do: nil
-  def input_id(%{id: id}, field) when is_atom(field) or is_binary(field), do: "#{id}_#{field}"
 
-  def input_id(name, field) when (is_atom(name) and is_atom(field)) or is_binary(field),
-    do: "#{name}_#{field}"
+  def input_id(%{id: id}, field) when is_atom(field) or is_binary(field) do
+    "#{id}_#{field}"
+  end
+
+  def input_id(name, field) when (is_atom(name) and is_atom(field)) or is_binary(field) do
+    "#{name}_#{field}"
+  end
 
   @doc """
   Returns an id of a corresponding form field and value attached to it.
@@ -1263,7 +1267,7 @@ defmodule Phoenix.HTML.Form do
   """
   def date_select(form, field, opts \\ []) do
     value = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
-    builder = Keyword.get(opts, :builder) || &date_builder(&1, opts)
+    builder = Keyword.get(opts, :builder) || (&date_builder(&1, opts))
     builder.(datetime_builder(form, field, date_value(value), nil, opts))
   end
 
@@ -1290,7 +1294,7 @@ defmodule Phoenix.HTML.Form do
   """
   def time_select(form, field, opts \\ []) do
     value = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
-    builder = Keyword.get(opts, :builder) || &time_builder(&1, opts)
+    builder = Keyword.get(opts, :builder) || (&time_builder(&1, opts))
     builder.(datetime_builder(form, field, nil, time_value(value), opts))
   end
 
@@ -1401,6 +1405,34 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Generates a label tag.
 
+  Useful when wrapping another input inside a label.
+
+  ## Examples
+
+      label do
+        radio_button :user, :choice, "Choice"
+      end
+      #=> <label class="control-label">...</label>
+
+      label class: "control-label" do
+        radio_button :user, :choice, "Choice"
+      end
+      #=> <label class="control-label">...</label>
+
+  """
+  def label(do_block)
+
+  def label(do: block) do
+    content_tag(:label, block, [])
+  end
+
+  def label(opts, do: block) when is_list(opts) do
+    content_tag(:label, block, opts)
+  end
+
+  @doc """
+  Generates a label tag for the given field.
+
   The form should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
 
@@ -1408,6 +1440,8 @@ defmodule Phoenix.HTML.Form do
   A default value is provided for `for` attribute but can
   be overriden if you pass a value to the `for` option.
   Text content would be inferred from `field` if not specified.
+
+  To wrap a label around an input, see `label/1`.
 
   ## Examples
 
@@ -1433,14 +1467,17 @@ defmodule Phoenix.HTML.Form do
         "E-mail Address"
       end
       #=> <label class="control-label" for="user_email">E-mail Address</label>
+
   """
-  def label(form, field) do
+  def label(form, field) when is_atom(field) or is_binary(field) do
     label(form, field, humanize(field), [])
   end
 
   @doc """
   See `label/2`.
   """
+  def label(form, field, text_or_do_block_or_attributes)
+
   def label(form, field, text) when is_binary(text) do
     label(form, field, text, [])
   end
@@ -1456,14 +1493,16 @@ defmodule Phoenix.HTML.Form do
   @doc """
   See `label/2`.
   """
+  def label(form, field, text, do_block_or_attributes)
+
   def label(form, field, text, opts) when is_binary(text) and is_list(opts) do
     opts = Keyword.put_new(opts, :for, input_id(form, field))
     content_tag(:label, text, opts)
   end
 
-  def label(form, field, opts, do: block) do
+  def label(form, field, opts, do: block) when is_list(opts) do
     opts = Keyword.put_new(opts, :for, input_id(form, field))
-    content_tag(:label, opts, do: block)
+    content_tag(:label, block, opts)
   end
 
   # Normalize field name to string version
