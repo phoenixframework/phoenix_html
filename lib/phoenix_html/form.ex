@@ -1460,25 +1460,23 @@ defmodule Phoenix.HTML.Form do
   See `label/2`.
   """
   def label(form, field, text, opts) when is_binary(text) and is_list(opts) do
-    {opts, input_id} =
-      case Keyword.pop(opts, :value) do
-        {nil, opts} -> {opts, input_id(form, field)}
-        {value, opts} -> {opts, input_id(form, field, value)}
-      end
-
-    opts = Keyword.put_new(opts, :for, input_id)
+    opts = label_options(form, field, opts)
     content_tag(:label, text, opts)
   end
 
   def label(form, field, opts, do: block) do
+    opts = label_options(form, field, opts)
+    content_tag(:label, opts, do: block)
+  end
+
+  defp label_options(form, field, opts) do
     {opts, input_id} =
       case Keyword.pop(opts, :value) do
         {nil, opts} -> {opts, input_id(form, field)}
         {value, opts} -> {opts, input_id(form, field, value)}
       end
 
-    opts = Keyword.put_new(opts, :for, input_id)
-    content_tag(:label, opts, do: block)
+    Keyword.put_new(opts, :for, input_id)
   end
 
   # Normalize field name to string version
