@@ -1174,8 +1174,7 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "label/4 with for_value option" do
-    assert safe_form(&label(&1, :key, value: "1")) ==
-            ~s(<label for="search_key_1">Key</label>)
+    assert safe_form(&label(&1, :key, value: "1")) == ~s(<label for="search_key_1">Key</label>)
   end
 
   test "label/3 with a block" do
