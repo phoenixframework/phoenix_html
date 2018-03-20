@@ -378,15 +378,13 @@ defmodule Phoenix.HTML.Form do
 
   @doc """
   Returns an id of a corresponding form field and value attached to it.
+
   Useful for radio buttons and inputs like multiselect checkboxes.
   """
-  @spec input_id(t | atom, field, String.t() | atom) :: String.t()
-  def input_id(name, field, value) when is_atom(value) do
-    input_id(name, field, Atom.to_string(value))
-  end
-
-  def input_id(name, field, value) when is_binary(value) do
-    value_id = String.replace(value, ~r/\W/u, "_")
+  @spec input_id(t | atom, field, Phoenix.HTML.Safe.t()) :: String.t()
+  def input_id(name, field, value) do
+    {:safe, value} = html_escape(value)
+    value_id = value |> IO.iodata_to_binary() |> String.replace(~r/\W/u, "_")
     input_id(name, field) <> "_" <> value_id
   end
 
@@ -662,13 +660,13 @@ defmodule Phoenix.HTML.Form do
       |> Keyword.put_new(:id, input_id(form, field))
       |> Keyword.put_new(:name, input_name(form, field))
       |> Keyword.put_new(:value, input_value(form, field))
-      |> Keyword.update!(:value, &escape_value/1)
+      |> Keyword.update!(:value, &maybe_html_escape/1)
 
     tag(:input, opts)
   end
 
-  defp escape_value(nil), do: nil
-  defp escape_value(value), do: html_escape(value)
+  defp maybe_html_escape(nil), do: nil
+  defp maybe_html_escape(value), do: html_escape(value)
 
   @doc """
   Generates a textarea input.
@@ -809,7 +807,7 @@ defmodule Phoenix.HTML.Form do
     opts =
       opts
       |> Keyword.put_new(:type, "radio")
-      |> Keyword.put_new(:id, input_id(form, field, value))
+      |> Keyword.put_new(:id, input_id(form, field, escaped_value))
       |> Keyword.put_new(:name, input_name(form, field))
 
     opts =
