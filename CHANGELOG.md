@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.11.1 (2018-03-20)
+
+* Enhancements
+  * Add `label/1`
+  * Copy the target attribute of the link in the generated JS form
+
+* Bug fixes
+  * Support any value that is html escapable in `radio_button`
+
 ## v2.11.0 (2018-03-09)
 
 * Enhancements
