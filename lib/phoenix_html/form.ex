@@ -629,28 +629,45 @@ defmodule Phoenix.HTML.Form do
   Warning: this feature isn't available in all browsers.
   Check `http://caniuse.com/#feat=input-datetime` for further informations.
 
-  See `text_input/3` for example and docs.
+  ## Options
+
+    * `:precision` - Allowed values: `:minute`, `:second`, `:millisecond`.
+      Defaults to `:minute`.
+
+  All other options are forwarded. See `text_input/3` for example and docs.
+
+  ## Examples
+
+      time_input form, :time
+      #=> <input id="form_time" name="form[time]" type="time" value="23:00">
+
+      time_input form, :time, precision: :second
+      #=> <input id="form_time" name="form[time]" type="time" value="23:00:00">
+
+      time_input form, :time, precision: :millisecond
+      #=> <input id="form_time" name="form[time]" type="time" value="23:00:00.000">
   """
   def time_input(form, field, opts \\ []) do
-    opts =
-      case Keyword.fetch(opts, :value) do
-        {:ok, value} ->
-          Keyword.put(opts, :value, time_input_value(value))
-
-        :error ->
-          opts
-      end
+    {precision, opts} = Keyword.pop(opts, :precision, :minute)
+    value = opts[:value] || input_value(form, field)
+    opts = Keyword.put(opts, :value, truncate_time(value, precision))
 
     generic_input(:time, form, field, opts)
   end
 
-  defp time_input_value(%Time{} = value) do
-    value
-    |> to_string
-    |> String.slice(0..4)
+  defp truncate_time(%Time{} = time, :minute) do
+    time
+    |> Time.to_string()
+    |> String.slice(0, 5)
   end
 
-  defp time_input_value(other), do: other
+  defp truncate_time(%Time{} = time, precision) do
+    time
+    |> Time.truncate(precision)
+    |> Time.to_string()
+  end
+
+  defp truncate_time(value, _), do: value
 
   defp generic_input(type, form, field, opts)
        when is_list(opts) and (is_atom(field) or is_binary(field)) do
@@ -1265,7 +1282,7 @@ defmodule Phoenix.HTML.Form do
   """
   def date_select(form, field, opts \\ []) do
     value = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
-    builder = Keyword.get(opts, :builder) || (&date_builder(&1, opts))
+    builder = Keyword.get(opts, :builder) || &date_builder(&1, opts)
     builder.(datetime_builder(form, field, date_value(value), nil, opts))
   end
 
@@ -1292,7 +1309,7 @@ defmodule Phoenix.HTML.Form do
   """
   def time_select(form, field, opts \\ []) do
     value = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
-    builder = Keyword.get(opts, :builder) || (&time_builder(&1, opts))
+    builder = Keyword.get(opts, :builder) || &time_builder(&1, opts)
     builder.(datetime_builder(form, field, nil, time_value(value), opts))
   end
 

@@ -27,6 +27,7 @@ defmodule Phoenix.HTML.FormTest do
     Plug.Test.conn(:get, "/foo", %{
       "search" => %{
         "key" => "value",
+        "time" => ~T[01:02:03.004005],
         "alt_key" => nil,
         "datetime" => %{
           "year" => "2020",
@@ -455,6 +456,17 @@ defmodule Phoenix.HTML.FormTest do
   test "time_input/3 with form" do
     assert safe_form(&time_input(&1, :key)) ==
              ~s(<input id="search_key" name="search[key]" type="time" value="value">)
+
+    assert safe_form(&time_input(&1, :time)) ==
+             ~s(<input id="search_time" name="search[time]" type="time" value="01:02">)
+
+    if Version.match?(System.version(), ">= 1.6.0") do
+      assert safe_form(&time_input(&1, :time, precision: :second)) ==
+               ~s(<input id="search_time" name="search[time]" type="time" value="01:02:03">)
+
+      assert safe_form(&time_input(&1, :time, precision: :millisecond)) ==
+               ~s(<input id="search_time" name="search[time]" type="time" value="01:02:03.004">)
+    end
 
     assert safe_form(&time_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
              ~s(<input id="key" name="search[key][]" type="time" value="foo">)
