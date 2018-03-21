@@ -56,7 +56,7 @@ defmodule Phoenix.HTML.TagTest do
              "<p class=\"dark\"><Hello></p>"
 
     content =
-      content_tag(:form, action: "/users", data: [remote: true]) do
+      content_tag :form, action: "/users", data: [remote: true] do
         tag(:input, name: "user[name]")
       end
 
@@ -130,7 +130,7 @@ defmodule Phoenix.HTML.TagTest do
     csrf_token = Plug.CSRFProtection.get_csrf_token()
 
     assert safe_to_string(
-             form_tag("/") do
+             form_tag "/" do
                "<>"
              end
            ) ==
@@ -139,7 +139,7 @@ defmodule Phoenix.HTML.TagTest do
                ~s(<input name="_utf8" type="hidden" value="✓">) <> ~s(&lt;&gt;) <> ~s(</form>)
 
     assert safe_to_string(
-             form_tag("/", method: :get) do
+             form_tag "/", method: :get do
                "<>"
              end
            ) ==
