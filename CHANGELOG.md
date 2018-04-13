@@ -18,6 +18,7 @@
   * Add support for HTML5 boolean attributes to `content_tag` and `tag`
   * Improve performance by relying on `html_safe_to_iodata/1`
   * Protect against CSRF tokens leaking across hosts when the POST URL is dynamic
+  * Require `to` attribute in links to explicitly pass protocols as a separate option for safety reasons
 
 * Bug fixes
   * Guarantee `input_name/2` always returns strings

@@ -201,7 +201,7 @@ defmodule Phoenix.HTML.Link do
   end
 
   defp valid_string_destination!(to, context) do
-    if String.contains?(to, ":") do
+    if not match?("/" <> _, to) and String.contains?(to, ":") do
       raise ArgumentError, """
       unsupported scheme given to #{context}. In case you want to link to an
       unknown or unsafe scheme, such as javascript, use a tuple: {:javascript, rest}

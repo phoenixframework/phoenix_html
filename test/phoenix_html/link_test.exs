@@ -34,18 +34,24 @@ defmodule Phoenix.HTML.LinkTest do
     assert safe_to_string(link(to: "/hello", do: "world")) == ~s[<a href="/hello">world</a>]
   end
 
-  test "link with scheme tuple" do
-    assert safe_to_string(link("foo", to: {:javascript, "alert(1)"})) ==
-             ~s[<a href="javascript:alert(1)">foo</a>]
+  test "link with scheme" do
+    assert safe_to_string(link("foo", to: "/javascript:alert(<1>)")) ==
+             ~s[<a href="/javascript:alert(&lt;1&gt;)">foo</a>]
 
-    assert safe_to_string(link("foo", to: {:javascript, 'alert(1)'})) ==
-             ~s[<a href="javascript:alert(1)">foo</a>]
+    assert safe_to_string(link("foo", to: {:safe, "/javascript:alert(<1>)"})) ==
+             ~s[<a href="/javascript:alert(<1>)">foo</a>]
 
-    assert safe_to_string(link("foo", to: {:javascript, {:safe, "alert(1)"}})) ==
-             ~s[<a href="javascript:alert(1)">foo</a>]
+    assert safe_to_string(link("foo", to: {:javascript, "alert(<1>)"})) ==
+             ~s[<a href="javascript:alert(&lt;1&gt;)">foo</a>]
 
-    assert safe_to_string(link("foo", to: {:javascript, {:safe, 'alert(1)'}})) ==
-             ~s[<a href="javascript:alert(1)">foo</a>]
+    assert safe_to_string(link("foo", to: {:javascript, 'alert(<1>)'})) ==
+             ~s[<a href="javascript:alert(&lt;1&gt;)">foo</a>]
+
+    assert safe_to_string(link("foo", to: {:javascript, {:safe, "alert(<1>)"}})) ==
+             ~s[<a href="javascript:alert(<1>)">foo</a>]
+
+    assert safe_to_string(link("foo", to: {:javascript, {:safe, 'alert(<1>)'}})) ==
+             ~s[<a href="javascript:alert(<1>)">foo</a>]
   end
 
   test "link with invalid args" do
