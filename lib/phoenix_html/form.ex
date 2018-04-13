@@ -941,7 +941,7 @@ defmodule Phoenix.HTML.Form do
           </select>
 
       select(form, :role, [[key: "Admin", value: "admin", disabled: true],
-                           [key: "User", value: "user"])
+                           [key: "User", value: "user"]])
       #=> <select id="user_role" name="user[role]">
           <option value="admin" disabled="disabled">Admin</option>
           <option value="user">User</option>
