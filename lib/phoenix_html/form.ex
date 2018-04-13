@@ -1282,7 +1282,7 @@ defmodule Phoenix.HTML.Form do
   """
   def date_select(form, field, opts \\ []) do
     value = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
-    builder = Keyword.get(opts, :builder) || &date_builder(&1, opts)
+    builder = Keyword.get(opts, :builder) || (&date_builder(&1, opts))
     builder.(datetime_builder(form, field, date_value(value), nil, opts))
   end
 
@@ -1309,7 +1309,7 @@ defmodule Phoenix.HTML.Form do
   """
   def time_select(form, field, opts \\ []) do
     value = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
-    builder = Keyword.get(opts, :builder) || &time_builder(&1, opts)
+    builder = Keyword.get(opts, :builder) || (&time_builder(&1, opts))
     builder.(datetime_builder(form, field, nil, time_value(value), opts))
   end
 

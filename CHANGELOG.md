@@ -1,5 +1,13 @@
 # Changelog
 
+## v2.11.2 (2018-04-13)
+
+* Enhancements
+  * Support custom precision on time input
+
+* Bug fixes
+  * Do not raise when `:` is part of a path on link/button attributes
+
 ## v2.11.1 (2018-03-20)
 
 * Enhancements
@@ -18,7 +26,7 @@
   * Add support for HTML5 boolean attributes to `content_tag` and `tag`
   * Improve performance by relying on `html_safe_to_iodata/1`
   * Protect against CSRF tokens leaking across hosts when the POST URL is dynamic
-  * Require `to` attribute in links to explicitly pass protocols as a separate option for safety reasons
+  * Require `to` attribute in links and buttons to explicitly pass protocols as a separate option for safety reasons
 
 * Bug fixes
   * Guarantee `input_name/2` always returns strings
