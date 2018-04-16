@@ -24,7 +24,7 @@ defmodule Phoenix.HTML.Link do
 
       # If you supply a method other than `:get`:
       link("delete", to: "/everything", method: :delete)
-      #=> <a href="#" data-csrf="csrf_token" data-method="delete" data-to="/everything">delete</a>
+      #=> <a href="/everything" data-csrf="csrf_token" data-method="delete" data-to="/everything">delete</a>
 
       # You can use a `do ... end` block too:
       link to: "/hello" do
@@ -103,7 +103,7 @@ defmodule Phoenix.HTML.Link do
     else
       {csrf_data, opts} = csrf_data(to, opts)
       opts = Keyword.put_new(opts, :rel, "nofollow")
-      content_tag(:a, text, [href: "#", data: [method: method, to: to] ++ csrf_data] ++ opts)
+      content_tag(:a, text, [href: to, data: [method: method, to: to] ++ csrf_data] ++ opts)
     end
   end
 

@@ -8,19 +8,19 @@ defmodule Phoenix.HTML.LinkTest do
     csrf_token = Plug.CSRFProtection.get_csrf_token()
 
     assert safe_to_string(link("hello", to: "/world", method: :post)) ==
-             ~s[<a data-csrf="#{csrf_token}" data-method="post" data-to="/world" href="#" rel="nofollow">hello</a>]
+             ~s[<a data-csrf="#{csrf_token}" data-method="post" data-to="/world" href="/world" rel="nofollow">hello</a>]
   end
 
   test "link with put/delete" do
     csrf_token = Plug.CSRFProtection.get_csrf_token()
 
     assert safe_to_string(link("hello", to: "/world", method: :put)) ==
-             ~s[<a data-csrf="#{csrf_token}" data-method="put" data-to="/world" href="#" rel="nofollow">hello</a>]
+             ~s[<a data-csrf="#{csrf_token}" data-method="put" data-to="/world" href="/world" rel="nofollow">hello</a>]
   end
 
   test "link with put/delete without csrf_token" do
     assert safe_to_string(link("hello", to: "/world", method: :put, csrf_token: false)) ==
-             ~s[<a data-method="put" data-to="/world" href="#" rel="nofollow">hello</a>]
+             ~s[<a data-method="put" data-to="/world" href="/world" rel="nofollow">hello</a>]
   end
 
   test "link with :do contents" do
