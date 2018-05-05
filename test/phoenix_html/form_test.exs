@@ -915,6 +915,38 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option value="13" selected>13</option>)
   end
 
+  test "date_select/4 with form and a builder" do
+    content =
+      safe_form(
+        &date_select(
+          &1,
+          :datetime,
+          builder: fn b ->
+            b.(:day, prompt: "Day", class: "custom-select") /
+              b.(:month, prompt: "Month", class: "custom-select") /
+              b.(
+                :year,
+                options: 1900..2100,
+                prompt: "Year",
+                class: "custom-select"
+              )
+          end
+        )
+      )
+
+    assert content =~
+             ~s(<select id="datetime_year" name="[datetime][year]">) <>
+               ~s(<option class="custom-select" value="">Year</option>)
+
+    assert content =~
+             ~s(<select id="datetime_month" name="[datetime][month]">) <>
+               ~s(<option class="custom-select" value="">Month</option>)
+
+    assert content =~
+             ~s(<select id="datetime_day" name="[datetime][day]">) <>
+               ~s(<option class="custom-select" value="">Day</option>)
+  end
+
   # time_select/4
 
   test "time_select/4" do
