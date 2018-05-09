@@ -20,7 +20,7 @@ defmodule Phoenix.HTML.Form do
 
   The entry point for defining forms in Phoenix is with
   the `form_for/4` function. For this example, we will
-  use `Ecto.Changeset`, which integrate nicely with Phoenix
+  use `Ecto.Changeset`, which integrates nicely with Phoenix
   forms via the `phoenix_ecto` package.
 
   Imagine you have the following action in your controller:
