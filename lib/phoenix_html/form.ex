@@ -1193,8 +1193,8 @@ defmodule Phoenix.HTML.Form do
             {gettext("December"), "12"},
           ])
 
-      datetime_select(form, field, opts)
-    end
+        datetime_select(form, field, opts)
+      end
 
   ## Options
 
