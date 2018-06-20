@@ -1249,6 +1249,7 @@ defmodule Phoenix.HTML.Form do
 
     * a map containing the `year`, `month` and `day` keys (either as strings or atoms)
     * a tuple with three elements: `{year, month, day}`
+    * a string in ISO 8601 format
     * `nil`
 
   ## Supported time values
@@ -1282,7 +1283,7 @@ defmodule Phoenix.HTML.Form do
   """
   def date_select(form, field, opts \\ []) do
     value = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
-    builder = Keyword.get(opts, :builder) || (&date_builder(&1, opts))
+    builder = Keyword.get(opts, :builder) || &date_builder(&1, opts)
     builder.(datetime_builder(form, field, date_value(value), nil, opts))
   end
 
@@ -1300,6 +1301,13 @@ defmodule Phoenix.HTML.Form do
   defp date_value({year, month, day}), do: %{year: year, month: month, day: day}
 
   defp date_value(nil), do: %{year: nil, month: nil, day: nil}
+
+  defp date_value(string) when is_binary(string) do
+    string
+    |> Date.from_iso8601!()
+    |> date_value
+  end
+
   defp date_value(other), do: raise(ArgumentError, "unrecognized date #{inspect(other)}")
 
   @doc """
@@ -1309,7 +1317,7 @@ defmodule Phoenix.HTML.Form do
   """
   def time_select(form, field, opts \\ []) do
     value = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
-    builder = Keyword.get(opts, :builder) || (&time_builder(&1, opts))
+    builder = Keyword.get(opts, :builder) || &time_builder(&1, opts)
     builder.(datetime_builder(form, field, nil, time_value(value), opts))
   end
 
@@ -1342,6 +1350,13 @@ defmodule Phoenix.HTML.Form do
   defp time_value({hour, min, sec}), do: %{hour: hour, minute: min, second: sec}
 
   defp time_value(nil), do: %{hour: nil, minute: nil, second: nil}
+
+  defp time_value(string) when is_binary(string) do
+    string
+    |> Time.from_iso8601!()
+    |> time_value
+  end
+
   defp time_value(other), do: raise(ArgumentError, "unrecognized time #{inspect(other)}")
 
   @months [
