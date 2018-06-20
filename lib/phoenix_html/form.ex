@@ -1350,6 +1350,13 @@ defmodule Phoenix.HTML.Form do
   defp time_value({hour, min, sec}), do: %{hour: hour, minute: min, second: sec}
 
   defp time_value(nil), do: %{hour: nil, minute: nil, second: nil}
+
+  defp time_value(string) when is_binary(string) do
+    string
+    |> Time.from_iso8601!()
+    |> time_value
+  end
+
   defp time_value(other), do: raise(ArgumentError, "unrecognized time #{inspect(other)}")
 
   @months [

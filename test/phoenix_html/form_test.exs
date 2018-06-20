@@ -938,6 +938,11 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option value="9" selected>09</option>)
     assert content =~ ~s(<option value="9" selected>09</option>)
 
+    content = safe_to_string(time_select(:search, :datetime, value: "02:11:13.123Z", second: []))
+    assert content =~ ~s(<option value="2" selected>02</option>)
+    assert content =~ ~s(<option value="11" selected>11</option>)
+    assert content =~ ~s(<option value="13" selected>13</option>)
+
     content = safe_to_string(time_select(:search, :datetime, value: {2, 11, 13}, second: []))
     assert content =~ ~s(<option value="2" selected>02</option>)
     assert content =~ ~s(<option value="11" selected>11</option>)
