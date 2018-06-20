@@ -1302,7 +1302,7 @@ defmodule Phoenix.HTML.Form do
 
   defp date_value(nil), do: %{year: nil, month: nil, day: nil}
 
-  defp date_value("" <> string) do
+  defp date_value(string) when is_binary(string) do
     string
     |> Date.from_iso8601!()
     |> date_value
