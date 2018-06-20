@@ -851,6 +851,11 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option value="4" selected>April</option>)
     assert content =~ ~s(<option value="17" selected>17</option>)
 
+    content = safe_to_string(date_select(:search, :datetime, value: "2020-04-17"))
+    assert content =~ ~s(<option value="2020" selected>2020</option>)
+    assert content =~ ~s(<option value="4" selected>April</option>)
+    assert content =~ ~s(<option value="17" selected>17</option>)
+
     content =
       safe_to_string(date_select(:search, :datetime, value: %{year: 2020, month: 04, day: 07}))
 
