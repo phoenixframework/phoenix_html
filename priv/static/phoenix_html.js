@@ -9,19 +9,19 @@
     return input;
   }
 
-  function handleLinkClick(link) {
-    var message = link.getAttribute("data-confirm");
+  function handleClick(element) {
+    var message = element.getAttribute("data-confirm");
     if(message && !window.confirm(message)) {
         return;
     }
 
-    var to = link.getAttribute("data-to"),
-        method = buildHiddenInput("_method", link.getAttribute("data-method")),
-        csrf = buildHiddenInput("_csrf_token", link.getAttribute("data-csrf")),
+    var to = element.getAttribute("data-to"),
+        method = buildHiddenInput("_method", element.getAttribute("data-method")),
+        csrf = buildHiddenInput("_csrf_token", element.getAttribute("data-csrf")),
         form = document.createElement("form"),
-        target = link.getAttribute("target");
+        target = element.getAttribute("target");
 
-    form.method = (link.getAttribute("data-method") === "get") ? "get" : "post";
+    form.method = (element.getAttribute("data-method") === "get") ? "get" : "post";
     form.action = to;
     form.style.display = "hidden";
 
@@ -38,7 +38,7 @@
 
     while (element && element.getAttribute) {
       if(element.getAttribute("data-method")) {
-        handleLinkClick(element);
+        handleClick(element);
         e.preventDefault();
         return false;
       } else {
