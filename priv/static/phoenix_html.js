@@ -10,11 +10,6 @@
   }
 
   function handleClick(element) {
-    var message = element.getAttribute("data-confirm");
-    if(message && !window.confirm(message)) {
-        return;
-    }
-
     var to = element.getAttribute("data-to"),
         method = buildHiddenInput("_method", element.getAttribute("data-method")),
         csrf = buildHiddenInput("_csrf_token", element.getAttribute("data-csrf")),
@@ -33,11 +28,21 @@
     form.submit();
   }
 
+  function canceledConfirm(element) {
+    var message = element.getAttribute("data-confirm");
+    return message && !window.confirm(message);
+  }
+
   window.addEventListener("click", function(e) {
     var element = e.target;
 
     while (element && element.getAttribute) {
-      if(element.getAttribute("data-method")) {
+      if (element.getAttribute("data-confirm") && canceledConfirm(element)) {
+        e.preventDefault();
+        return false;
+      }
+
+      if (element.getAttribute("data-method")) {
         handleClick(element);
         e.preventDefault();
         return false;
