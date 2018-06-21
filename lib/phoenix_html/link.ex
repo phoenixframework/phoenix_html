@@ -137,6 +137,14 @@ defmodule Phoenix.HTML.Link do
     * `:method` - the method to use with the button. Defaults to :post.
 
   All other options are forwarded to the underlying button input.
+
+  ## Data attributes
+
+  Data attributes are added as a keyword list passed to the
+  `data` key. The following data attributes are supported:
+
+    * `data-confirm` - shows a confirmation prompt before generating and
+      submitting the form.
   """
   def button(opts, do: contents) do
     button(contents, opts)
