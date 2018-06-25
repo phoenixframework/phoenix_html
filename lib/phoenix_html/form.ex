@@ -366,7 +366,7 @@ defmodule Phoenix.HTML.Form do
   by `form_for` or an atom.
   """
   @spec input_id(t | atom, field) :: String.t()
-  def input_id(%{id: nil}, _field), do: nil
+  def input_id(%{id: nil}, field), do: "#{field}"
 
   def input_id(%{id: id}, field) when is_atom(field) or is_binary(field) do
     "#{id}_#{field}"
