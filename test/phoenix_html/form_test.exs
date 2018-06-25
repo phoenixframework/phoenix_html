@@ -109,7 +109,7 @@ defmodule Phoenix.HTML.FormTest do
         end)
       )
 
-    assert form =~ ~s(<input name="key" type="text">)
+    assert form =~ ~s(<input id="key" name="key" type="text">)
   end
 
   ## text_input/3
@@ -804,22 +804,22 @@ defmodule Phoenix.HTML.FormTest do
              &multiple_select(&1, :key, [{"foo", 1}, {"bar", 2}], value: [1], selected: [2]),
              []
            ) ==
-             ~s(<select multiple="" name="key[]">) <>
+             ~s(<select id="key" multiple="" name="key[]">) <>
                ~s(<option value="1" selected>foo</option>) <>
                ~s(<option value="2">bar</option>) <> ~s(</select>)
 
     assert safe_form(&multiple_select(&1, :other, [{"foo", 1}, {"bar", 2}], selected: [2]), []) ==
-             ~s(<select multiple="" name="other[]">) <>
+             ~s(<select id="other" multiple="" name="other[]">) <>
                ~s(<option value="1">foo</option>) <>
                ~s(<option value="2" selected>bar</option>) <> ~s(</select>)
 
     assert safe_form(&multiple_select(&1, :key, [{"foo", 1}, {"bar", 2}], value: [2]), []) ==
-             ~s(<select multiple="" name="key[]">) <>
+             ~s(<select id="key" multiple="" name="key[]">) <>
                ~s(<option value="1">foo</option>) <>
                ~s(<option value="2" selected>bar</option>) <> ~s(</select>)
 
     assert safe_form(&multiple_select(&1, :key, ~w(value novalue), value: ["novalue"]), []) ==
-             ~s(<select multiple="" name="key[]">) <>
+             ~s(<select id="key" multiple="" name="key[]">) <>
                ~s(<option value="value">value</option>) <>
                ~s(<option value="novalue" selected>novalue</option>) <> ~s(</select>)
 
@@ -832,7 +832,7 @@ defmodule Phoenix.HTML.FormTest do
              ),
              []
            ) ==
-             ~s(<select multiple="" name="key[]">) <>
+             ~s(<select id="key" multiple="" name="key[]">) <>
                ~s(<option value="1">foo</option>) <>
                ~s(<option value="2">bar</option>) <>
                ~s(<option value="3" selected>goo</option>) <> ~s(</select>)
@@ -1250,6 +1250,10 @@ defmodule Phoenix.HTML.FormTest do
     assert safe_form(&input_id(&1, :key)) == "search_key"
   end
 
+  test "input_id/2 with form with no name" do
+    assert safe_form(&input_id(&1, :key), []) == "key"
+  end
+
   ## input_id/3
 
   test "input_id/3" do
@@ -1262,6 +1266,10 @@ defmodule Phoenix.HTML.FormTest do
     assert input_id(:search, :key, 37) == "search_key_37"
     assert input_id(:search, :key, 0) == "search_key_0"
     assert input_id(:search, :key, -1) == "search_key__1"
+  end
+
+  test "input_id/3 with form with no name" do
+    assert safe_form(&input_id(&1, :key, :value), []) == "key_value"
   end
 
   ## input_name/2
