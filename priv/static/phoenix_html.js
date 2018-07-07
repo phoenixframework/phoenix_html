@@ -43,25 +43,15 @@
     form.submit();
   }
 
-  function canceledConfirm(element) {
-    var phoenixLinkEvent = new PolyfillEvent('phoenix.confirm.click', {
-      "bubbles": true, "cancelable": true
-    });
-    return !link.dispatchEvent(phoenixLinkEvent);
-  }
-
-  window.addEventListener('phoenix.confirm.click', function (e) {
-    var message = e.target.getAttribute("data-confirm");
-    if(message && !window.confirm(message)) {
-      e.preventDefault();
-    }
-  }, false);
-
   window.addEventListener("click", function(e) {
     var element = e.target;
 
     while (element && element.getAttribute) {
-      if (element.getAttribute("data-confirm") && canceledConfirm(element)) {
+      var phoenixLinkEvent = new PolyfillEvent('phoenix.link.click', {
+        "bubbles": true, "cancelable": true
+      });
+
+      if (!link.dispatchEvent(phoenixLinkEvent)) {
         e.preventDefault();
         return false;
       }
@@ -73,6 +63,13 @@
       } else {
         element = element.parentNode;
       }
+    }
+  }, false);
+
+  window.addEventListener('phoenix.link.click', function (e) {
+    var message = e.target.getAttribute("data-confirm");
+    if(message && !window.confirm(message)) {
+      e.preventDefault();
     }
   }, false);
 })();
