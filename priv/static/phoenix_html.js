@@ -1,6 +1,21 @@
 "use strict";
 
 (function() {
+  var PolyfillEvent = eventConstructor();
+
+  function eventConstructor() {
+    if (typeof window.CustomEvent === "function") return window.CustomEvent;
+    // IE<=9 Support
+    function CustomEvent(event, params) {
+      params = params || {bubbles: false, cancelable: false, detail: undefined};
+      var evt = document.createEvent('CustomEvent');
+      evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+      return evt;
+    }
+    CustomEvent.prototype = window.Event.prototype;
+    return CustomEvent;
+  }
+
   function buildHiddenInput(name, value) {
     var input = document.createElement("input");
     input.type = "hidden";
@@ -28,16 +43,15 @@
     form.submit();
   }
 
-  function canceledConfirm(element) {
-    var message = element.getAttribute("data-confirm");
-    return message && !window.confirm(message);
-  }
-
   window.addEventListener("click", function(e) {
     var element = e.target;
 
     while (element && element.getAttribute) {
-      if (element.getAttribute("data-confirm") && canceledConfirm(element)) {
+      var phoenixLinkEvent = new PolyfillEvent('phoenix.link.click', {
+        "bubbles": true, "cancelable": true
+      });
+
+      if (!link.dispatchEvent(phoenixLinkEvent)) {
         e.preventDefault();
         return false;
       }
@@ -49,6 +63,13 @@
       } else {
         element = element.parentNode;
       }
+    }
+  }, false);
+
+  window.addEventListener('phoenix.link.click', function (e) {
+    var message = e.target.getAttribute("data-confirm");
+    if(message && !window.confirm(message)) {
+      e.preventDefault();
     }
   }, false);
 })();

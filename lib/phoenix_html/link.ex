@@ -42,21 +42,65 @@ defmodule Phoenix.HTML.Link do
 
   All other options are forwarded to the underlying `<a>` tag.
 
-  ## Data attributes
+  ## JavaScript dependency
 
-  Data attributes are added as a keyword list passed to the
-  `data` key. The following data attributes are supported:
+  In order to support links where `:method` is not `:get` or use the above
+  data attributes, `Phoenix.HTML` relies on JavaScript. You can load
+  `priv/static/phoenix_html.js` into your build tool.
+
+  ### Data attributes
+
+  Data attributes are added as a keyword list passed to the `data` key.
+  The following data attributes are supported:
 
     * `data-confirm` - shows a confirmation prompt before
       generating and submitting the form when `:method`
       is not `:get`.
 
-  ## JavaScript dependency
+  ### Overriding the default confirm behaviour
 
-  In order to support links where `:method` is not `:get`
-  or use the above data attributes, `Phoenix.HTML` relies
-  on JavaScript. You can load `priv/static/phoenix_html.js`
-  into your build tool.
+  `phoenix_html.js` does trigger a custom event `phoenix.link.click` on the 
+  clicked DOM element when a click happened. This allows you to intercept the
+  event on it's way bubbling up to `window` and do your own custom logic to 
+  enhance or replace how the `data-confirm` attribute is handled.
+
+  You could for example replace the browsers `confirm()` behavior with a 
+  custom javascript implementation:
+
+  ```javascript
+  // listen on document.body, so it's executed before the default of 
+  // phoenix_html, which is listening on the window object
+  document.body.addEventListener('phoenix.link.click', function (e) {
+    // Prevent default implementation
+    e.stopPropagation();
+    
+    // Introduce alternative implementation
+    var message = e.target.getAttribute("data-confirm");
+    if(!message){ return true; }
+    vex.dialog.confirm({
+      message: message,
+      callback: function (value) {
+        if (value == false) { e.preventDefault(); } 
+      }
+    })
+  }, false);
+  ```
+
+  Or you could attach your own custom behavior.
+
+  ```javascript
+  window.addEventListener('phoenix.link.click', function (e) {
+    // Introduce custom behaviour
+    var message = e.target.getAttribute("data-prompt");
+    var answer = e.target.getAttribute("data-prompt-answer");
+    if(message && answer && (answer != window.prompt(message))) {
+      e.preventDefault();
+    }
+  }, false);
+  ```
+
+  The latter could also be bound to any `click` event, but this way you can be 
+  sure your custom code is only executed when the code of `phoenix_html.js` is run.
 
   ## CSRF Protection
 
