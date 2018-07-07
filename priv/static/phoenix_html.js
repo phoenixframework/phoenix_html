@@ -1,6 +1,21 @@
 "use strict";
 
 (function() {
+  var PolyfillEvent = eventConstructor();
+
+  function eventConstructor() {
+    if (typeof window.CustomEvent === "function") return window.CustomEvent;
+    // IE<=9 Support
+    function CustomEvent(event, params) {
+      params = params || {bubbles: false, cancelable: false, detail: undefined};
+      var evt = document.createEvent('CustomEvent');
+      evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+      return evt;
+    }
+    CustomEvent.prototype = window.Event.prototype;
+    return CustomEvent;
+  }
+
   function buildHiddenInput(name, value) {
     var input = document.createElement("input");
     input.type = "hidden";
@@ -29,9 +44,18 @@
   }
 
   function canceledConfirm(element) {
-    var message = element.getAttribute("data-confirm");
-    return message && !window.confirm(message);
+    var phoenixLinkEvent = new PolyfillEvent('phoenix.confirm.click', {
+      "bubbles": true, "cancelable": true
+    });
+    return !link.dispatchEvent(phoenixLinkEvent);
   }
+
+  window.addEventListener('phoenix.confirm.click', function (e) {
+    var message = e.target.getAttribute("data-confirm");
+    if(message && !window.confirm(message)) {
+      e.preventDefault();
+    }
+  }, false);
 
   window.addEventListener("click", function(e) {
     var element = e.target;
