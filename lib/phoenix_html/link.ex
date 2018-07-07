@@ -42,21 +42,20 @@ defmodule Phoenix.HTML.Link do
 
   All other options are forwarded to the underlying `<a>` tag.
 
-  ## Data attributes
+  ## JavaScript dependency
 
-  Data attributes are added as a keyword list passed to the
-  `data` key. The following data attributes are supported:
+  In order to support links where `:method` is not `:get` or use the above
+  data attributes, `Phoenix.HTML` relies on JavaScript. You can load
+  `priv/static/phoenix_html.js` into your build tool.
+
+  ### Data attributes
+
+  Data attributes are added as a keyword list passed to the `data` key.
+  The following data attributes are supported:
 
     * `data-confirm` - shows a confirmation prompt before
       generating and submitting the form when `:method`
       is not `:get`.
-
-  ## JavaScript dependency
-
-  In order to support links where `:method` is not `:get`
-  or use the above data attributes, `Phoenix.HTML` relies
-  on JavaScript. You can load `priv/static/phoenix_html.js`
-  into your build tool.
 
   ### Overriding the default confirm behaviour
 
