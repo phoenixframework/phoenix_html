@@ -51,7 +51,7 @@
         "bubbles": true, "cancelable": true
       });
 
-      if (!link.dispatchEvent(phoenixLinkEvent)) {
+      if (!element.dispatchEvent(phoenixLinkEvent)) {
         e.preventDefault();
         return false;
       }
