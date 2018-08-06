@@ -1,5 +1,15 @@
 # Changelog
 
+## v2.12.0 (2018-08-06)
+
+* Enhancements
+  * Configurable and extendable data-confirm behaviour
+  * Allow data-confirm with submit buttons
+  * Support ISO 8601 formatted strings for date and time values
+
+* Bug fixes
+  * Provide a default id of the field name for `@conn` based forms
+
 ## v2.11.2 (2018-04-13)
 
 * Enhancements
