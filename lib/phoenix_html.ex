@@ -119,7 +119,7 @@ defmodule Phoenix.HTML do
       {:safe, ""}
 
   """
-  @spec raw(iodata | safe) :: safe
+  @spec raw(iodata | safe | nil) :: safe
   def raw({:safe, value}), do: {:safe, value}
   def raw(nil), do: {:safe, ""}
   def raw(value) when is_binary(value) or is_list(value), do: {:safe, value}
