@@ -112,6 +112,21 @@ defmodule Phoenix.HTML.FormTest do
     assert form =~ ~s(<input id="key" name="key" type="text">)
   end
 
+  test "form_for/4 with errors through options" do
+    errors = [field: {"error message!", []}]
+
+    form =
+      safe_to_string(
+        form_for(conn, "/", [errors: errors], fn f ->
+          for {field, {message, _}} <- f.errors do
+            Phoenix.HTML.Tag.content_tag(:span, humanize(field) <> " " <> message, class: "errors")
+          end
+        end)
+      )
+
+    assert form =~ ~s(<span class="errors">Field error message!</span>)
+  end
+
   ## text_input/3
 
   test "text_input/3" do

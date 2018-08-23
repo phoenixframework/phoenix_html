@@ -60,14 +60,17 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
           {name, Map.get(conn.params, name) || %{}, opts}
       end
 
+    {errors, opts} = Keyword.pop(opts, :errors, [])
+
     %Phoenix.HTML.Form{
       source: conn,
       impl: __MODULE__,
       id: name,
       name: name,
       params: params,
-      options: opts,
-      data: %{}
+      data: %{},
+      errors: errors,
+      options: opts
     }
   end
 
