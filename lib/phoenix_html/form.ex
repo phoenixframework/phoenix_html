@@ -98,18 +98,18 @@ defmodule Phoenix.HTML.Form do
   When you feed `form_for/4` with `:errors` as an option you will be able to use
   your favorite `error_tag`-helper like:
 
-    def error_tag(form, field) do
-      if error = form.errors[field] do
-        content_tag :span, translate_error(error), class: "help-block"
+      def error_tag(form, field) do
+        if error = form.errors[field] do
+          content_tag :span, translate_error(error), class: "help-block"
+        end
       end
-    end
 
   For example, put the errors in the conn.assigns and create your form like this:
 
-    <%= form_for @conn, '/', [errors: @conn.assigns[:errors]], fn f -> %>
-      <%= text_input f, :field %>
-      <%= error_tag f, :field %>
-    <% end %>
+      <%= form_for @conn, '/', [errors: @conn.assigns[:errors]], fn f -> %>
+        <%= text_input f, :field %>
+        <%= error_tag f, :field %>
+      <% end %>
 
   ## Without form data
 
@@ -293,10 +293,10 @@ defmodule Phoenix.HTML.Form do
       character to force the browser to use UTF-8 as the charset. When set to
       false, this is disabled.
 
-    * `:errors` - use this to manually pass errors to the form (for example
-      from `conn.assigns[:errors]`). These are made available on the form struct
-      that is passed to the function as the argument f. This makes it easy to
-      access it as `f.errors`.
+    * `:errors` - use this to manually pass a keyword list of errors to the form
+      (for example from `conn.assigns[:errors]`). This option is only used when a
+      connection is used as the form source and it will make the errors available
+      under `f.errors`.
 
     * Other options will be passed as html attributes.
       ie, `class: "foo", id: "bar"`
