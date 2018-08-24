@@ -93,6 +93,24 @@ defmodule Phoenix.HTML.Form do
   request parameters. In this case, the input's value would be set
   to `@conn.params["search"]["for"]`.
 
+  #### A note on `:errors`
+
+  When you feed `form_for/4` with `:errors` as an option you will be able to use
+  your favorite `error_tag`-helper like:
+
+      def error_tag(form, field) do
+        if error = form.errors[field] do
+          content_tag :span, translate_error(error), class: "help-block"
+        end
+      end
+
+  For example, put the errors in the conn.assigns and create your form like this:
+
+      <%= form_for @conn, '/', [errors: @conn.assigns[:errors]], fn f -> %>
+        <%= text_input f, :field %>
+        <%= error_tag f, :field %>
+      <% end %>
+
   ## Without form data
 
   Sometimes we may want to generate a `text_input/3` or any other
@@ -274,6 +292,11 @@ defmodule Phoenix.HTML.Form do
       to "UTF-8" and a hidden input named `_utf8` containing a unicode
       character to force the browser to use UTF-8 as the charset. When set to
       false, this is disabled.
+
+    * `:errors` - use this to manually pass a keyword list of errors to the form
+      (for example from `conn.assigns[:errors]`). This option is only used when a
+      connection is used as the form source and it will make the errors available
+      under `f.errors`.
 
     * Other options will be passed as html attributes.
       ie, `class: "foo", id: "bar"`
