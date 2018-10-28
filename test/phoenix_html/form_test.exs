@@ -578,6 +578,9 @@ defmodule Phoenix.HTML.FormTest do
     assert safe_to_string(checkbox(:search, :key, value: 1, checked_value: 1, unchecked_value: 0)) ==
              ~s(<input name="search[key]" type="hidden" value="0">) <>
                ~s(<input id="search_key" name="search[key]" type="checkbox" value="1" checked>)
+
+    assert safe_to_string(checkbox(:search, :key, value: 1, hidden_input: false)) ==
+               ~s(<input id="search_key" name="search[key]" type="checkbox" value="true">)
   end
 
   test "checkbox/3 with form" do
