@@ -877,6 +877,9 @@ defmodule Phoenix.HTML.Form do
     * `:checked_value` - the value to be sent when the checkbox is checked.
       Defaults to "true"
 
+    * `:hidden_input` - the value to check if a checkox will generate a hidden input or not,
+      Defaults to "true"
+
     * `:unchecked_value` - the value to be sent when the checkbox is unchecked,
       Defaults to "false"
 
@@ -890,7 +893,8 @@ defmodule Phoenix.HTML.Form do
   Because an unchecked checkbox is not sent to the server, Phoenix
   automatically generates a hidden field with the unchecked_value
   *before* the checkbox field to ensure the `unchecked_value` is sent
-  when the checkbox is not marked.
+  when the checkbox is not marked. Set `hidden_input` to false If you
+  don't want to send values from unchecked checkbox to the server.
   """
   def checkbox(form, field, opts \\ []) do
     opts =
@@ -902,6 +906,7 @@ defmodule Phoenix.HTML.Form do
     {value, opts} = Keyword.pop(opts, :value, input_value(form, field))
     {checked_value, opts} = Keyword.pop(opts, :checked_value, true)
     {unchecked_value, opts} = Keyword.pop(opts, :unchecked_value, false)
+    {hidden_input, opts} = Keyword.pop(opts, :hidden_input, true)
 
     # We html escape all values to be sure we are comparing
     # apples to apples. After all we may have true in the data
@@ -917,10 +922,16 @@ defmodule Phoenix.HTML.Form do
         opts
       end
 
-    html_escape([
-      tag(:input, name: Keyword.get(opts, :name), type: "hidden", value: unchecked_value),
-      tag(:input, [value: checked_value] ++ opts)
-    ])
+    if hidden_input do
+      html_escape([
+        tag(:input, name: Keyword.get(opts, :name), type: "hidden", value: unchecked_value),
+        tag(:input, [value: checked_value] ++ opts)
+      ])
+    else
+      html_escape([
+        tag(:input, [value: checked_value] ++ opts)
+      ])
+    end
   end
 
   @doc """
