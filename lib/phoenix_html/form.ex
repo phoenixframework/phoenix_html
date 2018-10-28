@@ -877,8 +877,8 @@ defmodule Phoenix.HTML.Form do
     * `:checked_value` - the value to be sent when the checkbox is checked.
       Defaults to "true"
 
-    * `:hidden_input` - the value to check if a checkox will generate a hidden input or not,
-      Defaults to "true"
+    * `:hidden_input` - the value to check if a checkbox will generate a hidden input
+      for the unchecked value or not. Defaults to "true"
 
     * `:unchecked_value` - the value to be sent when the checkbox is unchecked,
       Defaults to "false"
