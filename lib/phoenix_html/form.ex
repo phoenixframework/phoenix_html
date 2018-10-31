@@ -414,10 +414,17 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Returns a name of a corresponding form field.
 
-  The form should either be a `Phoenix.HTML.Form` emitted
+  The first param should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
+
+  ## Examples
+
+      iex> Phoenix.HTML.Form.input_name(:user, :first_name)
+      "user[first_name]"
   """
   @spec input_name(t | atom, field) :: String.t()
+  def input_name(form_or_name, field)
+
   def input_name(%{name: nil}, field), do: to_string(field)
 
   def input_name(%{name: name}, field) when is_atom(field) or is_binary(field),
