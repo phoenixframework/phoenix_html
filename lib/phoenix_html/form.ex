@@ -414,7 +414,7 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Returns a name of a corresponding form field.
 
-  The first param should either be a `Phoenix.HTML.Form` emitted
+  The first argument should either be a `Phoenix.HTML.Form` emitted
   by `form_for` or an atom.
 
   ## Examples
