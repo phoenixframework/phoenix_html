@@ -440,12 +440,7 @@ defmodule Phoenix.HTML.Form do
   @spec input_validations(t, field) :: Keyword.t()
   def input_validations(%{source: source, impl: impl} = form, field)
       when is_atom(field) or is_binary(field) do
-    # TODO: Remove me on 3.0
-    try do
-      impl.input_validations(source, form, field)
-    rescue
-      UndefinedFunctionError -> impl.input_validations(source, field)
-    end
+    impl.input_validations(source, form, field)
   end
 
   @mapping %{
@@ -472,13 +467,7 @@ defmodule Phoenix.HTML.Form do
   @spec input_type(t, field) :: atom
   def input_type(%{impl: impl, source: source} = form, field, mapping \\ @mapping)
       when is_atom(field) or is_binary(field) do
-    # TODO: Remove me on 3.0
-    type =
-      try do
-        impl.input_type(source, form, field)
-      rescue
-        UndefinedFunctionError -> impl.input_type(source, field)
-      end
+    type = impl.input_type(source, form, field)
 
     if type == :text_input do
       field = field_to_string(field)
@@ -1579,15 +1568,4 @@ defmodule Phoenix.HTML.Form do
   # Normalize field name to string version
   defp field_to_string(field) when is_atom(field), do: Atom.to_string(field)
   defp field_to_string(field) when is_binary(field), do: field
-
-  # TODO: Remove me on 3.0
-
-  @doc false
-  def field_value(form, field, default \\ nil), do: input_value(form, field) || default
-
-  @doc false
-  def field_name(form, field), do: input_name(form, field)
-
-  @doc false
-  def field_id(form, field), do: input_id(form, field)
 end
