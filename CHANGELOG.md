@@ -48,6 +48,9 @@
   * Improve handling of uncommon whitespace and null in `escape_javascript`
   * Escape value attribute so it is never treated as a boolean
 
+* Backwards incompatible changes
+  * The :csrf_token_generator configuration in the Phoenix.HTML app no longer works due to the improved security mechanisms
+
 ## v2.10.5 (2017-11-08)
 
 * Enhancements
