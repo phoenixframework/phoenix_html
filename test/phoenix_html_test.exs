@@ -10,20 +10,20 @@ defmodule Phoenix.HTMLTest do
     assert html_escape("\" & \'") == {:safe, [[[[] | "&quot;"], " " | "&amp;"], " " | "&#39;"]}
   end
 
-  test "escape_javascript/1" do
-    assert escape_javascript("") == ""
-    assert escape_javascript("\\Double backslash") == "\\\\Double backslash"
-    assert escape_javascript("\"Double quote\"") == "\\\"Double quote\\\""
-    assert escape_javascript("'Single quote'") == "\\'Single quote\\'"
-    assert escape_javascript("New line\r") == "New line\\n"
-    assert escape_javascript("New line\n") == "New line\\n"
-    assert escape_javascript("New line\r\n") == "New line\\n"
-    assert escape_javascript("</close>") == "<\\/close>"
-    assert escape_javascript("Line separator\u2028") == "Line separator\\u2028"
-    assert escape_javascript("Paragraph separator\u2029") == "Paragraph separator\\u2029"
-    assert escape_javascript("Null character\u0000") == "Null character\\u0000"
-    assert escape_javascript({:safe, "'Single quote'"}) == {:safe, "\\'Single quote\\'"}
-    assert escape_javascript({:safe, ["'Single quote'"]}) == {:safe, "\\'Single quote\\'"}
+  test "javascript_escape/1" do
+    assert javascript_escape("") == ""
+    assert javascript_escape("\\Double backslash") == "\\\\Double backslash"
+    assert javascript_escape("\"Double quote\"") == "\\\"Double quote\\\""
+    assert javascript_escape("'Single quote'") == "\\'Single quote\\'"
+    assert javascript_escape("New line\r") == "New line\\n"
+    assert javascript_escape("New line\n") == "New line\\n"
+    assert javascript_escape("New line\r\n") == "New line\\n"
+    assert javascript_escape("</close>") == "<\\/close>"
+    assert javascript_escape("Line separator\u2028") == "Line separator\\u2028"
+    assert javascript_escape("Paragraph separator\u2029") == "Paragraph separator\\u2029"
+    assert javascript_escape("Null character\u0000") == "Null character\\u0000"
+    assert javascript_escape({:safe, "'Single quote'"}) == {:safe, "\\'Single quote\\'"}
+    assert javascript_escape({:safe, ["'Single quote'"]}) == {:safe, "\\'Single quote\\'"}
   end
 
   test "only accepts valid iodata" do

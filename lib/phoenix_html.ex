@@ -158,44 +158,49 @@ defmodule Phoenix.HTML do
     IO.iodata_to_binary(iodata)
   end
 
+  @doc false
+  @deprecated "Use javascript_escape/1 instead"
+  def escape_javascript(data), do: javascript_escape(data)
+
   @doc """
   Escapes quotes (double and single), double backslashes and other.
 
   This function is useful in JavaScript responses when there is a need
-  to escape html rendered from other templates, like in the following:
+  to escape HTML rendered from other templates, like in the following:
 
-      $("#container").append("<%= escape_javascript(render("post.html", post: @post)) %>");
+      $("#container").append("<%= javascript_escape(render("post.html", post: @post)) %>");
   """
-  @spec escape_javascript(binary | safe) :: String.t()
-  def escape_javascript({:safe, data}) do
-    {:safe, data |> IO.iodata_to_binary() |> escape_javascript}
-  end
+  @spec javascript_escape(binary) :: binary
+  @spec javascript_escape(safe) :: safe
+  def javascript_escape({:safe, data}),
+    do: {:safe, data |> IO.iodata_to_binary() |> javascript_escape("")}
 
-  def escape_javascript(data) when is_binary(data) do
-    escape_javascript(data, "")
-  end
+  def javascript_escape(data) when is_binary(data),
+    do: javascript_escape(data, "")
 
-  defp escape_javascript(<<0x2028::utf8, t::binary>>, acc),
-    do: escape_javascript(t, <<acc::binary, "\\u2028">>)
+  defp javascript_escape(<<0x2028::utf8, t::binary>>, acc),
+    do: javascript_escape(t, <<acc::binary, "\\u2028">>)
 
-  defp escape_javascript(<<0x2029::utf8, t::binary>>, acc),
-    do: escape_javascript(t, <<acc::binary, "\\u2029">>)
+  defp javascript_escape(<<0x2029::utf8, t::binary>>, acc),
+    do: javascript_escape(t, <<acc::binary, "\\u2029">>)
 
-  defp escape_javascript(<<0::utf8, t::binary>>, acc),
-    do: escape_javascript(t, <<acc::binary, "\\u0000">>)
+  defp javascript_escape(<<0::utf8, t::binary>>, acc),
+    do: javascript_escape(t, <<acc::binary, "\\u0000">>)
 
-  defp escape_javascript(<<"</", t::binary>>, acc),
-    do: escape_javascript(t, <<acc::binary, ?<, ?\\, ?/>>)
+  defp javascript_escape(<<"</", t::binary>>, acc),
+    do: javascript_escape(t, <<acc::binary, ?<, ?\\, ?/>>)
 
-  defp escape_javascript(<<"\r\n", t::binary>>, acc),
-    do: escape_javascript(t, <<acc::binary, ?\\, ?n>>)
+  defp javascript_escape(<<"\r\n", t::binary>>, acc),
+    do: javascript_escape(t, <<acc::binary, ?\\, ?n>>)
 
-  defp escape_javascript(<<h, t::binary>>, acc) when h in [?", ?', ?\\],
-    do: escape_javascript(t, <<acc::binary, ?\\, h>>)
+  defp javascript_escape(<<h, t::binary>>, acc) when h in [?", ?', ?\\],
+    do: javascript_escape(t, <<acc::binary, ?\\, h>>)
 
-  defp escape_javascript(<<h, t::binary>>, acc) when h in [?\r, ?\n],
-    do: escape_javascript(t, <<acc::binary, ?\\, ?n>>)
+  defp javascript_escape(<<h, t::binary>>, acc) when h in [?\r, ?\n],
+    do: javascript_escape(t, <<acc::binary, ?\\, ?n>>)
 
-  defp escape_javascript(<<h, t::binary>>, acc), do: escape_javascript(t, <<acc::binary, h>>)
-  defp escape_javascript(<<>>, acc), do: acc
+  defp javascript_escape(<<h, t::binary>>, acc),
+    do: javascript_escape(t, <<acc::binary, h>>)
+
+  defp javascript_escape(<<>>, acc), do: acc
 end

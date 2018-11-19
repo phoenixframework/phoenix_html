@@ -2,6 +2,9 @@
 
 ## v3.0.0-dev
 
+* Deprecations
+  * Deprecate `Phoenix.HTML.escape_javascript/1` in favor of `Phoenix.HTML.javascript_escape/1` for consistency
+
 ## v2.12.0 (2018-08-06)
 
 * Enhancements
