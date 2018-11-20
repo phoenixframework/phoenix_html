@@ -1,6 +1,6 @@
 {
   "name": "phoenix_html",
-  "version": "3.0.0",
+  "version": "2.13.0",
   "main": "./priv/static/phoenix_html.js",
   "repository": {
   },
