@@ -9,6 +9,11 @@ defmodule Phoenix.HTML.EngineTest do
   <%= 789 %>
   """
 
+  test "encode_to_iodata!" do
+    assert Phoenix.HTML.Engine.encode_to_iodata!("<foo>") == "&lt;foo&gt;"
+    assert Phoenix.HTML.Engine.encode_to_iodata!({:safe, "<foo>"}) == "<foo>"
+  end
+
   test "evaluates expressions with buffers" do
     assert eval(@template, %{foo: true}) == "123\n\n  456\n\n789\n"
   end

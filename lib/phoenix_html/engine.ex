@@ -2,6 +2,9 @@ defmodule Phoenix.HTML.Engine do
   @moduledoc """
   This is an implementation of EEx.Engine that guarantees
   templates are HTML Safe.
+
+  The `encode_to_iodata!/1` function converts the rendered
+  template result into iodata.
   """
 
   @anno (if :erlang.system_info(:otp_release) >= '19' do
@@ -9,6 +12,12 @@ defmodule Phoenix.HTML.Engine do
          else
            [line: -1]
          end)
+
+  @doc """
+  Encodes the HTML templates to iodata.
+  """
+  def encode_to_iodata!({:safe, body}), do: body
+  def encode_to_iodata!(body) when is_binary(body), do: Plug.HTML.html_escape(body)
 
   use EEx.Engine
 
