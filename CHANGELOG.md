@@ -2,6 +2,9 @@
 
 ## v2.13.0-dev
 
+* Enhancements
+  * Require Elixir v1.5+ for more efficient template compilation/rendering
+
 * Deprecations
   * Deprecate `Phoenix.HTML.escape_javascript/1` in favor of `Phoenix.HTML.javascript_escape/1` for consistency
 

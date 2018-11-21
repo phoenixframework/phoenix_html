@@ -71,7 +71,7 @@ defmodule Phoenix.HTML do
       iex> ~e"\""
       ...> Hello <%= "world" %>
       ...> "\""
-      {:safe, [[["" | "Hello "] | "world"] | "\\n"]}
+      {:safe, ["Hello ", "world", "\\n"]}
 
   """
   defmacro sigil_e(expr, opts) do
@@ -87,7 +87,7 @@ defmodule Phoenix.HTML do
       iex> ~E"\""
       ...> Hello <%= "world" %>
       ...> "\""
-      {:safe, [[["" | "Hello "] | "world"] | "\\n"]}
+      {:safe, ["Hello ", "world", "\\n"]}
 
   """
   defmacro sigil_E(expr, opts) do

@@ -2,7 +2,7 @@ defmodule Phoenix.HTML.EngineTest do
   use ExUnit.Case, async: true
 
   @template """
-  <%= 123 %>
+  start: <%= 123 %>
   <%= if @foo do %>
     <%= 456 %>
   <% end %>
@@ -15,7 +15,7 @@ defmodule Phoenix.HTML.EngineTest do
   end
 
   test "evaluates expressions with buffers" do
-    assert eval(@template, %{foo: true}) == "123\n\n  456\n\n789\n"
+    assert eval(@template, %{foo: true}) == "start: 123\n\n  456\n\n789\n"
   end
 
   test "evaluates safe expressions" do

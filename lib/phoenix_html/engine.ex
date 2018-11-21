@@ -7,6 +7,8 @@ defmodule Phoenix.HTML.Engine do
   template result into iodata.
   """
 
+  @behaviour EEx.Engine
+
   @anno (if :erlang.system_info(:otp_release) >= '19' do
            [generated: true]
          else
@@ -19,66 +21,73 @@ defmodule Phoenix.HTML.Engine do
   def encode_to_iodata!({:safe, body}), do: body
   def encode_to_iodata!(body) when is_binary(body), do: Plug.HTML.html_escape(body)
 
-  use EEx.Engine
-
-  @doc false
-  def init(_opts), do: {:safe, ""}
-
-  @doc false
-  def handle_begin(_previous), do: {:safe, ""}
-
-  @doc false
-  def handle_end(quoted), do: quoted
-
-  @doc false
-  def handle_body(body), do: body
-
-  @doc false
-  # Required for Elixir < v1.5.1
-  def handle_text("", text) do
-    handle_text({:safe, ""}, text)
+  @impl true
+  def init(_opts) do
+    %{
+      iodata: [],
+      dynamic: [],
+      vars_count: 0
+    }
   end
 
-  def handle_text({:safe, buffer}, text) do
-    quote do
-      {:safe, [unquote(buffer) | unquote(text)]}
-    end
+  @impl true
+  def handle_begin(state) do
+    %{state | iodata: [], dynamic: []}
   end
 
-  @doc false
-  # Required for Elixir < v1.5.1
-  def handle_expr("", marker, expr) do
-    handle_expr({:safe, ""}, marker, expr)
+  @impl true
+  def handle_end(quoted) do
+    handle_body(quoted)
   end
 
-  def handle_expr({:safe, buffer}, "=", expr) do
-    line = line_from_expr(expr)
-    expr = expr(expr)
-
-    {:safe,
-     quote do
-       tmp1 = unquote(buffer)
-       [tmp1 | unquote(to_safe(expr, line))]
-     end}
+  @impl true
+  def handle_body(state) do
+    %{iodata: iodata, dynamic: dynamic} = state
+    safe = {:safe, Enum.reverse(iodata)}
+    {:__block__, [], Enum.reverse([safe | dynamic])}
   end
 
-  def handle_expr({:safe, buffer}, "", expr) do
-    expr = expr(expr)
+  @impl true
+  def handle_text(state, text) do
+    %{iodata: iodata} = state
+    %{state | iodata: [text | iodata]}
+  end
 
-    {:safe,
-     quote do
-       tmp2 = unquote(buffer)
-       unquote(expr)
-       tmp2
-     end}
+  @impl true
+  def handle_expr(state, "=", ast) do
+    ast = traverse(ast)
+    %{iodata: iodata, dynamic: dynamic, vars_count: vars_count} = state
+    var = Macro.var(:"arg#{vars_count}", __MODULE__)
+
+    ast =
+      quote do
+        unquote(var) = unquote(to_safe(ast))
+      end
+
+    %{state | dynamic: [ast | dynamic], iodata: [var | iodata], vars_count: vars_count + 1}
+  end
+
+  def handle_expr(state, "", ast) do
+    ast = traverse(ast)
+    %{dynamic: dynamic} = state
+    %{state | dynamic: [ast | dynamic]}
+  end
+
+  def handle_expr(state, marker, ast) do
+    EEx.Engine.handle_expr(state, marker, ast)
+  end
+
+  ## Safe conversion
+
+  defp to_safe(ast) do
+    to_safe(ast, line_from_expr(ast))
   end
 
   defp line_from_expr({_, meta, _}) when is_list(meta), do: Keyword.get(meta, :line)
   defp line_from_expr(_), do: nil
 
   # We can do the work at compile time
-  defp to_safe(literal, _line)
-       when is_binary(literal) or is_atom(literal) or is_number(literal) do
+  defp to_safe(literal, _line) when is_binary(literal) or is_atom(literal) or is_number(literal) do
     Phoenix.HTML.Safe.to_iodata(literal)
   end
 
@@ -103,35 +112,36 @@ defmodule Phoenix.HTML.Engine do
     end
   end
 
-  defp expr(expr) do
+  ## Traversal
+
+  defp traverse(expr) do
     Macro.prewalk(expr, &handle_assign/1)
   end
 
   defp handle_assign({:@, meta, [{name, _, atom}]}) when is_atom(name) and is_atom(atom) do
     quote line: meta[:line] || 0 do
-      Phoenix.HTML.Engine.fetch_assign(var!(assigns), unquote(name))
+      Phoenix.HTML.Engine.fetch_assign!(var!(assigns), unquote(name))
     end
   end
 
   defp handle_assign(arg), do: arg
 
   @doc false
-  def fetch_assign(assigns, key) do
+  def fetch_assign!(assigns, key) do
     case Access.fetch(assigns, key) do
       {:ok, val} ->
         val
 
       :error ->
-        raise ArgumentError,
-          message: """
-          assign @#{key} not available in eex template.
+        raise ArgumentError, """
+        assign @#{key} not available in eex template.
 
-          Please make sure all proper assigns have been set. If this
-          is a child template, ensure assigns are given explicitly by
-          the parent template as they are not automatically forwarded.
+        Please make sure all proper assigns have been set. If this
+        is a child template, ensure assigns are given explicitly by
+        the parent template as they are not automatically forwarded.
 
-          Available assigns: #{inspect(Enum.map(assigns, &elem(&1, 0)))}
-          """
+        Available assigns: #{inspect(Enum.map(assigns, &elem(&1, 0)))}
+        """
     end
   end
 end
