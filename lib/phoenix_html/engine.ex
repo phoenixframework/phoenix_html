@@ -20,6 +20,7 @@ defmodule Phoenix.HTML.Engine do
   """
   def encode_to_iodata!({:safe, body}), do: body
   def encode_to_iodata!(body) when is_binary(body), do: Plug.HTML.html_escape(body)
+  def encode_to_iodata!(other), do: Phoenix.HTML.Safe.to_iodata(other)
 
   @impl true
   def init(_opts) do
