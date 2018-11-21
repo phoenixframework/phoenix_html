@@ -59,12 +59,7 @@ defmodule Phoenix.HTML.Engine do
     ast = traverse(ast)
     %{iodata: iodata, dynamic: dynamic, vars_count: vars_count} = state
     var = Macro.var(:"arg#{vars_count}", __MODULE__)
-
-    ast =
-      quote do
-        unquote(var) = unquote(to_safe(ast))
-      end
-
+    ast = quote do: unquote(var) = unquote(to_safe(ast))
     %{state | dynamic: [ast | dynamic], iodata: [var | iodata], vars_count: vars_count + 1}
   end
 
@@ -94,7 +89,7 @@ defmodule Phoenix.HTML.Engine do
 
   # We can do the work at runtime
   defp to_safe(literal, line) when is_list(literal) do
-    quote line: line, do: Phoenix.HTML.Safe.to_iodata(unquote(literal))
+    quote line: line, do: Phoenix.HTML.Safe.List.to_iodata(unquote(literal))
   end
 
   # We need to check at runtime and we do so by
