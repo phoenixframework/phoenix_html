@@ -1,13 +1,8 @@
 defmodule Phoenix.HTML.EngineTest do
   use ExUnit.Case, async: true
 
-  @template """
-  start: <%= 123 %>
-  <%= if @foo do %>
-    <%= 456 %>
-  <% end %>
-  <%= 789 %>
-  """
+  def safe(do: {:safe, _} = safe), do: safe
+  def unsafe(do: {:safe, content}), do: content
 
   test "encode_to_iodata!" do
     assert Phoenix.HTML.Engine.encode_to_iodata!("<foo>") == "&lt;foo&gt;"
@@ -15,23 +10,53 @@ defmodule Phoenix.HTML.EngineTest do
     assert Phoenix.HTML.Engine.encode_to_iodata!(123) == "123"
   end
 
-  test "evaluates expressions with buffers" do
-    assert eval(@template, %{foo: true}) == "start: 123\n\n  456\n\n789\n"
+  test "escapes HTML" do
+    template = """
+    <start> <%= "<escaped>" %>
+    """
+
+    assert eval(template) == "<start> &lt;escaped&gt;\n"
   end
 
-  test "evaluates safe expressions" do
-    assert eval("Safe <%= {:safe, \"value\"} %>", %{}) == "Safe value"
+  test "escapes HTML from nested content" do
+    template = """
+    <%= Phoenix.HTML.EngineTest.unsafe do %>
+      <foo>
+    <% end %>
+    """
+
+    assert eval(template) == "\n  &lt;foo&gt;\n\n"
+  end
+
+  test "does not escape safe expressions" do
+    assert eval("Safe <%= {:safe, \"<value>\"} %>") == "Safe <value>"
+  end
+
+  test "nested content is always safe" do
+    template = """
+    <%= Phoenix.HTML.EngineTest.safe do %>
+      <foo>
+    <% end %>
+    """
+
+    assert eval(template) == "\n  <foo>\n\n"
+
+    template = """
+    <%= Phoenix.HTML.EngineTest.safe do %>
+      <%= "<foo>" %>
+    <% end %>
+    """
+
+    assert eval(template) == "\n  &lt;foo&gt;\n\n"
   end
 
   test "raises ArgumentError for missing assigns" do
     assert_raise ArgumentError,
                  ~r/assign @foo not available in eex template.*Available assigns: \[:bar\]/s,
-                 fn ->
-                   eval(@template, %{bar: "baz"})
-                 end
+                 fn -> eval("<%= @foo %>", %{bar: true}) end
   end
 
-  defp eval(string, assigns) do
+  defp eval(string, assigns \\ %{}) do
     {:safe, io} =
       EEx.eval_string(string, [assigns: assigns], file: __ENV__.file, engine: Phoenix.HTML.Engine)
 
