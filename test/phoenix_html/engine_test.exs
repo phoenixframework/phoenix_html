@@ -50,6 +50,19 @@ defmodule Phoenix.HTML.EngineTest do
     assert eval(template) == "\n  &lt;foo&gt;\n\n"
   end
 
+  test "handles assigns" do
+    assert eval("<%= @foo %>", %{foo: "<hello>"}) == "&lt;hello&gt;"
+  end
+
+  test "supports non-output expressions" do
+    template = """
+    <% foo = @foo %>
+    <%= foo %>
+    """
+
+    assert eval(template, %{foo: "<hello>"}) == "\n&lt;hello&gt;\n"
+  end
+
   test "raises ArgumentError for missing assigns" do
     assert_raise ArgumentError,
                  ~r/assign @foo not available in eex template.*Available assigns: \[:bar\]/s,
