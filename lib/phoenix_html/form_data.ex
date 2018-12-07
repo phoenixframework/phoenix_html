@@ -16,7 +16,7 @@ defprotocol Phoenix.HTML.FormData do
 
   @doc """
   Converts the field in the given form based on the data structure
-  into a `Phoenix.HTML.Form` struct.
+  into a list of `Phoenix.HTML.Form` structs.
 
   The options are the same options given to `inputs_for/4`. It
   can be used by implementations to configure their behaviour
@@ -24,7 +24,7 @@ defprotocol Phoenix.HTML.FormData do
   custom field removed.
   """
   @spec to_form(t, Phoenix.HTML.Form.t(), Phoenix.HTML.Form.field(), Keyword.t()) ::
-          Phoenix.HTML.Form.t()
+          [Phoenix.HTML.Form.t()]
   def to_form(data, form, field, options)
 
   @doc """
