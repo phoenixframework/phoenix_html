@@ -180,6 +180,28 @@ defmodule Phoenix.HTML.Form do
   party applications. If this behaviour is problematic, you can generate
   a non-host specific token with `Plug.CSRFProtection.get_csrf_token/0` and
   pass it to the form generator via the `:csrf_token` option.
+
+  ## Phoenix.LiveView integration
+
+  Because `Phoenix.LiveView` is unable to compute diffs inside
+  anonymous functions, Phoenix.HTML provides `form_for/3` that works
+  without passing an anonymous function. Inside live views, instead of
+
+      <%= form_for @changeset, opts, fn f -> %>
+        <%= text_input f, :name %>
+      <% end %>
+
+  you would write
+
+      <%= f = form_for @changeset, opts %>
+        <%= text_input f, :name %>
+      </form>
+
+  In the second case, the `form_for` emits only the opening of the
+  `<form>` tag, which then needs to be closed explicitly in HTML.
+  Since the anonymous function has been removed, `Phoenix.LiveView`
+  is able to optimize forms too. Although outside of live views,
+  we recommend using the first construct.
   """
 
   alias Phoenix.HTML.Form
@@ -212,6 +234,8 @@ defmodule Phoenix.HTML.Form do
     * `:options` - a copy of the options given when creating the
       form via `form_for/4` without any form data specific key
 
+    * `:action` - the action the form is meant to submit to
+
     * `:errors` - a keyword list of errors that associated with
       the form
   """
@@ -224,7 +248,8 @@ defmodule Phoenix.HTML.Form do
             params: %{},
             errors: [],
             options: [],
-            index: nil
+            index: nil,
+            action: nil
 
   @type t :: %Form{
           source: Phoenix.HTML.FormData.t(),
@@ -236,10 +261,18 @@ defmodule Phoenix.HTML.Form do
           errors: Keyword.t(),
           impl: module,
           id: String.t(),
-          index: nil | non_neg_integer
+          index: nil | non_neg_integer,
+          action: String.t
         }
 
   @type field :: atom | String.t()
+
+  defimpl Phoenix.HTML.Safe do
+    def to_iodata(%{action: action, options: options}) do
+      {:safe, contents} = form_tag(action, options)
+      contents
+    end
+  end
 
   @doc """
   Converts an attribute/form field into its humanize version.
@@ -265,8 +298,39 @@ defmodule Phoenix.HTML.Form do
     bin |> String.replace("_", " ") |> String.capitalize()
   end
 
+  @doc false
+  def form_for(form_data, action) do
+    form_for(form_data, action, [])
+  end
+
   @doc """
-  Generates a form tag with a form builder.
+  Generates a form tag with a form builder **without** an anonymous function.
+
+  This functionality exists mostly for integration with `Phoenix.LiveView`
+  that replaces the anonymous function for explicit closing of the `<form>`
+  tag:
+
+      <%= f = form_for @changeset, user_path(@conn, :create) %>
+        Name: <%= text_input f, :name %>
+      </form>
+
+  See the "Phoenix.LiveView integration" section in module documentation for
+  examples of using this function.
+
+  See `form_for/4` for the available options.
+  """
+  @spec form_for(Phoenix.HTML.FormData.t(), String.t(), Keyword.t()) ::
+          Phoenix.HTML.safe()
+  def form_for(form_data, action, options) when is_list(options) do
+    %{Phoenix.HTML.FormData.to_form(form_data, options) | action: action}
+  end
+
+  @doc """
+  Generates a form tag with a form builder and an anonymous function.
+
+      <%= form_for @changeset, user_path(@conn, :create), fn f -> %>
+        Name: <%= text_input f, :name %>
+      <% end %>
 
   See the module documentation for examples of using this function.
 
@@ -304,11 +368,13 @@ defmodule Phoenix.HTML.Form do
   See `Phoenix.HTML.Tag.form_tag/2` for more information on the
   options above.
   """
+  @spec form_for(Phoenix.HTML.FormData.t(), String.t(), (t -> Phoenix.HTML.unsafe())) ::
+          Phoenix.HTML.safe()
   @spec form_for(Phoenix.HTML.FormData.t(), String.t(), Keyword.t(), (t -> Phoenix.HTML.unsafe())) ::
           Phoenix.HTML.safe()
   def form_for(form_data, action, options \\ [], fun) when is_function(fun, 1) do
-    form = Phoenix.HTML.FormData.to_form(form_data, options)
-    html_escape([form_tag(action, form.options), fun.(form), raw("</form>")])
+    %{action: action, options: options} = form = form_for(form_data, action, options)
+    html_escape([form_tag(action, options), fun.(form), raw("</form>")])
   end
 
   @doc """

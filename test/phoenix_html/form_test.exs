@@ -41,6 +41,28 @@ defmodule Phoenix.HTML.FormTest do
     })
   end
 
+  ## form_for/3
+
+  test "form_for/3 with connection" do
+    form = form_for(conn(), "/", [as: :search])
+    assert %Phoenix.HTML.Form{} = form
+
+    contents = form |>  html_escape() |> safe_to_string()
+    assert contents =~ ~s(<form accept-charset="UTF-8" action="/" method="post">)
+    assert contents =~ ~s(<input name="_utf8" type="hidden" value="✓">)
+  end
+
+  test "form_for/3 with custom options" do
+    form = form_for(conn(), "/", [as: :search, method: :put, multipart: true])
+    assert %Phoenix.HTML.Form{} = form
+
+    contents = form |>  html_escape() |> safe_to_string()
+    assert contents =~ ~s(<form accept-charset="UTF-8" action="/" enctype="multipart/form-data" method="post">)
+    assert contents =~ ~s(method="post")
+    assert contents =~ ~s(<input name="_method" type="hidden" value="put">)
+    refute contents =~ ~s(</form>)
+  end
+
   ## form_for/4
 
   test "form_for/4 with connection" do
@@ -101,7 +123,7 @@ defmodule Phoenix.HTML.FormTest do
     assert form =~ "<form"
   end
 
-  test "form_for/3 with no name" do
+  test "form_for/4 without options and no name" do
     form =
       safe_to_string(
         form_for(conn(), "/", fn f ->
