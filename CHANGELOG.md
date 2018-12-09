@@ -1,9 +1,11 @@
 # Changelog
 
-## v2.13.0-dev
+## v2.13.0 (2018-12-09)
 
 * Enhancements
   * Require Elixir v1.5+ for more efficient template compilation/rendering
+  * Add `Phoenix.HTML.Engine.encode_to_iodata!/1`
+  * Add `Phoenix.HTML.Form.form_for/3` that works without an anonymous function
 
 * Deprecations
   * Deprecate `Phoenix.HTML.escape_javascript/1` in favor of `Phoenix.HTML.javascript_escape/1` for consistency
