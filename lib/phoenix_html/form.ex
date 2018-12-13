@@ -1096,7 +1096,7 @@ defmodule Phoenix.HTML.Form do
   All other options are forwarded to the underlying HTML tag.
   """
   def select(form, field, options, opts \\ []) when is_atom(field) or is_binary(field) do
-    {selected, opts} = selected(form, field, opts) || []
+    {selected, opts} = selected(form, field, opts)
 
     {prefix, opts} =
       case Keyword.pop(opts, :prompt) do
