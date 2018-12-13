@@ -262,7 +262,7 @@ defmodule Phoenix.HTML.Form do
           impl: module,
           id: String.t(),
           index: nil | non_neg_integer,
-          action: String.t
+          action: nil | String.t
         }
 
   @type field :: atom | String.t()
