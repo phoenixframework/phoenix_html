@@ -39,7 +39,7 @@ defmodule Phoenix.HTML.Form do
   Now a `@changeset` assign is available in views which we
   can pass to the form:
 
-      <%= form_for @changeset, user_path(@conn, :create), fn f -> %>
+      <%= form_for @changeset, Routes.user_path(@conn, :create), fn f -> %>
         <label>
           Name: <%= text_input f, :name %>
         </label>
@@ -84,7 +84,7 @@ defmodule Phoenix.HTML.Form do
   This is useful when you are creating forms that are not backed
   by any kind of data from the data layer, like a search form.
 
-      <%= form_for @conn, search_path(@conn, :new), [as: :search], fn f -> %>
+      <%= form_for @conn, Routes.search_path(@conn, :new), [as: :search], fn f -> %>
         <%= text_input f, :for %>
         <%= submit "Search" %>
       <% end %>
@@ -146,7 +146,7 @@ defmodule Phoenix.HTML.Form do
 
   In the form, you now can:
 
-      <%= form_for @changeset, user_path(@conn, :create), fn f -> %>
+      <%= form_for @changeset, Routes.user_path(@conn, :create), fn f -> %>
         <%= text_input f, :name %>
 
         <%= inputs_for f, :permalink, fn fp -> %>
@@ -310,7 +310,7 @@ defmodule Phoenix.HTML.Form do
   that replaces the anonymous function for explicit closing of the `<form>`
   tag:
 
-      <%= f = form_for @changeset, user_path(@conn, :create) %>
+      <%= f = form_for @changeset, Routes.user_path(@conn, :create) %>
         Name: <%= text_input f, :name %>
       </form>
 
@@ -328,7 +328,7 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Generates a form tag with a form builder and an anonymous function.
 
-      <%= form_for @changeset, user_path(@conn, :create), fn f -> %>
+      <%= form_for @changeset, Routes.user_path(@conn, :create), fn f -> %>
         Name: <%= text_input f, :name %>
       <% end %>
 
