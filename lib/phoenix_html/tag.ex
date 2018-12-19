@@ -307,14 +307,14 @@ defmodule Phoenix.HTML.Tag do
   To generate a path to an image hosted in your application "priv/static",
   use `static_path/1` to get a URL with cache control parameters:
 
-      img_tag(static_path("logo.png"))
+      img_tag(Routes.static_path("logo.png"))
       <img src="logo.png?vsn=3456789">
 
   To generate a path to an image hosted in your application "priv/static",
   with the `@conn` endpoint, use `static_path/2` to get a URL with 
   cache control parameters:
 
-      img_tag(static_path(@conn, "/images/logo.png"))
+      img_tag(Routes.static_path(@conn, "/images/logo.png"))
       <img src="logo.png?vsn=3456789">
 
   """
