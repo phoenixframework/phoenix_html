@@ -1241,6 +1241,11 @@ defmodule Phoenix.HTML.FormTest do
                ~s(<label class="foo" for="test_key">Search</label>)
     end
 
+    test "with field and inline safe content" do
+      assert safe_to_string(label(:search, :key, {:safe, "<em>Search</em>"})) ==
+               ~s(<label for="search_key"><em>Search</em></label>)
+    end
+
     test "with field and block content" do
       assert safe_form(&label(&1, :key, do: "Hello")) == ~s(<label for="search_key">Hello</label>)
 
