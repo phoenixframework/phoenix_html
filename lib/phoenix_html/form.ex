@@ -1615,10 +1615,6 @@ defmodule Phoenix.HTML.Form do
   """
   def label(form, field, text_or_do_block_or_attributes)
 
-  def label(form, field, text) when is_binary(text) do
-    label(form, field, text, [])
-  end
-
   def label(form, field, do: block) do
     label(form, field, [], do: block)
   end
@@ -1627,19 +1623,23 @@ defmodule Phoenix.HTML.Form do
     label(form, field, humanize(field), opts)
   end
 
+  def label(form, field, text) do
+    label(form, field, text, [])
+  end
+
   @doc """
   See `label/2`.
   """
   def label(form, field, text, do_block_or_attributes)
 
-  def label(form, field, text, opts) when is_binary(text) and is_list(opts) do
-    opts = Keyword.put_new(opts, :for, input_id(form, field))
-    content_tag(:label, text, opts)
-  end
-
   def label(form, field, opts, do: block) when is_list(opts) do
     opts = Keyword.put_new(opts, :for, input_id(form, field))
     content_tag(:label, block, opts)
+  end
+
+  def label(form, field, text, opts) when is_list(opts) do
+    opts = Keyword.put_new(opts, :for, input_id(form, field))
+    content_tag(:label, text, opts)
   end
 
   # Normalize field name to string version
