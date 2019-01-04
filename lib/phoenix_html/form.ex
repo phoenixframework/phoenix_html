@@ -1647,14 +1647,14 @@ defmodule Phoenix.HTML.Form do
   defp field_to_string(field) when is_binary(field), do: field
 
   @doc false
-  @deprecated "Use field_value/3 instead"
+  @deprecated "Use input_value/3 instead"
   def field_value(form, field, default \\ nil), do: input_value(form, field) || default
 
   @doc false
-  @deprecated "Use field_name/2 instead"
+  @deprecated "Use input_name/2 instead"
   def field_name(form, field), do: input_name(form, field)
 
   @doc false
-  @deprecated "Use field_id/2 instead"
+  @deprecated "Use input_id/2 instead"
   def field_id(form, field), do: input_id(form, field)
 end
