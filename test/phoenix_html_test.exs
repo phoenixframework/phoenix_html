@@ -15,6 +15,7 @@ defmodule Phoenix.HTMLTest do
     assert javascript_escape("\\Double backslash") == "\\\\Double backslash"
     assert javascript_escape("\"Double quote\"") == "\\\"Double quote\\\""
     assert javascript_escape("'Single quote'") == "\\'Single quote\\'"
+    assert javascript_escape("`Backtick`") == "\\`Backtick\\`"
     assert javascript_escape("New line\r") == "New line\\n"
     assert javascript_escape("New line\n") == "New line\\n"
     assert javascript_escape("New line\r\n") == "New line\\n"
