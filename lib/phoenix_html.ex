@@ -163,12 +163,14 @@ defmodule Phoenix.HTML do
   def escape_javascript(data), do: javascript_escape(data)
 
   @doc """
-  Escapes quotes (double and single), double backslashes and other.
+  Escapes HTML content to be inserted a JavaScript string.
 
   This function is useful in JavaScript responses when there is a need
   to escape HTML rendered from other templates, like in the following:
 
       $("#container").append("<%= javascript_escape(render("post.html", post: @post)) %>");
+
+  It escapes quotes (double and single), double backslashes and others.
   """
   @spec javascript_escape(binary) :: binary
   @spec javascript_escape(safe) :: safe
