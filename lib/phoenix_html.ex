@@ -193,7 +193,7 @@ defmodule Phoenix.HTML do
   defp javascript_escape(<<"\r\n", t::binary>>, acc),
     do: javascript_escape(t, <<acc::binary, ?\\, ?n>>)
 
-  defp javascript_escape(<<h, t::binary>>, acc) when h in [?", ?', ?\\],
+  defp javascript_escape(<<h, t::binary>>, acc) when h in [?", ?', ?\\, ?`],
     do: javascript_escape(t, <<acc::binary, ?\\, h>>)
 
   defp javascript_escape(<<h, t::binary>>, acc) when h in [?\r, ?\n],
