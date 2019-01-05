@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.13.1 (2018-01-05)
+
+* Enhancements
+  * Allow safe content to be given to label
+  * Also escale template literals in `javascript_escape/1`
+
+* Bug fixes
+  * Fix deprecation warnings to point to the correct alternative
+
 ## v2.13.0 (2018-12-09)
 
 * Enhancements
