@@ -82,9 +82,10 @@ defmodule Phoenix.HTML.Form do
   to create forms based only on connection information.
 
   This is useful when you are creating forms that are not backed
-  by any kind of data from the data layer, like a search form.
+  by any kind of data from the data layer.  Let's assume that we're
+  submitting a search form for the `FooController`:
 
-      <%= form_for @conn, Routes.search_path(@conn, :new), [as: :search], fn f -> %>
+      <%= form_for @conn, Routes.foo_path(@conn, :new), [as: :search], fn f -> %>
         <%= text_input f, :for %>
         <%= submit "Search" %>
       <% end %>
