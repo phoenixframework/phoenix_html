@@ -1,6 +1,6 @@
 # Changelog
 
-## v2.13.1 (2018-01-05)
+## v2.13.1 (2019-01-05)
 
 * Enhancements
   * Allow safe content to be given to label
