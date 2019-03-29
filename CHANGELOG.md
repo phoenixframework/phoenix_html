@@ -1,6 +1,6 @@
 # Changelog
 
-## v2.13.2-dev
+## v2.13.2 (2019-03-29)
 
 * Bug fixes
   * Stop event propagation when confirm dialog is canceled
