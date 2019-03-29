@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.13.2-dev
+
+* Bug fixes
+  * Stop event propagation when confirm dialog is canceled
+
 ## v2.13.1 (2019-01-05)
 
 * Enhancements
