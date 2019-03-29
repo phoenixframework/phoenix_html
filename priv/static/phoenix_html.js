@@ -53,6 +53,7 @@
 
       if (!element.dispatchEvent(phoenixLinkEvent)) {
         e.preventDefault();
+        e.stopImmediatePropagation();
         return false;
       }
 
