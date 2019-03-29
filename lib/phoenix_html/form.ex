@@ -315,8 +315,8 @@ defmodule Phoenix.HTML.Form do
         Name: <%= text_input f, :name %>
       </form>
 
-  See the "Phoenix.LiveView integration" section in module documentation for
-  examples of using this function.
+  See the [Phoenix.LiveView integration](#module-phoenix-liveview-integration)
+  section in module documentation for examples of using this function.
 
   See `form_for/4` for the available options.
   """
