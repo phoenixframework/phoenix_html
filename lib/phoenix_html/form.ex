@@ -188,13 +188,13 @@ defmodule Phoenix.HTML.Form do
   anonymous functions, Phoenix.HTML provides `form_for/3` that works
   without passing an anonymous function. Inside live views, instead of
 
-      <%= form_for @changeset, opts, fn f -> %>
+      <%= form_for @changeset, url, opts, fn f -> %>
         <%= text_input f, :name %>
       <% end %>
 
   you would write
 
-      <%= f = form_for @changeset, opts %>
+      <%= f = form_for @changeset, url, opts %>
         <%= text_input f, :name %>
       </form>
 
@@ -299,7 +299,16 @@ defmodule Phoenix.HTML.Form do
     bin |> String.replace("_", " ") |> String.capitalize()
   end
 
-  @doc false
+  @doc """
+  Generates a form tag with a form builder **without** options or an anonymous function.
+
+      <%= f = form_for @changeset, Routes.user_path(@conn, :create) %>
+        Name: <%= text_input f, :name %>
+      </form>
+
+  A shortcut for `form_for(changeset, url, [])`.
+  """
+  @spec form_for(Phoenix.HTML.FormData.t(), String.t()) :: Phoenix.HTML.safe()
   def form_for(form_data, action) do
     form_for(form_data, action, [])
   end
@@ -311,7 +320,7 @@ defmodule Phoenix.HTML.Form do
   that replaces the anonymous function for explicit closing of the `<form>`
   tag:
 
-      <%= f = form_for @changeset, Routes.user_path(@conn, :create) %>
+      <%= f = form_for @changeset, Routes.user_path(@conn, :create), opts %>
         Name: <%= text_input f, :name %>
       </form>
 
