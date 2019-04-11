@@ -300,13 +300,13 @@ defmodule Phoenix.HTML.Form do
   end
 
   @doc """
-  Generates a form tag with a form builder **without** options or an anonymouse function.
+  Generates a form tag with a form builder **without** options or an anonymous function.
 
       <%= f = form_for @changeset, Routes.user_path(@conn, :create) %>
         Name: <%= text_input f, :name %>
       </form>
 
-  See `form_for/3` for the available options.
+  A shortcut for `form_for(changeset, url, [])`.
   """
   @spec form_for(Phoenix.HTML.FormData.t(), String.t()) :: Phoenix.HTML.safe()
   def form_for(form_data, action) do
