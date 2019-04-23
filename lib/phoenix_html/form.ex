@@ -308,7 +308,7 @@ defmodule Phoenix.HTML.Form do
 
   A shortcut for `form_for(changeset, url, [])`.
   """
-  @spec form_for(Phoenix.HTML.FormData.t(), String.t()) :: Phoenix.HTML.safe()
+  @spec form_for(Phoenix.HTML.FormData.t(), String.t()) :: Phoenix.HTML.Form.t()
   def form_for(form_data, action) do
     form_for(form_data, action, [])
   end
@@ -330,7 +330,7 @@ defmodule Phoenix.HTML.Form do
   See `form_for/4` for the available options.
   """
   @spec form_for(Phoenix.HTML.FormData.t(), String.t(), Keyword.t()) ::
-          Phoenix.HTML.safe()
+          Phoenix.HTML.Form.t()
   def form_for(form_data, action, options) when is_list(options) do
     %{Phoenix.HTML.FormData.to_form(form_data, options) | action: action}
   end
