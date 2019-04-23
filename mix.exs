@@ -22,7 +22,9 @@ defmodule PhoenixHtml.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :plug]]
+    [
+      extra_applications: [:eex, :logger]
+    ]
   end
 
   defp deps do
