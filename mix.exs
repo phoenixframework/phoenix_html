@@ -28,7 +28,7 @@ defmodule PhoenixHtml.Mixfile do
   defp deps do
     [
       {:plug, "~> 1.5"},
-      {:ex_doc, "~> 0.18", only: :docs}
+      {:ex_doc, ">= 0.0.0", only: :docs, runtime: false}
     ]
   end
 
