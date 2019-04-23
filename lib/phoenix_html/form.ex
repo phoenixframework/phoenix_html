@@ -378,8 +378,6 @@ defmodule Phoenix.HTML.Form do
   See `Phoenix.HTML.Tag.form_tag/2` for more information on the
   options above.
   """
-  @spec form_for(Phoenix.HTML.FormData.t(), String.t(), (t -> Phoenix.HTML.unsafe())) ::
-          Phoenix.HTML.safe()
   @spec form_for(Phoenix.HTML.FormData.t(), String.t(), Keyword.t(), (t -> Phoenix.HTML.unsafe())) ::
           Phoenix.HTML.safe()
   def form_for(form_data, action, options \\ [], fun) when is_function(fun, 1) do
