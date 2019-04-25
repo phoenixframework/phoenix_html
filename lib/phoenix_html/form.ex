@@ -410,10 +410,17 @@ defmodule Phoenix.HTML.Form do
       applies if the field value is a list and no parameters were
       sent through the form.
 
+    * `:skip_hidden` - skip the automatic rendering of hidden
+      fields to allow for more tight control over the generated
+      markup. You can use `hidden_fields_of_form(form)` to 
+      generate them manually within the supplied callback.
+
   """
   @spec inputs_for(t, field, Keyword.t(), (t -> Phoenix.HTML.unsafe())) :: Phoenix.HTML.safe()
   def inputs_for(%{impl: impl} = form, field, options \\ [], fun)
       when is_atom(field) or is_binary(field) do
+    {skip, options} = Keyword.pop(options, :skip_hidden, false)
+    
     options =
       form.options
       |> Keyword.take([:multipart])
@@ -423,10 +430,19 @@ defmodule Phoenix.HTML.Form do
 
     html_escape(
       Enum.map(forms, fn form ->
-        hidden = Enum.map(form.hidden, fn {k, v} -> hidden_input(form, k, value: v) end)
-        [hidden, fun.(form)]
+        if skip do
+          fun.(form)
+        else
+          [hidden_fields_of_form(form), fun.(form)]
+        end
       end)
     )
+  end
+  
+  @doc false
+  @spec hidden_fields_of_form(t) :: [Phoenix.HTML.safe()]
+  def hidden_fields_of_form(%{hidden: hidden}) do
+    Enum.map(hidden, fn {k, v} -> hidden_input(form, k, value: v) end)
   end
 
   @doc """
