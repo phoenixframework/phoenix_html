@@ -400,10 +400,17 @@ defmodule Phoenix.HTML.Form do
       applies if the field value is a list and no parameters were
       sent through the form.
 
+    * `:skip_hidden` - skip the automatic rendering of hidden
+      fields to allow for more tight control over the generated
+      markup. You can use `hidden_form_inputs(form)` to
+      generate them manually within the supplied callback.
+
   """
   @spec inputs_for(t, field, Keyword.t(), (t -> Phoenix.HTML.unsafe())) :: Phoenix.HTML.safe()
   def inputs_for(%{impl: impl} = form, field, options \\ [], fun)
       when is_atom(field) or is_binary(field) do
+    {skip, options} = Keyword.pop(options, :skip_hidden, false)
+
     options =
       form.options
       |> Keyword.take([:multipart])
@@ -413,10 +420,19 @@ defmodule Phoenix.HTML.Form do
 
     html_escape(
       Enum.map(forms, fn form ->
-        hidden = Enum.map(form.hidden, fn {k, v} -> hidden_input(form, k, value: v) end)
-        [hidden, fun.(form)]
+        if skip do
+          fun.(form)
+        else
+          [hidden_form_inputs(form), fun.(form)]
+        end
       end)
     )
+  end
+
+  @doc false
+  @spec hidden_form_inputs(t) :: [Phoenix.HTML.safe()]
+  def hidden_form_inputs(form) do
+    Enum.map(form.hidden, fn {k, v} -> hidden_input(form, k, value: v) end)
   end
 
   @doc """
@@ -1384,7 +1400,7 @@ defmodule Phoenix.HTML.Form do
   """
   def date_select(form, field, opts \\ []) do
     value = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
-    builder = Keyword.get(opts, :builder) || &date_builder(&1, opts)
+    builder = Keyword.get(opts, :builder) || (&date_builder(&1, opts))
     builder.(datetime_builder(form, field, date_value(value), nil, opts))
   end
 
@@ -1418,7 +1434,7 @@ defmodule Phoenix.HTML.Form do
   """
   def time_select(form, field, opts \\ []) do
     value = Keyword.get(opts, :value, input_value(form, field) || Keyword.get(opts, :default))
-    builder = Keyword.get(opts, :builder) || &time_builder(&1, opts)
+    builder = Keyword.get(opts, :builder) || (&time_builder(&1, opts))
     builder.(datetime_builder(form, field, nil, time_value(value), opts))
   end
 

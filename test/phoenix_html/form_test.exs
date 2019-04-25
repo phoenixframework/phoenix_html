@@ -260,6 +260,53 @@ defmodule Phoenix.HTML.FormTest do
     end
   end
 
+  describe "inputs_for/4" do
+    test "generate a new form builder for the given parameter" do
+      conn = conn()
+
+      form =
+          form_for(conn, "/", [as: :user], fn form ->
+            inputs_for(form, :company, fn company_form ->
+              text_input company_form, :name
+            end)
+          end)
+          |> safe_to_string()
+
+      assert form =~ ~s(<input name="_utf8" type="hidden" value="✓">)
+      assert form =~ ~s(<input id="user_company_name" name="user[company][name]" type="text">)
+    end
+
+    test "generate a new form builder with hidden inputs when they are present" do
+      conn = conn()
+
+      form =
+          form_for(conn, "/", [as: :user], fn form ->
+            inputs_for(form, :company, [hidden: [id: 1]],fn company_form ->
+              text_input company_form, :name
+            end)
+          end)
+          |> safe_to_string()
+
+      assert form =~ ~s(input id="user_company_id" name="user[company][id]" type="hidden" value="1">)
+      assert form =~ ~s(<input id="user_company_name" name="user[company][name]" type="text">)
+    end
+
+    test "skip hidden inputs" do
+      conn = conn()
+
+      form =
+          form_for(conn, "/", [as: :user], fn form ->
+            inputs_for(form, :company, [skip_hidden: true, hidden: [id: 1]],fn company_form ->
+              text_input company_form, :name
+            end)
+          end)
+          |> safe_to_string()
+
+      refute form =~ ~s(input id="user_company_id" name="user[company][id]" type="hidden" value="1">)
+      assert form =~ ~s(<input id="user_company_name" name="user[company][name]" type="text">)
+    end
+  end
+
   ## text_input/3
 
   test "text_input/3" do

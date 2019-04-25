@@ -91,6 +91,7 @@ defimpl Phoenix.HTML.FormData, for: [Plug.Conn, Atom] do
     {append, opts} = Keyword.pop(opts, :append, [])
     {name, opts} = Keyword.pop(opts, :as)
     {id, opts} = Keyword.pop(opts, :id)
+    {hidden, opts} = Keyword.pop(opts, :hidden, [])
 
     id = to_string(id || form.id <> "_#{field}")
     name = to_string(name || form.name <> "[#{field}]")
@@ -107,6 +108,7 @@ defimpl Phoenix.HTML.FormData, for: [Plug.Conn, Atom] do
             name: name,
             data: default,
             params: params || %{},
+            hidden: hidden,
             options: opts
           }
         ]
@@ -133,6 +135,7 @@ defimpl Phoenix.HTML.FormData, for: [Plug.Conn, Atom] do
             name: name <> "[" <> index_string <> "]",
             data: data,
             params: params,
+            hidden: hidden,
             options: opts
           }
         end
