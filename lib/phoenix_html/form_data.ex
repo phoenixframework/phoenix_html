@@ -48,22 +48,13 @@ defprotocol Phoenix.HTML.FormData do
   def input_type(data, form, field)
 end
 
-defimpl Phoenix.HTML.FormData, for: Plug.Conn do
-  def to_form(conn, opts) do
-    {name, params, opts} =
-      case Keyword.pop(opts, :as) do
-        {nil, opts} ->
-          {nil, conn.params, opts}
-
-        {name, opts} ->
-          name = to_string(name)
-          {name, Map.get(conn.params, name) || %{}, opts}
-      end
-
+defimpl Phoenix.HTML.FormData, for: [Plug.Conn, Atom] do
+  def to_form(conn_or_atom, opts) do
+    {name, params, opts} = name_params_and_opts(conn_or_atom, opts)
     {errors, opts} = Keyword.pop(opts, :errors, [])
 
     %Phoenix.HTML.Form{
-      source: conn,
+      source: conn_or_atom,
       impl: __MODULE__,
       id: name,
       name: name,
@@ -74,7 +65,27 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
     }
   end
 
-  def to_form(conn, form, field, opts) when is_atom(field) or is_binary(field) do
+  case @for do
+    Atom ->
+      defp name_params_and_opts(atom, opts) do
+        {params, opts} = Keyword.pop(opts, :params, %{})
+        {Atom.to_string(atom), params, opts}
+      end
+
+    Plug.Conn ->
+      defp name_params_and_opts(conn, opts) do
+        case Keyword.pop(opts, :as) do
+          {nil, opts} ->
+            {nil, conn.params, opts}
+
+          {name, opts} ->
+            name = to_string(name)
+            {name, Map.get(conn.params, name) || %{}, opts}
+        end
+      end
+  end
+
+  def to_form(conn_or_atom, form, field, opts) when is_atom(field) or is_binary(field) do
     {default, opts} = Keyword.pop(opts, :default, %{})
     {prepend, opts} = Keyword.pop(opts, :prepend, [])
     {append, opts} = Keyword.pop(opts, :append, [])
@@ -90,7 +101,7 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
       is_map(default) ->
         [
           %Phoenix.HTML.Form{
-            source: conn,
+            source: conn_or_atom,
             impl: __MODULE__,
             id: id,
             name: name,
@@ -115,7 +126,7 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
           index_string = Integer.to_string(index)
 
           %Phoenix.HTML.Form{
-            source: conn,
+            source: conn_or_atom,
             impl: __MODULE__,
             index: index,
             id: id <> "_" <> index_string,
@@ -128,7 +139,7 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
     end
   end
 
-  def input_value(_conn, %{data: data, params: params}, field)
+  def input_value(_conn_or_atom, %{data: data, params: params}, field)
       when is_atom(field) or is_binary(field) do
     case Map.fetch(params, field_to_string(field)) do
       {:ok, value} ->
@@ -139,8 +150,8 @@ defimpl Phoenix.HTML.FormData, for: Plug.Conn do
     end
   end
 
-  def input_type(_conn, _form, _field), do: :text_input
-  def input_validations(_conn, _form, _field), do: []
+  def input_type(_conn_or_atom, _form, _field), do: :text_input
+  def input_validations(_conn_or_atom, _form, _field), do: []
 
   # Normalize field name to string version
   defp field_to_string(field) when is_atom(field), do: Atom.to_string(field)

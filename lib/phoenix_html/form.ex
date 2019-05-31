@@ -8,11 +8,13 @@ defmodule Phoenix.HTML.Form do
     * with changeset data - when information to populate
       the form comes from a changeset
 
-    * with connection data - when a form is created based
-      on the information in the connection (aka `Plug.Conn`)
+    * with limited data - when a form is created without
+      an underlying data layer. In this scenario, you can
+      use the connection information (aka Plug.Conn.params)
+      or pass the form values by hand
 
-    * without form data - when the functions are used directly,
-      outside of a form
+    * outside of a form  - when the functions are used directly,
+      outside of `form_for`
 
   We will explore all three scenarios below.
 
@@ -59,7 +61,7 @@ defmodule Phoenix.HTML.Form do
   if the user had a default value for age set, it will
   automatically show up as selected in the form.
 
-  #### A note on `:errors`
+  ### A note on `:errors`
 
   If no action has been applied to the changeset or action was set to `:ignore`,
   no errors are shown on the form object even if the changeset has a non-empty
@@ -74,16 +76,15 @@ defmodule Phoenix.HTML.Form do
   also set the action yourself, either directly on the `Ecto.Changeset` struct
   field or by using `Ecto.Changeset.apply_action/2`.
 
-  ## With connection data
+  ## With limited data
 
   `form_for/4` expects as first argument any data structure that
   implements the `Phoenix.HTML.FormData` protocol. By default,
-  Phoenix implements this protocol for `Plug.Conn`, allowing us
-  to create forms based only on connection information.
+  Phoenix implements this protocol for `Plug.Conn` and `Atom`.
 
   This is useful when you are creating forms that are not backed
-  by any kind of data from the data layer. Let's assume that we're
-  submitting a form to the `:new` action in the `FooController`:
+  by any kind of data layer. Let's assume that we're submitting a
+  form to the `:new` action in the `FooController`:
 
       <%= form_for @conn, Routes.foo_path(@conn, :new), [as: :foo], fn f -> %>
         <%= text_input f, :for %>
@@ -91,25 +92,14 @@ defmodule Phoenix.HTML.Form do
       <% end %>
 
   `form_for/4` uses the `Plug.Conn` to set input values from the
-  request parameters. In this case, the input's value would be set
-  to `@conn.params["foo"]["for"]`.
+  request parameters.
 
-  #### A note on `:errors`
+  Alternatively, if you don't have a connection, you can pass `:foo`
+  as the form data source and explicitly pass the value for every input:
 
-  When you feed `form_for/4` with `:errors` as an option you will be able to use
-  your favorite `error_tag`-helper like:
-
-      def error_tag(form, field) do
-        if error = form.errors[field] do
-          content_tag :span, translate_error(error), class: "help-block"
-        end
-      end
-
-  For example, put the errors in the conn.assigns and create your form like this:
-
-      <%= form_for @conn, '/', [errors: @conn.assigns[:errors]], fn f -> %>
-        <%= text_input f, :field %>
-        <%= error_tag f, :field %>
+      <%= form_for :foo, Routes.foo_path(MyApp.Endpoint, :new), fn f -> %>
+        <%= text_input f, :for, value: "current value" %>
+        <%= submit "Search" %>
       <% end %>
 
   ## Without form data
