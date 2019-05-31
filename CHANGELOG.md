@@ -1,5 +1,13 @@
 # Changelog
 
+## v2.13.3 (2019-05-31)
+
+* Enhancements
+  * Add atom support to FormData
+
+* Bug fixes
+  * Keep proper line numbers on .eex templates for proper coverage
+
 ## v2.13.2 (2019-03-29)
 
 * Bug fixes
