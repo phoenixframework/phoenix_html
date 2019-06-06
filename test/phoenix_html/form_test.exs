@@ -39,7 +39,8 @@ defmodule Phoenix.HTML.FormTest do
         "hour" => "2",
         "minute" => "11",
         "second" => "13"
-      }
+      },
+      "naive_datetime" => ~N[2000-01-01 10:00:42]
     }
   end
 
@@ -549,6 +550,9 @@ defmodule Phoenix.HTML.FormTest do
     assert safe_to_string(datetime_local_input(:search, :key)) ==
              ~s(<input id="search_key" name="search[key]" type="datetime-local">)
 
+    assert safe_form(&datetime_local_input(&1, :naive_datetime)) ==
+             ~s(<input id="search_naive_datetime" name="search[naive_datetime]" type="datetime-local" value="2000-01-01T10:00">)
+              
     assert safe_to_string(
              datetime_local_input(:search, :key, value: "foo", id: "key", name: "search[key][]")
            ) == ~s(<input id="key" name="search[key][]" type="datetime-local" value="foo">)
