@@ -698,14 +698,8 @@ defmodule Phoenix.HTML.Form do
   See `text_input/3` for example and docs.
   """
   def datetime_local_input(form, field, opts \\ []) do
-    opts =
-      case Keyword.fetch(opts, :value) do
-        {:ok, value} ->
-          Keyword.put(opts, :value, datetime_local_input_value(value))
-
-        :error ->
-          opts
-      end
+    value = Keyword.get(opts, :value, input_value(form, field))
+    opts = Keyword.put(opts, :value, datetime_local_input_value(value))
 
     generic_input(:"datetime-local", form, field, opts)
   end
