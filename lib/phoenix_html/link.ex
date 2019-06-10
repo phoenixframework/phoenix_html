@@ -40,6 +40,9 @@ defmodule Phoenix.HTML.Link do
       which sets the proper information. In order to submit the
       form, JavaScript must be enabled
 
+    * `:csrf_token` - a custom token to use for links with a method
+      other than `:get`.
+
   All other options are forwarded to the underlying `<a>` tag.
 
   ## JavaScript dependency
