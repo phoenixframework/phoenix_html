@@ -402,8 +402,8 @@ defmodule Phoenix.HTML.Form do
 
     * `:skip_hidden` - skip the automatic rendering of hidden
       fields to allow for more tight control over the generated
-      markup. You can use `hidden_form_inputs(form)` to
-      generate them manually within the supplied callback.
+      markup. You can access `form.hidden` to generate them manually
+      within the supplied callback.
 
   """
   @spec inputs_for(t, field, Keyword.t(), (t -> Phoenix.HTML.unsafe())) :: Phoenix.HTML.safe()
@@ -423,16 +423,11 @@ defmodule Phoenix.HTML.Form do
         if skip do
           fun.(form)
         else
-          [hidden_form_inputs(form), fun.(form)]
+          hidden = Enum.map(form.hidden, fn {k, v} -> hidden_input(form, k, value: v) end)
+          [hidden, fun.(form)]
         end
       end)
     )
-  end
-
-  @doc false
-  @spec hidden_form_inputs(t) :: [Phoenix.HTML.safe()]
-  def hidden_form_inputs(form) do
-    Enum.map(form.hidden, fn {k, v} -> hidden_input(form, k, value: v) end)
   end
 
   @doc """
