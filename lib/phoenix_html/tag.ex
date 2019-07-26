@@ -311,8 +311,32 @@ defmodule Phoenix.HTML.Tag do
       img_tag(Routes.static_path(@conn, "/logo.png"))
       <img src="/logo-123456.png?vsn=d">
 
+  For responsive images, pass a map, list or string through `:srcset`.
+
+      img_tag("/logo.png", srcset: %{"/logo.png" => "1x", "/logo-2x.png" => "2x"})
+      <img src="/logo.png" srcset="/logo.png 1x, /logo-2x.png 2x">
+
+      img_tag("/logo.png", srcset: ["/logo.png", {"/logo-2x.png", "2x"}])
+      <img src="/logo.png" srcset="/logo.png, /logo-2x.png 2x">
+
   """
   def img_tag(src, opts \\ []) do
+    opts =
+      case Keyword.pop(opts, :srcset) do
+        {nil, opts} -> opts
+        {srcset, opts} -> [srcset: stringify_srcset(srcset)] ++ opts
+      end
+
     tag(:img, Keyword.put_new(opts, :src, src))
   end
+
+  defp stringify_srcset(srcset) when is_map(srcset) or is_list(srcset) do
+    Enum.map_join(srcset, ", ", fn
+      {src, descriptor} -> "#{src} #{descriptor}"
+      default -> default
+    end)
+  end
+
+  defp stringify_srcset(srcset) when is_binary(srcset),
+    do: srcset
 end
