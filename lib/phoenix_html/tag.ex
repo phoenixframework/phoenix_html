@@ -299,23 +299,17 @@ defmodule Phoenix.HTML.Tag do
   ## Examples
 
       img_tag(user.photo_path)
-      <img src="photo.png">
+      <img src="/photo.png">
 
       img_tag(user.photo, class: "image")
-      <img src="smile.png" class="image">
+      <img src="/smile.png" class="image">
 
   To generate a path to an image hosted in your application "priv/static",
-  use `static_path/1` to get a URL with cache control parameters:
-
-      img_tag(Routes.static_path("logo.png"))
-      <img src="logo.png?vsn=3456789">
-
-  To generate a path to an image hosted in your application "priv/static",
-  with the `@conn` endpoint, use `static_path/2` to get a URL with 
+  with the `@conn` endpoint, use `static_path/2` to get a URL with
   cache control parameters:
 
-      img_tag(Routes.static_path(@conn, "/images/logo.png"))
-      <img src="logo.png?vsn=3456789">
+      img_tag(Routes.static_path(@conn, "/logo.png"))
+      <img src="/logo-123456.png?vsn=d">
 
   """
   def img_tag(src, opts \\ []) do
