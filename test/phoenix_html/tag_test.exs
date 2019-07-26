@@ -92,6 +92,16 @@ defmodule Phoenix.HTML.TagTest do
 
     assert img_tag("user.png", class: "big") |> safe_to_string() ==
              ~s(<img class="big" src="user.png">)
+
+    assert img_tag("user.png", srcset: %{"big.png" => "2x", "small.png" => "1x"})
+           |> safe_to_string() ==
+             ~s(<img src="user.png" srcset="big.png 2x, small.png 1x">)
+
+    assert img_tag("user.png", srcset: [{"big.png", "2x"}, "small.png"]) |> safe_to_string() ==
+             ~s(<img src="user.png" srcset="big.png 2x, small.png">)
+
+    assert img_tag("user.png", srcset: "big.png 2x, small.png") |> safe_to_string() ==
+             ~s[<img src="user.png" srcset="big.png 2x, small.png">]
   end
 
   test "form_tag for get" do
