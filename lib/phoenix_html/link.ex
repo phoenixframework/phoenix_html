@@ -163,6 +163,11 @@ defmodule Phoenix.HTML.Link do
     link(contents, opts)
   end
 
+  def mail_to(email_address), do: mail_to(email_address, email_address)
+  def mail_to(email_address, name) do
+    link(name, to: "mailto:#{email_address}")
+  end
+
   @doc """
   Generates a button that uses a regular HTML form to submit to the given URL.
 
