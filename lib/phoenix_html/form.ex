@@ -352,11 +352,6 @@ defmodule Phoenix.HTML.Form do
       include an input tag with name `_csrf_token`. When set to false, this
       is disabled
 
-    * `:enforce_utf8` - the form will have an `accept-charset` attribute set
-      to "UTF-8" and a hidden input named `_utf8` containing a unicode
-      character to force the browser to use UTF-8 as the charset. When set to
-      false, this is disabled.
-
     * `:errors` - use this to manually pass a keyword list of errors to the form
       (for example from `conn.assigns[:errors]`). This option is only used when a
       connection is used as the form source and it will make the errors available

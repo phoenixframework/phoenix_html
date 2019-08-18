@@ -52,8 +52,7 @@ defmodule Phoenix.HTML.FormTest do
       assert %Phoenix.HTML.Form{} = form
 
       contents = form |>  html_escape() |> safe_to_string()
-      assert contents =~ ~s(<form accept-charset="UTF-8" action="/" method="post">)
-      assert contents =~ ~s(<input name="_utf8" type="hidden" value="✓">)
+      assert contents =~ ~s(<form action="/" method="post">)
     end
 
     test "with custom options" do
@@ -61,7 +60,7 @@ defmodule Phoenix.HTML.FormTest do
       assert %Phoenix.HTML.Form{} = form
 
       contents = form |>  html_escape() |> safe_to_string()
-      assert contents =~ ~s(<form accept-charset="UTF-8" action="/" enctype="multipart/form-data" method="post">)
+      assert contents =~ ~s(<form action="/" enctype="multipart/form-data" method="post">)
       assert contents =~ ~s(method="post")
       assert contents =~ ~s(<input name="_method" type="hidden" value="put">)
       refute contents =~ ~s(</form>)
@@ -74,16 +73,18 @@ defmodule Phoenix.HTML.FormTest do
       assert %Phoenix.HTML.Form{} = form
 
       contents = form |> html_escape() |> safe_to_string()
-      assert contents =~ ~s(<form accept-charset="UTF-8" action="/" method="post">)
-      assert contents =~ ~s(<input name="_utf8" type="hidden" value="✓">)
+      assert contents =~ ~s(<form action="/" method="post">)
     end
 
     test "with custom options" do
       form = form_for(:search, "/", [method: :put, multipart: true])
       assert %Phoenix.HTML.Form{} = form
 
-      contents = form |>  html_escape() |> safe_to_string()
-      assert contents =~ ~s(<form accept-charset="UTF-8" action="/" enctype="multipart/form-data" method="post">)
+      contents = form |> html_escape() |> safe_to_string()
+
+      assert contents =~
+               ~s(<form action="/" enctype="multipart/form-data" method="post">)
+
       assert contents =~ ~s(method="post")
       assert contents =~ ~s(<input name="_method" type="hidden" value="put">)
       refute contents =~ ~s(</form>)
@@ -105,8 +106,7 @@ defmodule Phoenix.HTML.FormTest do
           end)
         )
 
-      assert form =~ ~s(<form accept-charset="UTF-8" action="/" method="post">)
-      assert form =~ ~s(<input name="_utf8" type="hidden" value="✓">)
+      assert form =~ ~s(<form action="/" method="post">)
     end
 
     test "without :as" do
@@ -132,7 +132,7 @@ defmodule Phoenix.HTML.FormTest do
         )
 
       assert form =~
-               ~s(<form accept-charset="UTF-8" action="/" enctype="multipart/form-data" method="post">)
+               ~s(<form action="/" enctype="multipart/form-data" method="post">)
 
       assert form =~ ~s(<input name="_method" type="hidden" value="put">)
     end
@@ -189,8 +189,7 @@ defmodule Phoenix.HTML.FormTest do
           end)
         )
 
-      assert form =~ ~s(<form accept-charset="UTF-8" action="/" method="post">)
-      assert form =~ ~s(<input name="_utf8" type="hidden" value="✓">)
+      assert form =~ ~s(<form action="/" method="post">)
     end
 
     test "with params" do
@@ -216,7 +215,7 @@ defmodule Phoenix.HTML.FormTest do
         )
 
       assert form =~
-               ~s(<form accept-charset="UTF-8" action="/" enctype="multipart/form-data" method="post">)
+               ~s(<form action="/" enctype="multipart/form-data" method="post">)
 
       assert form =~ ~s(<input name="_method" type="hidden" value="put">)
     end
@@ -272,7 +271,6 @@ defmodule Phoenix.HTML.FormTest do
           end)
           |> safe_to_string()
 
-      assert form =~ ~s(<input name="_utf8" type="hidden" value="✓">)
       assert form =~ ~s(<input id="user_company_name" name="user[company][name]" type="text">)
     end
 
@@ -599,7 +597,7 @@ defmodule Phoenix.HTML.FormTest do
 
     assert safe_form(&datetime_local_input(&1, :naive_datetime)) ==
              ~s(<input id="search_naive_datetime" name="search[naive_datetime]" type="datetime-local" value="2000-01-01T10:00">)
-              
+
     assert safe_to_string(
              datetime_local_input(:search, :key, value: "foo", id: "key", name: "search[key][]")
            ) == ~s(<input id="key" name="search[key][]" type="datetime-local" value="foo">)
