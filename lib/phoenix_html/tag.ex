@@ -173,23 +173,7 @@ defmodule Phoenix.HTML.Tag do
       include an input tag with name `_csrf_token`. When set to false, this
       is disabled
 
-    * `:enforce_utf8` - when false, does not enforce utf8. Read below
-      for more information
-
   All other options are passed to the underlying HTML tag.
-
-  ## Enforce UTF-8
-
-  Although forms provide the `accept-charset` attribute, which we set
-  to UTF-8, Internet Explorer 5 up to 8 may ignore the value of this
-  attribute if the user chooses their browser to do so. This ends up
-  triggering the browser to send data in a format that is not
-  understandable by the server.
-
-  For this reason, Phoenix automatically includes a "_utf8=✓" parameter
-  in your forms, to force those browsers to send the data in the proper
-  encoding. This technique has been seen in the Rails web framework and
-  reproduced here.
 
   ## CSRF Protection
 
@@ -222,16 +206,6 @@ defmodule Phoenix.HTML.Tag do
             Keyword.put(opts, :method, "post"),
             ~s'<input name="#{@method_param}" type="hidden" value="#{method}">'
           )
-      end
-
-    {opts, extra} =
-      case Keyword.pop(opts, :enforce_utf8, true) do
-        {false, opts} ->
-          {opts, extra}
-
-        {true, opts} ->
-          {Keyword.put_new(opts, :accept_charset, "UTF-8"),
-           extra <> ~s'<input name="_utf8" type="hidden" value="✓">'}
       end
 
     opts =

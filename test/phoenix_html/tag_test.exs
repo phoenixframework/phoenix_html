@@ -106,10 +106,9 @@ defmodule Phoenix.HTML.TagTest do
 
   test "form_tag for get" do
     assert safe_to_string(form_tag("/", method: :get)) ==
-             ~s(<form accept-charset="UTF-8" action="/" method="get">) <>
-               ~s(<input name="_utf8" type="hidden" value="✓">)
+             ~s(<form action="/" method="get">)
 
-    assert safe_to_string(form_tag("/", method: :get, enforce_utf8: false)) ==
+    assert safe_to_string(form_tag("/", method: :get)) ==
              ~s(<form action="/" method="get">)
   end
 
@@ -117,23 +116,20 @@ defmodule Phoenix.HTML.TagTest do
     csrf_token = Plug.CSRFProtection.get_csrf_token()
 
     assert safe_to_string(form_tag("/")) ==
-             ~s(<form accept-charset="UTF-8" action="/" method="post">) <>
-               ~s(<input name="_csrf_token" type="hidden" value="#{csrf_token}">) <>
-               ~s(<input name="_utf8" type="hidden" value="✓">)
+             ~s(<form action="/" method="post">) <>
+               ~s(<input name="_csrf_token" type="hidden" value="#{csrf_token}">)
 
     assert safe_to_string(form_tag("/", method: :post, csrf_token: false, multipart: true)) ==
-             ~s(<form accept-charset="UTF-8" action="/" enctype="multipart/form-data" method="post">) <>
-               ~s(<input name="_utf8" type="hidden" value="✓">)
+             ~s(<form action="/" enctype="multipart/form-data" method="post">)
   end
 
   test "form_tag for other method" do
     csrf_token = Plug.CSRFProtection.get_csrf_token()
 
     assert safe_to_string(form_tag("/", method: :put)) ==
-             ~s(<form accept-charset="UTF-8" action="/" method="post">) <>
+             ~s(<form action="/" method="post">) <>
                ~s(<input name="_method" type="hidden" value="put">) <>
-               ~s(<input name="_csrf_token" type="hidden" value="#{csrf_token}">) <>
-               ~s(<input name="_utf8" type="hidden" value="✓">)
+               ~s(<input name="_csrf_token" type="hidden" value="#{csrf_token}">)
   end
 
   test "form_tag with do block" do
@@ -144,17 +140,17 @@ defmodule Phoenix.HTML.TagTest do
                "<>"
              end
            ) ==
-             ~s(<form accept-charset="UTF-8" action="/" method="post">) <>
+             ~s(<form action="/" method="post">) <>
                ~s(<input name="_csrf_token" type="hidden" value="#{csrf_token}">) <>
-               ~s(<input name="_utf8" type="hidden" value="✓">) <> ~s(&lt;&gt;) <> ~s(</form>)
+               ~s(&lt;&gt;) <> ~s(</form>)
 
     assert safe_to_string(
              form_tag "/", method: :get do
                "<>"
              end
            ) ==
-             ~s(<form accept-charset="UTF-8" action="/" method="get">) <>
-               ~s(<input name="_utf8" type="hidden" value="✓">) <> ~s(&lt;&gt;) <> ~s(</form>)
+             ~s(<form action="/" method="get">) <>
+               ~s(&lt;&gt;) <> ~s(</form>)
   end
 
   test "csrf_meta_tag" do
