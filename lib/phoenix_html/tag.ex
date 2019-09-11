@@ -10,7 +10,7 @@ defmodule Phoenix.HTML.Tag do
 
   @tag_prefixes [:aria, :data]
   @list_attrs_map %{
-    class_list: :class
+    class_list: {:class, " "}
   }
   @list_attrs Map.keys(@list_attrs_map)
   @csrf_param "_csrf_token"
@@ -131,7 +131,8 @@ defmodule Phoenix.HTML.Tag do
   end
 
   defp build_attrs(tag, [{k, v} | t], acc) when k in @list_attrs and is_list(v) do
-    build_attrs(tag, t, [{dasherize(Map.fetch!(@list_attrs_map, k)), interleave(v, " ")} | acc])
+    {k_actual, interleave_char} = Map.fetch!(@list_attrs_map, k)
+    build_attrs(tag, t, [{dasherize(k_actual), interleave(v, interleave_char)} | acc])
   end
 
   defp build_attrs(tag, [{k, true} | t], acc) do
