@@ -55,6 +55,9 @@ defmodule Phoenix.HTML.TagTest do
     assert content_tag(:p, [class: "dark"], do: raw("<Hello>")) |> safe_to_string() ==
              "<p class=\"dark\"><Hello></p>"
 
+   assert content_tag(:p, "Hello", class_list: ["dark", "light"]) |> safe_to_string() ==
+            "<p class=\"dark light\">Hello</p>"
+
     content =
       content_tag :form, action: "/users", data: [remote: true] do
         tag(:input, name: "user[name]")

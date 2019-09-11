@@ -9,6 +9,10 @@ defmodule Phoenix.HTML.Tag do
   import Phoenix.HTML
 
   @tag_prefixes [:aria, :data]
+  @list_attrs_map %{
+    class_list: :class
+  }
+  @list_attrs Map.keys(@list_attrs_map)
   @csrf_param "_csrf_token"
   @method_param "_method"
 
@@ -126,6 +130,10 @@ defmodule Phoenix.HTML.Tag do
     build_attrs(tag, t, nested_attrs(dasherize(k), v, acc))
   end
 
+  defp build_attrs(tag, [{k, v} | t], acc) when k in @list_attrs and is_list(v) do
+    build_attrs(tag, t, [{dasherize(Map.fetch!(@list_attrs_map, k)), interleave(v, " ")} | acc])
+  end
+
   defp build_attrs(tag, [{k, true} | t], acc) do
     build_attrs(tag, t, [dasherize(k) | acc])
   end
@@ -144,6 +152,13 @@ defmodule Phoenix.HTML.Tag do
 
   defp dasherize(value) when is_atom(value), do: dasherize(Atom.to_string(value))
   defp dasherize(value) when is_binary(value), do: String.replace(value, "_", "-")
+
+  def interleave(list, char) do
+    List.foldr(list, [], fn
+      item, [] -> [item]
+      item, acc -> [item, char] ++ acc
+    end)
+  end
 
   @doc ~S"""
   Generates a form tag.
