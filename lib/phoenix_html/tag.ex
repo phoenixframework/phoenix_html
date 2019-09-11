@@ -131,8 +131,8 @@ defmodule Phoenix.HTML.Tag do
   end
 
   defp build_attrs(tag, [{k, v} | t], acc) when k in @list_attrs and is_list(v) do
-    {k_actual, interleave_char} = Map.fetch!(@list_attrs_map, k)
-    build_attrs(tag, t, [{dasherize(k_actual), interleave(v, interleave_char)} | acc])
+    {k_actual, interleave_str} = Map.fetch!(@list_attrs_map, k)
+    build_attrs(tag, t, [{dasherize(k_actual), interleave(v, interleave_str)} | acc])
   end
 
   defp build_attrs(tag, [{k, true} | t], acc) do
@@ -154,10 +154,10 @@ defmodule Phoenix.HTML.Tag do
   defp dasherize(value) when is_atom(value), do: dasherize(Atom.to_string(value))
   defp dasherize(value) when is_binary(value), do: String.replace(value, "_", "-")
 
-  def interleave(list, char) do
+  def interleave(list, str) do
     List.foldr(list, [], fn
       item, [] -> [item]
-      item, acc -> [item, char] ++ acc
+      item, acc -> [item, str] ++ acc
     end)
   end
 
