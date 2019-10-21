@@ -174,7 +174,7 @@ defmodule Phoenix.HTML.Link do
       button("hello", to: "/world")
       #=> <button class="button" data-csrf="csrf_token" data-method="post" data-to="/world">hello</button>
 
-      button("hello", to: "/world", method: "get", class: "btn")
+      button("hello", to: "/world", method: :get, class: "btn")
       #=> <button class="btn" data-method="get" data-to="/world">hello</button>
 
   ## Options
