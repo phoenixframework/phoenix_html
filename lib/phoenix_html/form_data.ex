@@ -1,10 +1,10 @@
 defprotocol Phoenix.HTML.FormData do
   @moduledoc """
-  Converts a data structure into a `Phoenix.HTML.Form` struct.
+  Converts a data structure into a [`Phoenix.HTML.Form`](`t:Phoenix.HTML.Form.t/0`) struct.
   """
 
   @doc """
-  Converts a data structure into a `Phoenix.HTML.Form` struct.
+  Converts a data structure into a [`Phoenix.HTML.Form`](`t:Phoenix.HTML.Form.t/0`) struct.
 
   The options are the same options given to `form_for/4`. It
   can be used by implementations to configure their behaviour
@@ -16,7 +16,7 @@ defprotocol Phoenix.HTML.FormData do
 
   @doc """
   Converts the field in the given form based on the data structure
-  into a list of `Phoenix.HTML.Form` structs.
+  into a list of [`Phoenix.HTML.Form`](`t:Phoenix.HTML.Form.t/0`) structs.
 
   The options are the same options given to `inputs_for/4`. It
   can be used by implementations to configure their behaviour
