@@ -120,7 +120,7 @@ defmodule Phoenix.HTML.Tag do
   defp build_attrs(_tag, []), do: []
   defp build_attrs(tag, attrs), do: build_attrs(tag, attrs, [])
 
-  defp build_attrs(_tag, [], acc), do: acc |> Enum.sort() |> tag_attrs
+  defp build_attrs(_tag, [], acc), do: acc |> tag_attrs
 
   defp build_attrs(tag, [{k, v} | t], acc) when k in @tag_prefixes and is_list(v) do
     build_attrs(tag, t, nested_attrs(dasherize(k), v, acc))
