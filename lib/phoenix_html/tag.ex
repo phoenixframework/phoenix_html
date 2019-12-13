@@ -72,19 +72,19 @@ defmodule Phoenix.HTML.Tag do
       "<option data-foo=\"bar\" value=\"value\">Display Value</option>"
 
   """
-  def content_tag(name, do: block) when is_atom(name) do
+  def content_tag(name, do: block) do
     content_tag(name, block, [])
   end
 
-  def content_tag(name, content) when is_atom(name) do
+  def content_tag(name, content) do
     content_tag(name, content, [])
   end
 
-  def content_tag(name, attrs, do: block) when is_atom(name) and is_list(attrs) do
+  def content_tag(name, attrs, do: block) when is_list(attrs) do
     content_tag(name, block, attrs)
   end
 
-  def content_tag(name, content, attrs) when is_atom(name) and is_list(attrs) do
+  def content_tag(name, content, attrs) when is_list(attrs) do
     name = to_string(name)
     {:safe, escaped} = html_escape(content)
     {:safe, [?<, name, build_attrs(name, attrs), ?>, escaped, ?<, ?/, name, ?>]}

@@ -85,6 +85,8 @@ defmodule Phoenix.HTML.TagTest do
     assert content_tag(:div, [autoplay: false], do: "") |> safe_to_string() == ~s(<div></div>)
 
     assert content_tag(:div, [autoplay: nil], do: "") |> safe_to_string() == ~s(<div></div>)
+
+    assert content_tag("custom-tag", "Hi") |> safe_to_string() == ~s(<custom-tag>Hi</custom-tag>)
   end
 
   test "img_tag" do
