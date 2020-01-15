@@ -94,8 +94,14 @@ defmodule Phoenix.HTML do
     handle_sigil(expr, opts, __CALLER__.line)
   end
 
-  defp handle_sigil({:<<>>, _, [expr]}, [], line) do
-    EEx.compile_string(expr, engine: Phoenix.HTML.Engine, line: line + 1)
+  defp handle_sigil({:<<>>, meta, [expr]}, [], line) do
+    options = [
+      engine: Phoenix.HTML.Engine,
+      line: line + 1,
+      indentation: meta[:indentation] || 0
+    ]
+
+    EEx.compile_string(expr, options)
   end
 
   defp handle_sigil(_, _, _) do
