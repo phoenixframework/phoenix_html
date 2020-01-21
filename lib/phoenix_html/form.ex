@@ -812,8 +812,8 @@ defmodule Phoenix.HTML.Form do
       |> Keyword.put_new(:id, input_id(form, field))
       |> Keyword.put_new(:name, input_name(form, field))
 
-    {value, opts} = Keyword.pop(opts, :value, input_value(form, field) || "")
-    content_tag(:textarea, ["\n", html_escape(value)], opts)
+    {value, opts} = Keyword.pop(opts, :value, input_value(form, field))
+    content_tag(:textarea, ["\n", html_escape(value || "")], opts)
   end
 
   @doc """
@@ -1363,7 +1363,7 @@ defmodule Phoenix.HTML.Form do
 
   The following values are supported as time:
 
-    * a map containing the `hour` and `min` keys and an optional `sec` key (either as strings or atoms)
+    * a map containing the `hour` and `minute` keys and an optional `second` key (either as strings or atoms)
     * a tuple with three elements: `{hour, min, sec}`
     * a tuple with four elements: `{hour, min, sec, usec}`
     * `nil`
@@ -1444,17 +1444,11 @@ defmodule Phoenix.HTML.Form do
   defp time_value(%{hour: hour, minute: min} = map),
     do: %{hour: hour, minute: min, second: Map.get(map, :second, 0)}
 
-  # Backwards compatibility with Ecto v1.1 versions
-  defp time_value(%{"hour" => hour, "min" => min} = map),
-    do: %{hour: hour, minute: min, second: Map.get(map, "sec", 0)}
+  defp time_value({_, {hour, min, sec}}),
+    do: %{hour: hour, minute: min, second: sec}
 
-  defp time_value(%{hour: hour, min: min} = map),
-    do: %{hour: hour, minute: min, second: Map.get(map, :sec, 0)}
-
-  defp time_value({_, {hour, min, sec, _msec}}), do: %{hour: hour, minute: min, second: sec}
-  defp time_value({hour, min, sec, _mseg}), do: %{hour: hour, minute: min, second: sec}
-  defp time_value({_, {hour, min, sec}}), do: %{hour: hour, minute: min, second: sec}
-  defp time_value({hour, min, sec}), do: %{hour: hour, minute: min, second: sec}
+  defp time_value({hour, min, sec}),
+    do: %{hour: hour, minute: min, second: sec}
 
   defp time_value(nil), do: %{hour: nil, minute: nil, second: nil}
 

@@ -1148,13 +1148,6 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option value="13" selected>13</option>)
 
     content =
-      safe_to_string(time_select(:search, :datetime, value: {2, 11, 13, 328_904}, second: []))
-
-    assert content =~ ~s(<option value="2" selected>02</option>)
-    assert content =~ ~s(<option value="11" selected>11</option>)
-    assert content =~ ~s(<option value="13" selected>13</option>)
-
-    content =
       safe_to_string(
         time_select(:search, :datetime, value: %{hour: 2, minute: 11, second: 13}, second: [])
       )
@@ -1242,23 +1235,6 @@ defmodule Phoenix.HTML.FormTest do
     content =
       safe_to_string(
         datetime_select(:search, :datetime, value: {{2020, 04, 17}, {2, 11, 13}}, second: [])
-      )
-
-    assert content =~ ~s(<option value="2020" selected>2020</option>)
-    assert content =~ ~s(<option value="4" selected>April</option>)
-    assert content =~ ~s(<option value="17" selected>17</option>)
-    assert content =~ ~s(<option value="2" selected>02</option>)
-    assert content =~ ~s(<option value="11" selected>11</option>)
-    assert content =~ ~s(<option value="13" selected>13</option>)
-
-    content =
-      safe_to_string(
-        datetime_select(
-          :search,
-          :datetime,
-          value: {{2020, 04, 17}, {2, 11, 13, 328_904}},
-          second: []
-        )
       )
 
     assert content =~ ~s(<option value="2020" selected>2020</option>)
