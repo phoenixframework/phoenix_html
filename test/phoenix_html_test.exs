@@ -4,6 +4,20 @@ defmodule Phoenix.HTMLTest do
   use Phoenix.HTML
   doctest Phoenix.HTML
 
+  test "~E sigil" do
+    assert ~E"""
+           <%= %>
+           """ == {:safe, ["", "\n"]}
+
+    assert ~E"""
+           <%= "foo" %>
+           """ == {:safe, ["foo", "\n"]}
+
+  assert ~E"""
+           <%= {:safe, "foo"} %>
+           """ == {:safe, ["foo", "\n"]}
+  end
+
   test "html_escape/1 entities" do
     assert html_escape("foo") == {:safe, "foo"}
     assert html_escape("<foo>") == {:safe, [[[] | "&lt;"], "foo" | "&gt;"]}
