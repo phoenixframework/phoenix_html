@@ -79,8 +79,8 @@ defmodule Phoenix.HTML.Engine do
     to_safe(ast, line_from_expr(ast))
   end
 
-  defp line_from_expr({_, meta, _}) when is_list(meta), do: Keyword.get(meta, :line)
-  defp line_from_expr(_), do: nil
+  defp line_from_expr({_, meta, _}) when is_list(meta), do: Keyword.get(meta, :line, 0)
+  defp line_from_expr(_), do: 0
 
   # We can do the work at compile time
   defp to_safe(literal, _line) when is_binary(literal) or is_atom(literal) or is_number(literal) do
