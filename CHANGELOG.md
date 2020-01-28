@@ -1,5 +1,19 @@
 # Changelog
 
+## v2.14.0 (2020-01-28)
+
+* Enhancements
+  * Remove enforce_utf8 workaround on forms as it is no longer required by browser
+  * Remove support tuple-based date/time with microseconds calendar types
+  * Allow strings as first element in `content_tag`
+  * Add `:srcset` support to `img_tag`
+  * Allow `inputs_for` to skip hidden fields
+
+## v2.13.4 (2020-01-28)
+
+* Bug fixes
+  * Fix invalid :line in Elixir v1.10.0
+
 ## v2.13.3 (2019-05-31)
 
 * Enhancements
