@@ -850,17 +850,34 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Generates a submit button to send the form.
 
+  ## Examples
+
+      submit do: "Submit"
+      #=> <button type="submit">Submit</button>
+
+  """
+  def submit([do: _] = block_option), do: submit([], block_option)
+
+  @doc """
+  Generates a submit button to send the form.
+
   All options are forwarded to the underlying button tag.
+  When called with a `do:` block, the button tag options
+  come first.
 
   ## Examples
 
       submit "Submit"
       #=> <button type="submit">Submit</button>
 
-  """
-  def submit([do: _] = block_option), do: submit([], block_option)
+      submit "Submit", class: "btn"
+      #=> <button class="btn" type="submit">Submit</button>
 
-  def submit(_, opts \\ [])
+      submit [class: "btn"], do: "Submit"
+      #=> <button class="btn" type="submit">Submit</button>
+
+  """
+  def submit(value, opts \\ [])
 
   def submit(opts, [do: _] = block_option) do
     opts = Keyword.put_new(opts, :type, "submit")
