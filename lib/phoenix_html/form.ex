@@ -1014,7 +1014,12 @@ defmodule Phoenix.HTML.Form do
 
     if hidden_input do
       html_escape([
-        tag(:input, name: Keyword.get(opts, :name), type: "hidden", value: unchecked_value),
+        tag(:input,
+          name: Keyword.get(opts, :name),
+          type: "hidden",
+          value: unchecked_value,
+          disabled: Keyword.get(opts, :disabled, false)
+        ),
         tag(:input, [value: checked_value] ++ opts)
       ])
     else
