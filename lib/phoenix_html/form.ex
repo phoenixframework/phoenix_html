@@ -253,7 +253,7 @@ defmodule Phoenix.HTML.Form do
           impl: module,
           id: String.t(),
           index: nil | non_neg_integer,
-          action: nil | String.t
+          action: nil | String.t()
         }
 
   @type field :: atom | String.t()
@@ -1013,13 +1013,10 @@ defmodule Phoenix.HTML.Form do
       end
 
     if hidden_input do
+      hidden_opts = [type: "hidden", value: unchecked_value]
+
       html_escape([
-        tag(:input,
-          name: Keyword.get(opts, :name),
-          type: "hidden",
-          value: unchecked_value,
-          disabled: Keyword.get(opts, :disabled, false)
-        ),
+        tag(:input, hidden_opts ++ Keyword.take(opts, [:name, :disabled])),
         tag(:input, [value: checked_value] ++ opts)
       ])
     else
