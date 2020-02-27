@@ -437,6 +437,14 @@ defmodule Phoenix.HTML.FormTest do
              ~s(<input id="key" name="search[key][]" type="hidden" value="foo">)
   end
 
+  describe "hidden_inputs_for/1" do
+    test "generates hidden fields from the given form" do
+      form = %{form_for(conn(), "/") | hidden: [id: 1]}
+
+      assert hidden_inputs_for(form) == [hidden_input(form, :id, value: 1)]
+    end
+  end
+
   ## email_input/3
 
   test "email_input/3" do
