@@ -373,6 +373,46 @@ defmodule Phoenix.HTML.Form do
   end
 
   @doc """
+  Same as `inputs_for(form, field, [])`.
+  """
+  @spec inputs_for(t, field) :: list(Phoenix.HTML.Form.t())
+  def inputs_for(form, field) when is_atom(field), do: inputs_for(form, field, [])
+
+  @doc """
+  Generate a new form builder for the given parameter in form **without** an
+  anonymous function.
+
+  This functionality exists mostly for integration with `Phoenix.LiveView`
+  that replaces the anonymous function for returning the generated forms
+  instead.
+
+  Keep in mind that this function does not generate hidden inputs automatically
+  like `inputs/4`. To generate them you need to explicit do it by yourself.
+
+      <%= f = form_for @changeset, Routes.user_path(@conn, :create), opts %>
+        Name: <%= text_input f, :name %>
+
+        <%= for friend_form = inputs_for(f, :friends) do %>
+          # for generating hidden inputs.
+          <%= hidden_inputs_for(company_form) %>
+          <%= text_input friend_form, :name %>
+        <% end %>
+      </form>
+
+  See `inputs_for/4` for the available options.
+  """
+  @spec inputs_for(t, field, Keyword.t()) :: list(Phoenix.HTML.Form.t())
+  def inputs_for(%{impl: impl} = form, field, options)
+      when is_atom(field) and is_list(options) do
+    options =
+      form.options
+      |> Keyword.take([:multipart])
+      |> Keyword.merge(options)
+
+    impl.to_form(form.source, form, field, options)
+  end
+
+  @doc """
   Generate a new form builder for the given parameter in form.
 
   See the module documentation for examples of using this function.
@@ -418,8 +458,7 @@ defmodule Phoenix.HTML.Form do
         if skip do
           fun.(form)
         else
-          hidden = Enum.map(form.hidden, fn {k, v} -> hidden_input(form, k, value: v) end)
-          [hidden, fun.(form)]
+          [hidden_inputs_for(form), fun.(form)]
         end
       end)
     )
@@ -596,6 +635,16 @@ defmodule Phoenix.HTML.Form do
   """
   def hidden_input(form, field, opts \\ []) do
     generic_input(:hidden, form, field, opts)
+  end
+
+  @doc """
+  Generates hidden inputs for the given form.
+  """
+  @spec hidden_inputs_for(t) :: list(Phoenix.HTML.safe())
+  def hidden_inputs_for(form) do
+    for {k, v} <- form.hidden do
+      hidden_input(form, k, value: v)
+    end
   end
 
   @doc """
