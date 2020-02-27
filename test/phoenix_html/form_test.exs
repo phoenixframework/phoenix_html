@@ -259,6 +259,36 @@ defmodule Phoenix.HTML.FormTest do
     end
   end
 
+  describe "inputs_for/3" do
+    test "generate a new form builder for the given parameter" do
+      conn = conn()
+
+      form =
+        form_for(conn, "/", [as: :user], fn form ->
+          for company_form <- inputs_for(form, :company) do
+            text_input(company_form, :name)
+          end
+        end)
+        |> safe_to_string()
+
+      assert form =~ ~s(<input id="user_company_name" name="user[company][name]" type="text">)
+    end
+
+    test "support options" do
+      conn = conn()
+
+      form =
+        form_for(conn, "/", [as: :user], fn form ->
+          for company_form <- inputs_for(form, :company, as: :new_company, id: :custom_id) do
+            text_input(company_form, :name)
+          end
+        end)
+        |> safe_to_string()
+
+      assert form =~ ~s(<input id="custom_id_name" name="new_company[name]" type="text">)
+    end
+  end
+
   describe "inputs_for/4" do
     test "generate a new form builder for the given parameter" do
       conn = conn()

@@ -373,6 +373,41 @@ defmodule Phoenix.HTML.Form do
   end
 
   @doc """
+  Same as `inputs_for(form, field, [])`.
+  """
+  @spec inputs_for(t, field) :: list(Phoenix.HTML.Form.t())
+  def inputs_for(form, field) when is_atom(field), do: inputs_for(form, field, [])
+
+  @doc """
+  Generate a new form builder for the given parameter in form **without** an
+  anonymous function.
+
+  This functionality exists mostly for integration with `Phoenix.LiveView`
+  that replaces the anonymous function for returning the generated forms
+  instead.
+
+      <%= f = form_for @changeset, Routes.user_path(@conn, :create), opts %>
+        Name: <%= text_input f, :name %>
+
+        <%= for friend_form = inputs_for(f, :friends) do %>
+          <%= text_input friend_form, :name %>
+        <% end %>
+      </form>
+
+  See `inputs_for/4` for the available options.
+  """
+  @spec inputs_for(t, field, Keyword.t()) :: list(Phoenix.HTML.Form.t())
+  def inputs_for(%{impl: impl} = form, field, options)
+      when is_atom(field) and is_list(options) do
+    options =
+      form.options
+      |> Keyword.take([:multipart])
+      |> Keyword.merge(options)
+
+    impl.to_form(form.source, form, field, options)
+  end
+
+  @doc """
   Generate a new form builder for the given parameter in form.
 
   See the module documentation for examples of using this function.
