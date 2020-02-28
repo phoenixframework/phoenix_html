@@ -392,9 +392,9 @@ defmodule Phoenix.HTML.Form do
       <%= f = form_for @changeset, Routes.user_path(@conn, :create), opts %>
         Name: <%= text_input f, :name %>
 
-        <%= for friend_form = inputs_for(f, :friends) do %>
+        <%= for friend_form <- inputs_for(f, :friends) do %>
           # for generating hidden inputs.
-          <%= hidden_inputs_for(company_form) %>
+          <%= hidden_inputs_for(friend_form) %>
           <%= text_input friend_form, :name %>
         <% end %>
       </form>
