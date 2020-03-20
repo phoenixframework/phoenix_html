@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.14.1 (2020-03-20)
+
+* Enhancements
+  * Add `Phoenix.HTML.Form.options_for_select/2`
+  * Add `Phoenix.HTML.Form.inputs_for/3`
+
+* Bug fixes
+  * Disable hidden input for disabled checkboxes
+
 ## v2.14.0 (2020-01-28)
 
 * Enhancements

@@ -2,7 +2,7 @@ defmodule PhoenixHtml.Mixfile do
   use Mix.Project
 
   # Also change package.json version
-  @version "2.14.0"
+  @version "2.14.1"
 
   def project do
     [
