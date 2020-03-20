@@ -51,15 +51,15 @@ defmodule Phoenix.HTML.FormTest do
       form = form_for(conn(), "/")
       assert %Phoenix.HTML.Form{} = form
 
-      contents = form |>  html_escape() |> safe_to_string()
+      contents = form |> html_escape() |> safe_to_string()
       assert contents =~ ~s(<form action="/" method="post">)
     end
 
     test "with custom options" do
-      form = form_for(conn(), "/", [as: :search, method: :put, multipart: true])
+      form = form_for(conn(), "/", as: :search, method: :put, multipart: true)
       assert %Phoenix.HTML.Form{} = form
 
-      contents = form |>  html_escape() |> safe_to_string()
+      contents = form |> html_escape() |> safe_to_string()
       assert contents =~ ~s(<form action="/" enctype="multipart/form-data" method="post">)
       assert contents =~ ~s(method="post")
       assert contents =~ ~s(<input name="_method" type="hidden" value="put">)
@@ -77,7 +77,7 @@ defmodule Phoenix.HTML.FormTest do
     end
 
     test "with custom options" do
-      form = form_for(:search, "/", [method: :put, multipart: true])
+      form = form_for(:search, "/", method: :put, multipart: true)
       assert %Phoenix.HTML.Form{} = form
 
       contents = form |> html_escape() |> safe_to_string()
@@ -167,7 +167,9 @@ defmodule Phoenix.HTML.FormTest do
         safe_to_string(
           form_for(conn(), "/", [errors: errors], fn f ->
             for {field, {message, _}} <- f.errors do
-              Phoenix.HTML.Tag.content_tag(:span, humanize(field) <> " " <> message, class: "errors")
+              Phoenix.HTML.Tag.content_tag(:span, humanize(field) <> " " <> message,
+                class: "errors"
+              )
             end
           end)
         )
@@ -250,7 +252,9 @@ defmodule Phoenix.HTML.FormTest do
         safe_to_string(
           form_for(conn(), "/", [errors: errors], fn f ->
             for {field, {message, _}} <- f.errors do
-              Phoenix.HTML.Tag.content_tag(:span, humanize(field) <> " " <> message, class: "errors")
+              Phoenix.HTML.Tag.content_tag(:span, humanize(field) <> " " <> message,
+                class: "errors"
+              )
             end
           end)
         )
@@ -294,12 +298,12 @@ defmodule Phoenix.HTML.FormTest do
       conn = conn()
 
       form =
-          form_for(conn, "/", [as: :user], fn form ->
-            inputs_for(form, :company, fn company_form ->
-              text_input company_form, :name
-            end)
+        form_for(conn, "/", [as: :user], fn form ->
+          inputs_for(form, :company, fn company_form ->
+            text_input(company_form, :name)
           end)
-          |> safe_to_string()
+        end)
+        |> safe_to_string()
 
       assert form =~ ~s(<input id="user_company_name" name="user[company][name]" type="text">)
     end
@@ -308,14 +312,16 @@ defmodule Phoenix.HTML.FormTest do
       conn = conn()
 
       form =
-          form_for(conn, "/", [as: :user], fn form ->
-            inputs_for(form, :company, [hidden: [id: 1]],fn company_form ->
-              text_input company_form, :name
-            end)
+        form_for(conn, "/", [as: :user], fn form ->
+          inputs_for(form, :company, [hidden: [id: 1]], fn company_form ->
+            text_input(company_form, :name)
           end)
-          |> safe_to_string()
+        end)
+        |> safe_to_string()
 
-      assert form =~ ~s(input id="user_company_id" name="user[company][id]" type="hidden" value="1">)
+      assert form =~
+               ~s(input id="user_company_id" name="user[company][id]" type="hidden" value="1">)
+
       assert form =~ ~s(<input id="user_company_name" name="user[company][name]" type="text">)
     end
 
@@ -323,14 +329,16 @@ defmodule Phoenix.HTML.FormTest do
       conn = conn()
 
       form =
-          form_for(conn, "/", [as: :user], fn form ->
-            inputs_for(form, :company, [skip_hidden: true, hidden: [id: 1]],fn company_form ->
-              text_input company_form, :name
-            end)
+        form_for(conn, "/", [as: :user], fn form ->
+          inputs_for(form, :company, [skip_hidden: true, hidden: [id: 1]], fn company_form ->
+            text_input(company_form, :name)
           end)
-          |> safe_to_string()
+        end)
+        |> safe_to_string()
 
-      refute form =~ ~s(input id="user_company_id" name="user[company][id]" type="hidden" value="1">)
+      refute form =~
+               ~s(input id="user_company_id" name="user[company][id]" type="hidden" value="1">)
+
       assert form =~ ~s(<input id="user_company_name" name="user[company][name]" type="text">)
     end
   end
@@ -803,7 +811,7 @@ defmodule Phoenix.HTML.FormTest do
                ~s(<input id="search_key" name="search[key]" type="checkbox" value="1" checked>)
 
     assert safe_to_string(checkbox(:search, :key, value: 1, hidden_input: false)) ==
-               ~s(<input id="search_key" name="search[key]" type="checkbox" value="true">)
+             ~s(<input id="search_key" name="search[key]" type="checkbox" value="true">)
   end
 
   test "checkbox/3 with form" do
@@ -1077,6 +1085,55 @@ defmodule Phoenix.HTML.FormTest do
                ~s(<option value="1">foo</option>) <>
                ~s(<option value="2">bar</option>) <>
                ~s(<option value="3" selected>goo</option>) <> ~s(</select>)
+  end
+
+  # options_for_select/2
+
+  test "options_for_select/2" do
+    assert options_for_select(~w(value novalue), "novalue") |> safe_to_string() ==
+             ~s(<option value="value">value</option>) <>
+               ~s(<option value="novalue" selected>novalue</option>)
+
+    assert options_for_select(~w(value novalue), "novalue") |> safe_to_string() ==
+             ~s(<option value="value">value</option>) <>
+               ~s(<option value="novalue" selected>novalue</option>)
+
+    assert options_for_select(
+             [
+               [value: "value", key: "Value", disabled: true],
+               [value: "novalue", key: "No Value"]
+             ],
+             "novalue"
+           )
+           |> safe_to_string() ==
+             ~s(<option value="value" disabled>Value</option>) <>
+               ~s(<option value="novalue" selected>No Value</option>)
+
+    assert options_for_select(~w(value novalue), ["value", "novalue"]) |> safe_to_string() ==
+             ~s(<option value="value" selected>value</option>) <>
+               ~s(<option value="novalue" selected>novalue</option>)
+  end
+
+  test "options_for_select/2 with groups" do
+    assert options_for_select([{"foo", ~w(bar baz)}, {"qux", ~w(qux quz)}], "qux")
+           |> safe_to_string() ==
+             ~s(<optgroup label="foo">) <>
+               ~s(<option value="bar">bar</option>) <>
+               ~s(<option value="baz">baz</option>) <>
+               ~s(</optgroup>) <>
+               ~s(<optgroup label="qux">) <>
+               ~s(<option value="qux" selected>qux</option>) <>
+               ~s(<option value="quz">quz</option>) <> ~s(</optgroup>)
+
+assert options_for_select([{"foo", ~w(bar baz)}, {"qux", ~w(qux quz)}], ["baz", "qux"])
+           |> safe_to_string() ==
+             ~s(<optgroup label="foo">) <>
+               ~s(<option value="bar">bar</option>) <>
+               ~s(<option value="baz" selected>baz</option>) <>
+               ~s(</optgroup>) <>
+               ~s(<optgroup label="qux">) <>
+               ~s(<option value="qux" selected>qux</option>) <>
+               ~s(<option value="quz">quz</option>) <> ~s(</optgroup>)
   end
 
   # date_select/4
