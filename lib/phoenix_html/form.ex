@@ -441,6 +441,7 @@ defmodule Phoenix.HTML.Form do
       within the supplied callback.
 
   """
+  @spec inputs_for(t, field, (t -> Phoenix.HTML.unsafe())) :: Phoenix.HTML.safe()
   @spec inputs_for(t, field, Keyword.t(), (t -> Phoenix.HTML.unsafe())) :: Phoenix.HTML.safe()
   def inputs_for(%{impl: impl} = form, field, options \\ [], fun)
       when is_atom(field) or is_binary(field) do
