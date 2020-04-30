@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.14.2 (2020-04-30)
+
+* Deprecations
+  * Deprecate `Phoenix`-specific assigns `:view_module` and `:view_template`
+
 ## v2.14.1 (2020-03-20)
 
 * Enhancements
