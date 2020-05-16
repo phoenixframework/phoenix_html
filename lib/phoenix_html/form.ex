@@ -212,6 +212,8 @@ defmodule Phoenix.HTML.Form do
 
     * `:id` - the id to be used when generating input fields
 
+    * `:index` - the index of the struct in the form
+
     * `:name` - the name to be used when generating input fields
 
     * `:data` - the field used to store lookup data
