@@ -30,6 +30,7 @@ defmodule Phoenix.HTML.FormTest do
   defp search_params do
     %{
       "key" => "value",
+      "F✓o]o%b+a'R" => "utf8_value",
       "time" => ~T[01:02:03.004005],
       "alt_key" => nil,
       "datetime" => %{
@@ -290,6 +291,18 @@ defmodule Phoenix.HTML.FormTest do
         |> safe_to_string()
 
       assert form =~ ~s(<input id="custom_id_name" name="new_company[name]" type="text">)
+    end
+
+    test "support atom or binary field" do
+      form = form_for(:user, "/")
+
+      [f] = inputs_for(form, :"F✓o]o%b+a'R")
+      assert f.name == "user[F✓o]o%b+a'R]"
+      assert f.id == "user_F✓o]o%b+a'R"
+
+      [f] = inputs_for(form, "F✓o]o%b+a'R")
+      assert f.name == "user[F✓o]o%b+a'R]"
+      assert f.id == "user_F✓o]o%b+a'R"
     end
   end
 
@@ -1125,7 +1138,7 @@ defmodule Phoenix.HTML.FormTest do
                ~s(<option value="qux" selected>qux</option>) <>
                ~s(<option value="quz">quz</option>) <> ~s(</optgroup>)
 
-assert options_for_select([{"foo", ~w(bar baz)}, {"qux", ~w(qux quz)}], ["baz", "qux"])
+    assert options_for_select([{"foo", ~w(bar baz)}, {"qux", ~w(qux quz)}], ["baz", "qux"])
            |> safe_to_string() ==
              ~s(<optgroup label="foo">) <>
                ~s(<option value="bar">bar</option>) <>
@@ -1486,6 +1499,14 @@ assert options_for_select([{"foo", ~w(bar baz)}, {"qux", ~w(qux quz)}], ["baz", 
       assert safe_form(&label(&1, :key, [class: "test-label"], do: "Hello")) ==
                ~s(<label class="test-label" for="search_key">Hello</label>)
     end
+
+    test "with atom or binary field" do
+      assert safe_form(&label(&1, :"F✓o]o%b+a'R", do: "Hello")) ==
+               ~s(<label for="search_F✓o]o%b+a&#39;R">Hello</label>)
+
+      assert safe_form(&label(&1, "F✓o]o%b+a'R", do: "Hello")) ==
+               ~s(<label for="search_F✓o]o%b+a&#39;R">Hello</label>)
+    end
   end
 
   ## input_value/2
@@ -1494,11 +1515,13 @@ assert options_for_select([{"foo", ~w(bar baz)}, {"qux", ~w(qux quz)}], ["baz", 
     assert input_value(:search, :key) == nil
     assert input_value(:search, 1) == nil
     assert input_value(:search, "key") == nil
+    assert input_value(:search, "F✓o]o%b+a'R") == nil
   end
 
   test "input_value/2 with form" do
     assert safe_form(&input_value(&1, :key)) == "value"
     assert safe_form(&input_value(&1, "key")) == "value"
+    assert safe_form(&input_value(&1, "F✓o]o%b+a'R")) == "utf8_value"
   end
 
   test "input_value/2 with form and data" do
@@ -1523,10 +1546,12 @@ assert options_for_select([{"foo", ~w(bar baz)}, {"qux", ~w(qux quz)}], ["baz", 
 
   test "input_id/2 without form" do
     assert input_id(:search, :key) == "search_key"
+    assert input_id(:search, "F✓o]o%b+a'R") == "search_F✓o]o%b+a'R"
   end
 
   test "input_id/2 with form" do
     assert safe_form(&input_id(&1, :key)) == "search_key"
+    assert safe_form(&input_id(&1, "F✓o]o%b+a'R")) == "search_F✓o]o%b+a&#39;R"
   end
 
   test "input_id/2 with form with no name" do
@@ -1555,9 +1580,11 @@ assert options_for_select([{"foo", ~w(bar baz)}, {"qux", ~w(qux quz)}], ["baz", 
 
   test "input_name/2 without form" do
     assert input_name(:search, :key) == "search[key]"
+    assert input_name(:search, "F✓o]o%b+a'R") == "search[F✓o]o%b+a'R]"
   end
 
   test "input_name/2 with form" do
     assert safe_form(&input_name(&1, :key)) == "search[key]"
+    assert safe_form(&input_name(&1, "F✓o]o%b+a'R")) == "search[F✓o]o%b+a&#39;R]"
   end
 end
