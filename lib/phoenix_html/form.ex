@@ -378,7 +378,8 @@ defmodule Phoenix.HTML.Form do
   Same as `inputs_for(form, field, [])`.
   """
   @spec inputs_for(t, field) :: list(Phoenix.HTML.Form.t())
-  def inputs_for(form, field) when is_atom(field), do: inputs_for(form, field, [])
+  def inputs_for(form, field) when is_atom(field) or is_binary(field),
+    do: inputs_for(form, field, [])
 
   @doc """
   Generate a new form builder for the given parameter in form **without** an
@@ -405,7 +406,7 @@ defmodule Phoenix.HTML.Form do
   """
   @spec inputs_for(t, field, Keyword.t()) :: list(Phoenix.HTML.Form.t())
   def inputs_for(%{impl: impl} = form, field, options)
-      when is_atom(field) and is_list(options) do
+      when (is_atom(field) or is_binary(field)) and is_list(options) do
     options =
       form.options
       |> Keyword.take([:multipart])

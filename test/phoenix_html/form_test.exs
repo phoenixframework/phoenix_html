@@ -291,6 +291,18 @@ defmodule Phoenix.HTML.FormTest do
 
       assert form =~ ~s(<input id="custom_id_name" name="new_company[name]" type="text">)
     end
+
+    test "support atom or binary field" do
+      form = form_for(:user, "/")
+
+      [f] = inputs_for(form, :key)
+      assert f.name == "user[key]"
+      assert f.id == "user_key"
+
+      [f] = inputs_for(form, "key")
+      assert f.name == "user[key]"
+      assert f.id == "user_key"
+    end
   end
 
   describe "inputs_for/4" do
@@ -1125,7 +1137,7 @@ defmodule Phoenix.HTML.FormTest do
                ~s(<option value="qux" selected>qux</option>) <>
                ~s(<option value="quz">quz</option>) <> ~s(</optgroup>)
 
-assert options_for_select([{"foo", ~w(bar baz)}, {"qux", ~w(qux quz)}], ["baz", "qux"])
+    assert options_for_select([{"foo", ~w(bar baz)}, {"qux", ~w(qux quz)}], ["baz", "qux"])
            |> safe_to_string() ==
              ~s(<optgroup label="foo">) <>
                ~s(<option value="bar">bar</option>) <>
@@ -1486,6 +1498,14 @@ assert options_for_select([{"foo", ~w(bar baz)}, {"qux", ~w(qux quz)}], ["baz", 
       assert safe_form(&label(&1, :key, [class: "test-label"], do: "Hello")) ==
                ~s(<label class="test-label" for="search_key">Hello</label>)
     end
+
+    test "with atom or binary field" do
+      assert safe_form(&label(&1, :key, do: "Hello")) ==
+               ~s(<label for="search_key">Hello</label>)
+
+      assert safe_form(&label(&1, "key", do: "Hello")) ==
+               ~s(<label for="search_key">Hello</label>)
+    end
   end
 
   ## input_value/2
@@ -1523,10 +1543,12 @@ assert options_for_select([{"foo", ~w(bar baz)}, {"qux", ~w(qux quz)}], ["baz", 
 
   test "input_id/2 without form" do
     assert input_id(:search, :key) == "search_key"
+    assert input_id(:search, "key") == "search_key"
   end
 
   test "input_id/2 with form" do
     assert safe_form(&input_id(&1, :key)) == "search_key"
+    assert safe_form(&input_id(&1, "key")) == "search_key"
   end
 
   test "input_id/2 with form with no name" do
@@ -1555,9 +1577,11 @@ assert options_for_select([{"foo", ~w(bar baz)}, {"qux", ~w(qux quz)}], ["baz", 
 
   test "input_name/2 without form" do
     assert input_name(:search, :key) == "search[key]"
+    assert input_name(:search, "key") == "search[key]"
   end
 
   test "input_name/2 with form" do
     assert safe_form(&input_name(&1, :key)) == "search[key]"
+    assert safe_form(&input_name(&1, "key")) == "search[key]"
   end
 end
