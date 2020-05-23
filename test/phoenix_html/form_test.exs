@@ -871,6 +871,20 @@ defmodule Phoenix.HTML.FormTest do
                ~s(<option value="foo">Foo</option>) <>
                ~s(<option value="bar">Bar</option>) <> ~s(</select>)
 
+    assert safe_to_string(
+             select(:search, :key, [Foo: "foo", Bar: "bar"],
+               prompt: [key: "Choose your destiny", disabled: true]
+             )
+           ) ==
+             ~s(<select id="search_key" name="search[key]">) <>
+               ~s(<option value="" disabled>Choose your destiny</option>) <>
+               ~s(<option value="foo">Foo</option>) <>
+               ~s(<option value="bar">Bar</option>) <> ~s(</select>)
+
+    assert_raise ArgumentError, fn ->
+      select(:search, :key, [Foo: "foo", Bar: "bar"], prompt: [])
+    end
+
     assert safe_to_string(select(:search, :key, ~w(foo bar), value: "foo")) =~
              ~s(<option value="foo" selected>foo</option>)
 

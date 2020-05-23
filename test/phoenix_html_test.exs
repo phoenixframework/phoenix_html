@@ -13,7 +13,7 @@ defmodule Phoenix.HTMLTest do
            <%= "foo" %>
            """ == {:safe, ["foo", "\n"]}
 
-  assert ~E"""
+    assert ~E"""
            <%= {:safe, "foo"} %>
            """ == {:safe, ["foo", "\n"]}
   end
