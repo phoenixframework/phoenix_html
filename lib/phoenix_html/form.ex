@@ -1126,9 +1126,20 @@ defmodule Phoenix.HTML.Form do
           <option value="user">User</option>
           </select>
 
+  You can also pass a prompt:
+
       select(form, :role, ["Admin": "admin", "User": "user"], prompt: "Choose your role")
       #=> <select id="user_role" name="user[role]">
           <option value="">Choose your role</option>
+          <option value="admin">Admin</option>
+          <option value="user">User</option>
+          </select>
+
+  And customize the prompt as any other entry:
+
+      select(form, :role, ["Admin": "admin", "User": "user"], prompt: [key: "Choose your role", disabled: true])
+      #=> <select id="user_role" name="user[role]">
+          <option value="" disabled="">Choose your role</option>
           <option value="admin">Admin</option>
           <option value="user">User</option>
           </select>
@@ -1157,8 +1168,8 @@ defmodule Phoenix.HTML.Form do
 
   ## Options
 
-    * `:prompt` - an option to include at the top of the options with
-      the given prompt text
+    * `:prompt` - an option to include at the top of the options. It may be
+      a string or a keyword list of atttributes and the `:key`
 
     * `:selected` - the default value to use when none was sent as parameter
 
@@ -1174,7 +1185,7 @@ defmodule Phoenix.HTML.Form do
     {options_html, opts} =
       case Keyword.pop(opts, :prompt) do
         {nil, opts} -> {options_html, opts}
-        {prompt, opts} -> {[content_tag(:option, prompt, value: "") | options_html], opts}
+        {prompt, opts} -> {[prompt_option(prompt) | options_html], opts}
       end
 
     opts =
@@ -1183,6 +1194,23 @@ defmodule Phoenix.HTML.Form do
       |> Keyword.put_new(:name, input_name(form, field))
 
     content_tag(:select, options_html, opts)
+  end
+
+  defp prompt_option(prompt) when is_list(prompt) do
+    {prompt_key, prompt_opts} = Keyword.pop(prompt, :key)
+
+    prompt_key ||
+      raise ArgumentError,
+            "expected :key key when building a prompt select option with a keyword list: " <>
+              inspect(prompt)
+
+    prompt_option(prompt_key, prompt_opts)
+  end
+
+  defp prompt_option(key) when is_binary(key), do: prompt_option(key, [])
+
+  defp prompt_option(key, opts) when is_list(opts) do
+    content_tag(:option, key, Keyword.put_new(opts, :value, ""))
   end
 
   @doc """
