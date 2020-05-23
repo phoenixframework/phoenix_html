@@ -1201,9 +1201,8 @@ defmodule Phoenix.HTML.Form do
 
     prompt_key ||
       raise ArgumentError,
-            "expected :key key when building a prompt select option with a keyword list: #{
+            "expected :key key when building a prompt select option with a keyword list: " <>
               inspect(prompt)
-            }"
 
     prompt_option(prompt_key, prompt_opts)
   end
