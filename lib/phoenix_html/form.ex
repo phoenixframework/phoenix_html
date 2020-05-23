@@ -1126,12 +1126,16 @@ defmodule Phoenix.HTML.Form do
           <option value="user">User</option>
           </select>
 
+  You can also pass a prompt:
+
       select(form, :role, ["Admin": "admin", "User": "user"], prompt: "Choose your role")
       #=> <select id="user_role" name="user[role]">
           <option value="">Choose your role</option>
           <option value="admin">Admin</option>
           <option value="user">User</option>
           </select>
+
+  And customize the prompt as any other entry:
 
       select(form, :role, ["Admin": "admin", "User": "user"], prompt: [key: "Choose your role", disabled: true])
       #=> <select id="user_role" name="user[role]">
@@ -1164,8 +1168,8 @@ defmodule Phoenix.HTML.Form do
 
   ## Options
 
-    * `:prompt` - an option to include at the top of the options with
-      the given prompt text
+    * `:prompt` - an option to include at the top of the options. It may be
+      a string or a keyword list of atttributes and the `:key`
 
     * `:selected` - the default value to use when none was sent as parameter
 
