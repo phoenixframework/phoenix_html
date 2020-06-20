@@ -390,7 +390,7 @@ defmodule Phoenix.HTML.Form do
   instead.
 
   Keep in mind that this function does not generate hidden inputs automatically
-  like `inputs/4`. To generate them you need to explicit do it by yourself.
+  like `inputs_for/4`. To generate them you need to explicit do it by yourself.
 
       <%= f = form_for @changeset, Routes.user_path(@conn, :create), opts %>
         Name: <%= text_input f, :name %>
