@@ -67,7 +67,7 @@ defmodule Phoenix.HTML.FormTest do
     end
   end
 
-  describe "form_for/3 with atomm" do
+  describe "form_for/3 with atom" do
     test "without options" do
       form = form_for(:search, "/", [])
       assert %Phoenix.HTML.Form{} = form
@@ -88,6 +88,32 @@ defmodule Phoenix.HTML.FormTest do
       assert contents =~ ~s(method="post")
       assert contents =~ ~s(<input name="_method" type="hidden" value="put">)
       refute contents =~ ~s(</form>)
+    end
+
+    test "with id prefix the form id in the input id" do
+      form = form_for(:search, "/", id: "form_id")
+      assert %Phoenix.HTML.Form{} = form
+
+      contents =
+        form
+        |> text_input(:name)
+        |> html_escape()
+        |> safe_to_string()
+
+      assert contents =~ ~s(<input id="form_id_name" name="search[name]" type="text">)
+    end
+
+    test "without id prefix the form name in the input id" do
+      form = form_for(:search, "/")
+      assert %Phoenix.HTML.Form{} = form
+
+      contents =
+        form
+        |> text_input(:name)
+        |> html_escape()
+        |> safe_to_string()
+
+      assert contents =~ ~s(<input id="search_name" name="search[name]" type="text">)
     end
   end
 
@@ -260,6 +286,18 @@ defmodule Phoenix.HTML.FormTest do
         )
 
       assert form =~ ~s(<span class="errors">Field error message!</span>)
+    end
+
+    test "with id prefix the form id in the input id" do
+      form =
+        safe_to_string(
+          form_for(:search, "/", [params: search_params(), id: "form_id"], fn f ->
+            text_input(f, :key)
+          end)
+        )
+
+      assert form =~
+               ~s(<input id="form_id_key" name="search[key]" type="text" value="value">)
     end
   end
 

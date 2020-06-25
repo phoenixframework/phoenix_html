@@ -52,11 +52,12 @@ defimpl Phoenix.HTML.FormData, for: [Plug.Conn, Atom] do
   def to_form(conn_or_atom, opts) do
     {name, params, opts} = name_params_and_opts(conn_or_atom, opts)
     {errors, opts} = Keyword.pop(opts, :errors, [])
+    {id, opts} = Keyword.pop(opts, :id)
 
     %Phoenix.HTML.Form{
       source: conn_or_atom,
       impl: __MODULE__,
-      id: name,
+      id: id || name,
       name: name,
       params: params,
       data: %{},
