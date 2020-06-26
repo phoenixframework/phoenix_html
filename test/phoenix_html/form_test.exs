@@ -94,25 +94,37 @@ defmodule Phoenix.HTML.FormTest do
       form = form_for(:search, "/", id: "form_id")
       assert %Phoenix.HTML.Form{} = form
 
-      contents =
+      form_content =
+        form
+        |> html_escape()
+        |> safe_to_string()
+
+      input_content =
         form
         |> text_input(:name)
         |> html_escape()
         |> safe_to_string()
 
-      assert contents =~ ~s(<input id="form_id_name" name="search[name]" type="text">)
+      assert form_content  =~ ~s(<form action="/" id="form_id" method="post">)
+      assert input_content =~ ~s(<input id="form_id_name" name="search[name]" type="text">)
     end
 
     test "without id prefix the form name in the input id" do
       form = form_for(:search, "/")
       assert %Phoenix.HTML.Form{} = form
 
+      form_content =
+        form
+        |> html_escape()
+        |> safe_to_string()
+
       contents =
         form
         |> text_input(:name)
         |> html_escape()
         |> safe_to_string()
 
+      assert form_content  =~ ~s(<form action="/" method="post">)
       assert contents =~ ~s(<input id="search_name" name="search[name]" type="text">)
     end
   end
