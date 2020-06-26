@@ -357,10 +357,12 @@ defmodule Phoenix.HTML.Form do
     * `:errors` - use this to manually pass a keyword list of errors to the form
       (for example from `conn.assigns[:errors]`). This option is only used when a
       connection is used as the form source and it will make the errors available
-      under `f.errors`.
+      under `f.errors`
 
-    * Other options will be passed as html attributes.
-      ie, `class: "foo", id: "bar"`
+    * `:id` - the ID of the form attribute. If an ID is given, all form inputs
+      will also be prefixed by the given ID
+
+    * Other options will be passed as html attributes, such as `class: "foo"`
 
   See `Phoenix.HTML.Tag.form_tag/2` for more information on the
   options above.
