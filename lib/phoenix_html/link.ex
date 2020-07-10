@@ -239,6 +239,10 @@ defmodule Phoenix.HTML.Link do
     {value, opts}
   end
 
+  defp valid_destination!(%URI{} = uri, context) do
+    valid_destination!(URI.to_string(uri), context)
+  end
+
   defp valid_destination!({:safe, to}, context) do
     {:safe, valid_string_destination!(IO.iodata_to_binary(to), context)}
   end

@@ -11,6 +11,18 @@ defmodule Phoenix.HTML.LinkTest do
              ~s[<a data-csrf="#{csrf_token}" data-method="post" data-to="/world" href="/world" rel="nofollow">hello</a>]
   end
 
+  test "link with %URI{}" do
+    url = "https://elixir-lang.org/"
+
+    assert safe_to_string(link("elixir", to: url)) ==
+             safe_to_string(link("elixir", to: URI.parse(url)))
+
+    path = "/elixir"
+
+    assert safe_to_string(link("elixir", to: path)) ==
+             safe_to_string(link("elixir", to: URI.parse(path)))
+  end
+
   test "link with put/delete" do
     csrf_token = Plug.CSRFProtection.get_csrf_token()
 
@@ -91,6 +103,13 @@ defmodule Phoenix.HTML.LinkTest do
 
     assert safe_to_string(button("hello", to: "/world")) ==
              ~s[<button data-csrf="#{csrf_token}" data-method="post" data-to="/world">hello</button>]
+  end
+
+  test "button with %URI{}" do
+    url = "https://elixir-lang.org/"
+
+    assert safe_to_string(button("elixir", to: url, csrf_token: false)) ==
+             safe_to_string(button("elixir", to: URI.parse(url), csrf_token: false))
   end
 
   test "button with post without csrf_token" do
