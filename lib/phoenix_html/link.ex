@@ -13,6 +13,9 @@ defmodule Phoenix.HTML.Link do
       link("hello", to: "/world")
       #=> <a href="/world">hello</a>
 
+      link("hello", to: URI.parse("https://elixir-lang.org"))
+      #=> <a href="https://elixir-lang.org">hello</a>
+
       link("<hello>", to: "/world")
       #=> <a href="/world">&lt;hello&gt;</a>
 
