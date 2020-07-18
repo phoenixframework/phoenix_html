@@ -75,7 +75,7 @@ defmodule Phoenix.HTML do
 
   """
   defmacro sigil_e(expr, opts) do
-    handle_sigil(expr, opts, __CALLER__.line)
+    handle_sigil(expr, opts, __CALLER__)
   end
 
   @doc """
@@ -91,13 +91,14 @@ defmodule Phoenix.HTML do
 
   """
   defmacro sigil_E(expr, opts) do
-    handle_sigil(expr, opts, __CALLER__.line)
+    handle_sigil(expr, opts, __CALLER__)
   end
 
-  defp handle_sigil({:<<>>, meta, [expr]}, [], line) do
+  defp handle_sigil({:<<>>, meta, [expr]}, [], caller) do
     options = [
       engine: Phoenix.HTML.Engine,
-      line: line + 1,
+      file: caller.file,
+      line: caller.line + 1,
       indentation: meta[:indentation] || 0
     ]
 
