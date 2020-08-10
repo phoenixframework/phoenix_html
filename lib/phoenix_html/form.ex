@@ -1015,7 +1015,7 @@ defmodule Phoenix.HTML.Form do
       # Assuming form contains a User schema
       checkbox(form, :famous)
       #=> <input name="user[famous]" type="hidden" value="false">
-          <input checked="checked" id="user_famous" name="user[famous]" type="checkbox" value="true">
+      #=> <input checked="checked" id="user_famous" name="user[famous]" type="checkbox" value="true">
 
   ## Options
 
@@ -1110,63 +1110,63 @@ defmodule Phoenix.HTML.Form do
       # Assuming form contains a User schema
       select(form, :age, 0..120)
       #=> <select id="user_age" name="user[age]">
-          <option value="0">0</option>
-          ...
-          <option value="120">120</option>
-          </select>
+      #=>   <option value="0">0</option>
+      #=>   ...
+      #=>   <option value="120">120</option>
+      #=> </select>
 
       select(form, :role, ["Admin": "admin", "User": "user"])
       #=> <select id="user_role" name="user[role]">
-          <option value="admin">Admin</option>
-          <option value="user">User</option>
-          </select>
+      #=>   <option value="admin">Admin</option>
+      #=>   <option value="user">User</option>
+      #=> </select>
 
       select(form, :role, [[key: "Admin", value: "admin", disabled: true],
                            [key: "User", value: "user"]])
       #=> <select id="user_role" name="user[role]">
-          <option value="admin" disabled="disabled">Admin</option>
-          <option value="user">User</option>
-          </select>
+      #=>   <option value="admin" disabled="disabled">Admin</option>
+      #=>   <option value="user">User</option>
+      #=> </select>
 
   You can also pass a prompt:
 
       select(form, :role, ["Admin": "admin", "User": "user"], prompt: "Choose your role")
       #=> <select id="user_role" name="user[role]">
-          <option value="">Choose your role</option>
-          <option value="admin">Admin</option>
-          <option value="user">User</option>
-          </select>
+      #=>   <option value="">Choose your role</option>
+      #=>   <option value="admin">Admin</option>
+      #=>   <option value="user">User</option>
+      #=> </select>
 
   And customize the prompt as any other entry:
 
       select(form, :role, ["Admin": "admin", "User": "user"], prompt: [key: "Choose your role", disabled: true])
       #=> <select id="user_role" name="user[role]">
-          <option value="" disabled="">Choose your role</option>
-          <option value="admin">Admin</option>
-          <option value="user">User</option>
-          </select>
+      #=>   <option value="" disabled="">Choose your role</option>
+      #=>   <option value="admin">Admin</option>
+      #=>   <option value="user">User</option>
+      #=> </select>
 
   If you want to select an option that comes from the database,
   such as a manager for a given project, you may write:
 
       select(form, :manager_id, Enum.map(@managers, &{&1.name, &1.id}))
       #=> <select id="manager_id" name="project[manager_id]">
-          <option value="1">Mary Jane</option>
-          <option value="2">John Doe</option>
-          </select>
+      #=>   <option value="1">Mary Jane</option>
+      #=>   <option value="2">John Doe</option>
+      #=> </select>
 
   Finally, if the values are a list or a map, we use the keys for
   grouping:
 
       select(form, :country, ["Europe": ["UK", "Sweden", "France"]], ...)
       #=> <select id="user_country" name="user[country]">
-          <optgroup label="Europe">
-            <option>UK</option>
-            <option>Sweden</option>
-            <option>France</option>
-          </optgroup>
-          ...
-          </select>
+      #=>   <optgroup label="Europe">
+      #=>     <option>UK</option>
+      #=>     <option>Sweden</option>
+      #=>     <option>France</option>
+      #=>   </optgroup>
+      #=>   ...
+      #=> </select>
 
   ## Options
 
@@ -1225,16 +1225,16 @@ defmodule Phoenix.HTML.Form do
 
       options_for_select(["Admin": "admin", "User": "user"], "admin")
       #=> <option value="admin" selected="selected">Admin</option>
-          <option value="user">User</option>
+      #=> <option value="user">User</option>
 
   Groups are also supported:
 
       options_for_select(["Europe": ["UK", "Sweden", "France"], ...], nil)
       #=> <optgroup label="Europe">
-            <option>UK</option>
-            <option>Sweden</option>
-            <option>France</option>
-          </optgroup>
+      #=>   <option>UK</option>
+      #=>   <option>Sweden</option>
+      #=>   <option>France</option>
+      #=> </optgroup>
 
   """
   def options_for_select(options, selected_values) do
@@ -1316,15 +1316,15 @@ defmodule Phoenix.HTML.Form do
       # Assuming form contains a User schema
       multiple_select(form, :roles, ["Admin": 1, "Power User": 2])
       #=> <select id="user_roles" name="user[roles][]">
-          <option value="1">Admin</option>
-          <option value="2">Power User</option>
-          </select>
+      #=>   <option value="1">Admin</option>
+      #=>   <option value="2">Power User</option>
+      #=> </select>
 
       multiple_select(form, :roles, ["Admin": 1, "Power User": 2], selected: [1])
       #=> <select id="user_roles" name="user[roles][]">
-          <option value="1" selected="selected">Admin</option>
-          <option value="2">Power User</option>
-          </select>
+      #=>   <option value="1" selected="selected">Admin</option>
+      #=>   <option value="2">Power User</option>
+      #=> </select>
 
   When working with structs, associations and embeds, you will need to tell
   Phoenix how to extract the value out of the collection. For example,
@@ -1365,10 +1365,10 @@ defmodule Phoenix.HTML.Form do
       # Assuming form contains a User schema
       datetime_select form, :born_at
       #=> <select id="user_born_at_year" name="user[born_at][year]">...</select> /
-          <select id="user_born_at_month" name="user[born_at][month]">...</select> /
-          <select id="user_born_at_day" name="user[born_at][day]">...</select> —
-          <select id="user_born_at_hour" name="user[born_at][hour]">...</select> :
-          <select id="user_born_at_min" name="user[born_at][minute]">...</select>
+      #=> <select id="user_born_at_month" name="user[born_at][month]">...</select> /
+      #=> <select id="user_born_at_day" name="user[born_at][day]">...</select> —
+      #=> <select id="user_born_at_hour" name="user[born_at][hour]">...</select> :
+      #=> <select id="user_born_at_min" name="user[born_at][minute]">...</select>
 
   If you want to include the seconds field (hidden by default), pass `second: []`:
 
