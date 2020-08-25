@@ -479,6 +479,14 @@ defmodule Phoenix.HTML.Form do
   When a form is given, it will lookup for changes and then
   fallback to parameters and finally fallback to the default
   struct/map value.
+
+  Since the function looks up parameter values too, there is
+  no guarantee that the value will have a certain type. For
+  example, a boolean field will be sent as "false" as a
+  parameter, and this function will return it as is. If you
+  need to normalize the result of `input_value`, the best
+  option is to call `html_escape` on it and compare the
+  resulting string.
   """
   @spec input_value(t | atom, field) :: term
   def input_value(%{source: source, impl: impl} = form, field)
