@@ -1079,7 +1079,7 @@ defmodule Phoenix.HTML.Form do
       hidden_opts = [type: "hidden", value: unchecked_value]
 
       html_escape([
-        tag(:input, hidden_opts ++ Keyword.take(opts, [:name, :disabled])),
+        tag(:input, hidden_opts ++ Keyword.take(opts, [:name, :disabled, :form])),
         tag(:input, [value: checked_value] ++ opts)
       ])
     else
