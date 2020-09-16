@@ -1,9 +1,7 @@
 "use strict";
 
-(function() {
-  var PolyfillEvent = eventConstructor();
-
-  function eventConstructor() {
+window._PhxForms = window._PhxForms || Object.freeze({
+  eventConstructor: function () {
     if (typeof window.CustomEvent === "function") return window.CustomEvent;
     // IE<=9 Support
     function CustomEvent(event, params) {
@@ -14,20 +12,18 @@
     }
     CustomEvent.prototype = window.Event.prototype;
     return CustomEvent;
-  }
-
-  function buildHiddenInput(name, value) {
+  },
+  buildHiddenInput: function (name, value) {
     var input = document.createElement("input");
     input.type = "hidden";
     input.name = name;
     input.value = value;
     return input;
-  }
-
-  function handleClick(element) {
+  },
+  handleClick: function (element) {
     var to = element.getAttribute("data-to"),
-        method = buildHiddenInput("_method", element.getAttribute("data-method")),
-        csrf = buildHiddenInput("_csrf_token", element.getAttribute("data-csrf")),
+        method = window._PhxForms.buildHiddenInput("_method", element.getAttribute("data-method")),
+        csrf = window._PhxForms.buildHiddenInput("_csrf_token", element.getAttribute("data-csrf")),
         form = document.createElement("form"),
         target = element.getAttribute("target");
 
@@ -41,16 +37,16 @@
     form.appendChild(method);
     document.body.appendChild(form);
     form.submit();
-  }
-
-  window.addEventListener("click", function(e) {
+  },
+  clickHandler: function (e) {
     var element = e.target;
+    var PolyfillEvent = window._PhxForms.eventConstructor();
+    var phoenixLinkEvent = new PolyfillEvent('phoenix.link.click', {
+      "bubbles": true,
+      "cancelable": true
+    });
 
     while (element && element.getAttribute) {
-      var phoenixLinkEvent = new PolyfillEvent('phoenix.link.click', {
-        "bubbles": true, "cancelable": true
-      });
-
       if (!element.dispatchEvent(phoenixLinkEvent)) {
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -58,19 +54,23 @@
       }
 
       if (element.getAttribute("data-method")) {
-        handleClick(element);
+        window._PhxForms.handleClick(element);
         e.preventDefault();
         return false;
       } else {
         element = element.parentNode;
       }
     }
-  }, false);
-
-  window.addEventListener('phoenix.link.click', function (e) {
+  },
+  confirmHandler: function (e) {
     var message = e.target.getAttribute("data-confirm");
-    if(message && !window.confirm(message)) {
+    if (message && !window.confirm(message)) {
       e.preventDefault();
     }
-  }, false);
+  }
+});
+
+(function() {
+  window.addEventListener("click", window._PhxForms.clickHandler, false);
+  window.addEventListener('phoenix.link.click', window._PhxForms.confirmHandler, false);
 })();
