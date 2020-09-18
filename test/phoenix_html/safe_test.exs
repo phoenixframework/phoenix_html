@@ -41,7 +41,7 @@ defmodule Phoenix.HTML.SafeTest do
 
   test "impl for NaiveDateTime" do
     {:ok, datetime} = NaiveDateTime.new(2000, 1, 1, 12, 13, 14)
-    assert Safe.to_iodata(datetime) == "2000-01-01 12:13:14"
+    assert Safe.to_iodata(datetime) == "2000-01-01T12:13:14"
   end
 
   test "impl for DateTime" do
@@ -59,10 +59,6 @@ defmodule Phoenix.HTML.SafeTest do
       utc_offset: 3600
     }
 
-    assert Safe.to_iodata(datetime) ==
-             [
-               [[[[], "2000-01-01 12:13:14+00:30 " | "&lt;"], "H" | "&gt;"], " " | "&lt;"],
-               "Hello" | "&gt;"
-             ]
+    assert Safe.to_iodata(datetime) == "2000-01-01T12:13:14+00:30"
   end
 end

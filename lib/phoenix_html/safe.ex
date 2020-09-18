@@ -25,23 +25,19 @@ defimpl Phoenix.HTML.Safe, for: BitString do
 end
 
 defimpl Phoenix.HTML.Safe, for: Time do
-  defdelegate to_iodata(data), to: Time, as: :to_string
+  defdelegate to_iodata(data), to: Time, as: :to_iso8601
 end
 
 defimpl Phoenix.HTML.Safe, for: Date do
-  defdelegate to_iodata(data), to: Date, as: :to_string
+  defdelegate to_iodata(data), to: Date, as: :to_iso8601
 end
 
 defimpl Phoenix.HTML.Safe, for: NaiveDateTime do
-  defdelegate to_iodata(data), to: NaiveDateTime, as: :to_string
+  defdelegate to_iodata(data), to: NaiveDateTime, as: :to_iso8601
 end
 
 defimpl Phoenix.HTML.Safe, for: DateTime do
-  def to_iodata(data) do
-    # Call escape in case someone can inject reserved
-    # characters in the timezone or its abbreviation
-    Plug.HTML.html_escape_to_iodata(DateTime.to_string(data))
-  end
+  defdelegate to_iodata(data), to: DateTime, as: :to_iso8601
 end
 
 defimpl Phoenix.HTML.Safe, for: List do
