@@ -4,7 +4,7 @@ defmodule Phoenix.HTML.SafeTest do
   alias Phoenix.HTML.Safe
 
   test "impl for binaries" do
-    assert Safe.to_iodata("<foo>") == "&lt;foo&gt;"
+    assert Safe.to_iodata("<foo>") == [[[] | "&lt;"], "foo" | "&gt;"]
   end
 
   test "impl for io data" do

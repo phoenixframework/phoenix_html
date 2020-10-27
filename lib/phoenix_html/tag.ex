@@ -103,7 +103,7 @@ defmodule Phoenix.HTML.Tag do
 
   defp attr_escape({:safe, data}), do: data
   defp attr_escape(nil), do: []
-  defp attr_escape(other) when is_binary(other), do: Plug.HTML.html_escape_to_iodata(other)
+  defp attr_escape(other) when is_binary(other), do: Phoenix.HTML.Engine.encode_to_iodata!(other)
   defp attr_escape(other), do: Phoenix.HTML.Safe.to_iodata(other)
 
   defp nested_attrs(attr, dict, acc) do
@@ -238,12 +238,17 @@ defmodule Phoenix.HTML.Tag do
         {extra <> ~s'<input name="#{@csrf_param}" type="hidden" value="#{csrf_token}">', opts}
 
       {true, opts} ->
-        csrf_token = Plug.CSRFProtection.get_csrf_token_for(to)
+        csrf_token = csrf_token(to)
         {extra <> ~s'<input name="#{@csrf_param}" type="hidden" value="#{csrf_token}">', opts}
 
       {false, opts} ->
         {extra, opts}
     end
+  end
+
+  defp csrf_token(to) do
+    {mod, fun, args} = Application.fetch_env!(:phoenix_html, :csrf_token_reader)
+    apply(mod, fun, [to | args])
   end
 
   @doc """
@@ -261,7 +266,7 @@ defmodule Phoenix.HTML.Tag do
       :meta,
       charset: "UTF-8",
       name: "csrf-token",
-      content: Plug.CSRFProtection.get_csrf_token(),
+      content: csrf_token(%URI{host: nil}),
       "csrf-param": @csrf_param,
       "method-param": @method_param
     )

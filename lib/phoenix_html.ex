@@ -149,10 +149,7 @@ defmodule Phoenix.HTML do
   """
   @spec html_escape(unsafe) :: safe
   def html_escape({:safe, _} = safe), do: safe
-  def html_escape(nil), do: {:safe, ""}
-  def html_escape(bin) when is_binary(bin), do: {:safe, Plug.HTML.html_escape_to_iodata(bin)}
-  def html_escape(list) when is_list(list), do: {:safe, Phoenix.HTML.Safe.List.to_iodata(list)}
-  def html_escape(other), do: {:safe, Phoenix.HTML.Safe.to_iodata(other)}
+  def html_escape(other), do: {:safe, Phoenix.HTML.Engine.encode_to_iodata!(other)}
 
   @doc """
   Converts a safe result into a string.
