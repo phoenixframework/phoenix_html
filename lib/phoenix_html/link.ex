@@ -167,7 +167,8 @@ defmodule Phoenix.HTML.Link do
   end
 
   @doc """
-  Generates a button that uses a regular HTML form to submit to the given URL.
+  Generates a button tag that uses the Javascript function handleClick()
+  (see phoenix_html.js) to submit the form data.
 
   Useful to ensure that links that change data are not triggered by
   search engines and other spidering software.
