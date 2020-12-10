@@ -19,8 +19,56 @@ defmodule Phoenix.HTML.Engine do
   Encodes the HTML templates to iodata.
   """
   def encode_to_iodata!({:safe, body}), do: body
-  def encode_to_iodata!(body) when is_binary(body), do: Plug.HTML.html_escape(body)
+  def encode_to_iodata!(nil), do: ""
+  def encode_to_iodata!(bin) when is_binary(bin), do: html_escape(bin)
+  def encode_to_iodata!(list) when is_list(list), do: Phoenix.HTML.Safe.List.to_iodata(list)
   def encode_to_iodata!(other), do: Phoenix.HTML.Safe.to_iodata(other)
+
+  @doc false
+  def html_escape(bin) when is_binary(bin) do
+    html_escape(bin, 0, bin, [])
+  end
+
+  escapes = [
+    {?<, "&lt;"},
+    {?>, "&gt;"},
+    {?&, "&amp;"},
+    {?", "&quot;"},
+    {?', "&#39;"}
+  ]
+
+  for {match, insert} <- escapes do
+    defp html_escape(<<unquote(match), rest::bits>>, skip, original, acc) do
+      html_escape(rest, skip + 1, original, [acc | unquote(insert)])
+    end
+  end
+
+  defp html_escape(<<_char, rest::bits>>, skip, original, acc) do
+    html_escape(rest, skip, original, acc, 1)
+  end
+
+  defp html_escape(<<>>, _skip, _original, acc) do
+    acc
+  end
+
+  for {match, insert} <- escapes do
+    defp html_escape(<<unquote(match), rest::bits>>, skip, original, acc, len) do
+      part = binary_part(original, skip, len)
+      html_escape(rest, skip + len + 1, original, [acc, part | unquote(insert)])
+    end
+  end
+
+  defp html_escape(<<_char, rest::bits>>, skip, original, acc, len) do
+    html_escape(rest, skip, original, acc, len + 1)
+  end
+
+  defp html_escape(<<>>, 0, original, _acc, _len) do
+    original
+  end
+
+  defp html_escape(<<>>, skip, original, acc, len) do
+    [acc | binary_part(original, skip, len)]
+  end
 
   @impl true
   def init(_opts) do
@@ -84,7 +132,9 @@ defmodule Phoenix.HTML.Engine do
 
   # We can do the work at compile time
   defp to_safe(literal, _line) when is_binary(literal) or is_atom(literal) or is_number(literal) do
-    Phoenix.HTML.Safe.to_iodata(literal)
+    literal
+    |> Phoenix.HTML.Safe.to_iodata()
+    |> IO.iodata_to_binary()
   end
 
   # We can do the work at runtime
@@ -96,7 +146,7 @@ defmodule Phoenix.HTML.Engine do
   defp to_safe(expr, line) do
     # Keep stacktraces for protocol dispatch and coverage
     safe_return = quote line: line, do: data
-    bin_return = quote line: line, do: Plug.HTML.html_escape_to_iodata(bin)
+    bin_return = quote line: line, do: Phoenix.HTML.Engine.html_escape(bin)
     other_return = quote line: line, do: Phoenix.HTML.Safe.to_iodata(other)
 
     # However ignore them for the generated clauses to avoid warnings

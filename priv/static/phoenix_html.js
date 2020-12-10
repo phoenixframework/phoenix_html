@@ -24,7 +24,7 @@
     return input;
   }
 
-  function handleClick(element) {
+  function handleClick(element, targetModifierKey) {
     var to = element.getAttribute("data-to"),
         method = buildHiddenInput("_method", element.getAttribute("data-method")),
         csrf = buildHiddenInput("_csrf_token", element.getAttribute("data-csrf")),
@@ -36,6 +36,7 @@
     form.style.display = "hidden";
 
     if (target) form.target = target;
+    else if (targetModifierKey) form.target = "_blank";
 
     form.appendChild(csrf);
     form.appendChild(method);
@@ -58,7 +59,7 @@
       }
 
       if (element.getAttribute("data-method")) {
-        handleClick(element);
+        handleClick(element, e.metaKey || e.shiftKey);
         e.preventDefault();
         return false;
       } else {

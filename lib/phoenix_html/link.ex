@@ -167,7 +167,8 @@ defmodule Phoenix.HTML.Link do
   end
 
   @doc """
-  Generates a button that uses a regular HTML form to submit to the given URL.
+  Generates a button tag that uses the Javascript function handleClick()
+  (see phoenix_html.js) to submit the form data.
 
   Useful to ensure that links that change data are not triggered by
   search engines and other spidering software.
@@ -187,6 +188,11 @@ defmodule Phoenix.HTML.Link do
     * `:method` - the method to use with the button. Defaults to :post.
 
   All other options are forwarded to the underlying button input.
+
+  When the `:method` is set to `:get` and the `:to` URL contains query
+  parameters the generated form element will strip the parameters in accordance
+  with the [W3C](https://www.w3.org/TR/html401/interact/forms.html#h-17.13.3.4)
+  form specification.
 
   ## Data attributes
 
@@ -225,11 +231,16 @@ defmodule Phoenix.HTML.Link do
         {[csrf: csrf], opts}
 
       {true, opts} ->
-        {[csrf: Plug.CSRFProtection.get_csrf_token_for(to)], opts}
+        {[csrf: csrf_token(to)], opts}
 
       {false, opts} ->
         {[], opts}
     end
+  end
+
+  defp csrf_token(to) do
+    {mod, fun, args} = Application.fetch_env!(:phoenix_html, :csrf_token_reader)
+    apply(mod, fun, [to | args])
   end
 
   defp pop_required_option!(opts, key, error_message) do

@@ -5,7 +5,7 @@ defmodule Phoenix.HTML.EngineTest do
   def unsafe(do: {:safe, content}), do: content
 
   test "encode_to_iodata!" do
-    assert Phoenix.HTML.Engine.encode_to_iodata!("<foo>") == "&lt;foo&gt;"
+    assert Phoenix.HTML.Engine.encode_to_iodata!("<foo>") == [[[] | "&lt;"], "foo" | "&gt;"]
     assert Phoenix.HTML.Engine.encode_to_iodata!({:safe, "<foo>"}) == "<foo>"
     assert Phoenix.HTML.Engine.encode_to_iodata!(123) == "123"
   end

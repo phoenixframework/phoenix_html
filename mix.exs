@@ -23,13 +23,14 @@ defmodule PhoenixHtml.Mixfile do
 
   def application do
     [
-      extra_applications: [:eex, :logger]
+      extra_applications: [:eex, :logger],
+      env: [csrf_token_reader: {Plug.CSRFProtection, :get_csrf_token_for, []}]
     ]
   end
 
   defp deps do
     [
-      {:plug, "~> 1.5"},
+      {:plug, "~> 1.5", optional: true},
       {:ex_doc, ">= 0.0.0", only: :docs}
     ]
   end

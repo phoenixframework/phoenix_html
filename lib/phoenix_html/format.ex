@@ -45,8 +45,11 @@ defmodule Phoenix.HTML.Format do
     |> Phoenix.HTML.html_escape()
   end
 
-  defp maybe_html_escape(string, true), do: Plug.HTML.html_escape(string)
-  defp maybe_html_escape(string, false), do: string
+  defp maybe_html_escape(string, true),
+    do: string |> Phoenix.HTML.Engine.html_escape() |> IO.iodata_to_binary()
+
+  defp maybe_html_escape(string, false),
+    do: string
 
   defp not_blank?("\r\n" <> rest), do: not_blank?(rest)
   defp not_blank?("\n" <> rest), do: not_blank?(rest)
