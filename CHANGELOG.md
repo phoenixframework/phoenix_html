@@ -2,7 +2,17 @@
 
 # v3.0.0-dev
 
-* Backwards incompatible changes 
+* Enhancements
+  * Allow extra html attributes with select option generated with prompt
+  * Make `Plug` an optional dependency
+  * Prefix form id on inputs when it is given to `form_for/3`
+  * Allow `%URI{}` to be passed to `link/2` and `button/2` as :to
+
+* Bug fixes
+  * Honor the `form` attribute when creating hidden checkbox input
+  * Use to_iso8601 as the standard implementation for safe dates and times
+
+* Backwards incompatible changes
   * By default dates and times will format to the `to_iso8601` functions provided by their implementation
 
 ## v2.14.2 (2020-04-30)
