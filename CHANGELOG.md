@@ -1,6 +1,9 @@
 # Changelog
 
-## v2.15-dev
+# v3.0.0-dev
+
+* Backwards incompatible changes 
+  * By default dates and times will format to the `to_iso8601` functions provided by their implementation
 
 ## v2.14.2 (2020-04-30)
 
