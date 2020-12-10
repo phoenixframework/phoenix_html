@@ -37,7 +37,11 @@ defimpl Phoenix.HTML.Safe, for: NaiveDateTime do
 end
 
 defimpl Phoenix.HTML.Safe, for: DateTime do
-  defdelegate to_iodata(data), to: DateTime, as: :to_iso8601
+  def to_iodata(data) do
+    # Call escape in case someone can inject reserved
+    # characters in the timezone or its abbreviation
+    Plug.HTML.html_escape_to_iodata(DateTime.to_iso8601(data))
+  end
 end
 
 defimpl Phoenix.HTML.Safe, for: List do
