@@ -70,7 +70,7 @@ defmodule Phoenix.HTML.Engine do
     [acc | binary_part(original, skip, len)]
   end
 
-  @impl true
+  @doc false
   def init(_opts) do
     %{
       iodata: [],
@@ -79,30 +79,35 @@ defmodule Phoenix.HTML.Engine do
     }
   end
 
-  @impl true
+  @doc false
   def handle_begin(state) do
     %{state | iodata: [], dynamic: []}
   end
 
-  @impl true
+  @doc false
   def handle_end(quoted) do
     handle_body(quoted)
   end
 
-  @impl true
+  @doc false
   def handle_body(state) do
     %{iodata: iodata, dynamic: dynamic} = state
     safe = {:safe, Enum.reverse(iodata)}
     {:__block__, [], Enum.reverse([safe | dynamic])}
   end
 
-  @impl true
+  @doc false
   def handle_text(state, text) do
+    handle_text(state, [], text)
+  end
+
+  @doc false
+  def handle_text(state, _meta, text) do
     %{iodata: iodata} = state
     %{state | iodata: [text | iodata]}
   end
 
-  @impl true
+  @doc false
   def handle_expr(state, "=", ast) do
     ast = traverse(ast)
     %{iodata: iodata, dynamic: dynamic, vars_count: vars_count} = state
@@ -123,9 +128,7 @@ defmodule Phoenix.HTML.Engine do
 
   ## Safe conversion
 
-  defp to_safe(ast) do
-    to_safe(ast, line_from_expr(ast))
-  end
+  defp to_safe(ast), do: to_safe(ast, line_from_expr(ast))
 
   defp line_from_expr({_, meta, _}) when is_list(meta), do: Keyword.get(meta, :line, 0)
   defp line_from_expr(_), do: 0
