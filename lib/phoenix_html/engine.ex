@@ -22,7 +22,7 @@ defmodule Phoenix.HTML.Engine do
   def encode_to_iodata!(body) when is_binary(body), do: Plug.HTML.html_escape(body)
   def encode_to_iodata!(other), do: Phoenix.HTML.Safe.to_iodata(other)
 
-  @impl true
+  @doc false
   def init(_opts) do
     %{
       iodata: [],
@@ -31,30 +31,35 @@ defmodule Phoenix.HTML.Engine do
     }
   end
 
-  @impl true
+  @doc false
   def handle_begin(state) do
     %{state | iodata: [], dynamic: []}
   end
 
-  @impl true
+  @doc false
   def handle_end(quoted) do
     handle_body(quoted)
   end
 
-  @impl true
+  @doc false
   def handle_body(state) do
     %{iodata: iodata, dynamic: dynamic} = state
     safe = {:safe, Enum.reverse(iodata)}
     {:__block__, [], Enum.reverse([safe | dynamic])}
   end
 
-  @impl true
+  @doc false
   def handle_text(state, text) do
+    handle_text(state, [], text)
+  end
+
+  @doc false
+  def handle_text(state, _meta, text) do
     %{iodata: iodata} = state
     %{state | iodata: [text | iodata]}
   end
 
-  @impl true
+  @doc false
   def handle_expr(state, "=", ast) do
     ast = traverse(ast)
     %{iodata: iodata, dynamic: dynamic, vars_count: vars_count} = state

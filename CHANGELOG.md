@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.14.3 (2020-12-12)
+
+* Bug fixes
+  * Fix warnings on Elixir v1.12
+
 ## v2.14.2 (2020-04-30)
 
 * Deprecations
