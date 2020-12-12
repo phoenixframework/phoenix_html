@@ -1772,16 +1772,4 @@ defmodule Phoenix.HTML.Form do
   # Normalize field name to string version
   defp field_to_string(field) when is_atom(field), do: Atom.to_string(field)
   defp field_to_string(field) when is_binary(field), do: field
-
-  @doc false
-  @deprecated "Use input_value/3 instead"
-  def field_value(form, field, default \\ nil), do: input_value(form, field) || default
-
-  @doc false
-  @deprecated "Use input_name/2 instead"
-  def field_name(form, field), do: input_name(form, field)
-
-  @doc false
-  @deprecated "Use input_id/2 instead"
-  def field_id(form, field), do: input_id(form, field)
 end

@@ -162,10 +162,6 @@ defmodule Phoenix.HTML do
     IO.iodata_to_binary(iodata)
   end
 
-  @doc false
-  @deprecated "Use javascript_escape/1 instead"
-  def escape_javascript(data), do: javascript_escape(data)
-
   @doc """
   Escapes HTML content to be inserted a JavaScript string.
 

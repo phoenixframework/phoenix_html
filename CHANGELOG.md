@@ -14,6 +14,15 @@
 
 * Backwards incompatible changes
   * By default dates and times will format to the `to_iso8601` functions provided by their implementation
+  * Remove deprecated `escape_javascript` in favor of `javascript_escape`
+  * Remove deprecated `field_value` in favor of `input_value`
+  * Remove deprecated `field_name` in favor of `input_name`
+  * Remove deprecated `field_id` in favor of `input_id`
+
+## v2.14.3 (2020-12-12)
+
+* Bug fixes
+  * Fix warnings on Elixir v1.12
 
 ## v2.14.2 (2020-04-30)
 

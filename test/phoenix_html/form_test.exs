@@ -31,7 +31,6 @@ defmodule Phoenix.HTML.FormTest do
     %{
       "key" => "value",
       "time" => ~T[01:02:03.004005],
-      "alt_key" => nil,
       "datetime" => %{
         "year" => "2020",
         "month" => "4",
@@ -430,9 +429,6 @@ defmodule Phoenix.HTML.FormTest do
 
     assert safe_form(&text_input(put_in(&1.data[:no_key], "original"), :no_key)) ==
              ~s(<input id="search_no_key" name="search[no_key]" type="text" value="original">)
-
-    assert safe_form(&text_input(put_in(&1.data[:alt_key], "original"), :alt_key)) ==
-             ~s(<input id="search_alt_key" name="search[alt_key]" type="text">)
   end
 
   ## textarea/3
@@ -764,13 +760,11 @@ defmodule Phoenix.HTML.FormTest do
     assert safe_form(&time_input(&1, :time)) ==
              ~s(<input id="search_time" name="search[time]" type="time" value="01:02">)
 
-    if Version.match?(System.version(), ">= 1.6.0") do
-      assert safe_form(&time_input(&1, :time, precision: :second)) ==
-               ~s(<input id="search_time" name="search[time]" type="time" value="01:02:03">)
+    assert safe_form(&time_input(&1, :time, precision: :second)) ==
+             ~s(<input id="search_time" name="search[time]" type="time" value="01:02:03">)
 
-      assert safe_form(&time_input(&1, :time, precision: :millisecond)) ==
-               ~s(<input id="search_time" name="search[time]" type="time" value="01:02:03.004">)
-    end
+    assert safe_form(&time_input(&1, :time, precision: :millisecond)) ==
+             ~s(<input id="search_time" name="search[time]" type="time" value="01:02:03.004">)
 
     assert safe_form(&time_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
              ~s(<input id="key" name="search[key][]" type="time" value="foo">)
@@ -1589,18 +1583,8 @@ defmodule Phoenix.HTML.FormTest do
     assert safe_form(&input_value(put_in(&1.data[:key], "original"), :key)) == "value"
     assert safe_form(&input_value(put_in(&1.data[:no_key], "original"), :no_key)) == "original"
 
-    safe_form(fn f ->
-      assert input_value(put_in(f.data[:alt_key], "original"), :alt_key) == nil
-      ""
-    end)
-
     assert safe_form(&input_value(put_in(&1.data["key"], "original"), "key")) == "value"
     assert safe_form(&input_value(put_in(&1.data["no_key"], "original"), "no_key")) == "original"
-
-    safe_form(fn f ->
-      assert input_value(put_in(f.data["alt_key"], "original"), "alt_key") == nil
-      ""
-    end)
   end
 
   ## input_id/2

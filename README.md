@@ -4,7 +4,7 @@ Collection of helpers to generate and manipulate HTML contents.
 
 Although this project was originally extracted from Phoenix,
 it does not depend on Phoenix and can be used with any Plug
-application.
+application (or even without Plug).
 
 See the [docs](https://hexdocs.pm/phoenix_html/) for more information.
 

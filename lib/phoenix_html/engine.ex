@@ -183,38 +183,15 @@ defmodule Phoenix.HTML.Engine do
         val
 
       :error ->
-        deprecated_fallback(key, assigns) ||
-          raise ArgumentError, """
-          assign @#{key} not available in eex template.
+        raise ArgumentError, """
+        assign @#{key} not available in eex template.
 
-          Please make sure all proper assigns have been set. If this
-          is a child template, ensure assigns are given explicitly by
-          the parent template as they are not automatically forwarded.
+        Please make sure all proper assigns have been set. If this
+        is a child template, ensure assigns are given explicitly by
+        the parent template as they are not automatically forwarded.
 
-          Available assigns: #{inspect(Enum.map(assigns, &elem(&1, 0)))}
-          """
+        Available assigns: #{inspect(Enum.map(assigns, &elem(&1, 0)))}
+        """
     end
   end
-
-  defp deprecated_fallback(:view_module, %{conn: %{private: %{phoenix_view: view_module}}}) do
-    IO.warn """
-    using @view_module is deprecated, please use view_module(conn) instead.
-
-    If using render(@view_module, @view_template, assigns), replace it by @inner_content.
-    """
-
-    view_module
-  end
-
-  defp deprecated_fallback(:view_template, %{conn: %{private: %{phoenix_template: view_template}}}) do
-    IO.warn """
-    using @view_template is deprecated, please use view_template(conn) instead.
-
-    If using render(@view_module, @view_template, assigns), replace it by @inner_content.
-    """
-
-    view_template
-  end
-
-  defp deprecated_fallback(_, _), do: nil
 end
