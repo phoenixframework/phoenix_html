@@ -49,7 +49,7 @@ defmodule Phoenix.HTML.Tag do
   def tag(name), do: tag(name, [])
 
   def tag(name, attrs) when is_list(attrs) do
-    {:safe, [?<, to_string(name), build_attrs(name, attrs), ?>]}
+    {:safe, [?<, to_string(name), build_attrs(attrs), ?>]}
   end
 
   @doc ~S"""
@@ -87,7 +87,7 @@ defmodule Phoenix.HTML.Tag do
   def content_tag(name, content, attrs) when is_list(attrs) do
     name = to_string(name)
     {:safe, escaped} = html_escape(content)
-    {:safe, [?<, name, build_attrs(name, attrs), ?>, escaped, ?<, ?/, name, ?>]}
+    {:safe, [?<, name, build_attrs(attrs), ?>, escaped, ?<, ?/, name, ?>]}
   end
 
   defp tag_attrs([]), do: []
@@ -117,29 +117,29 @@ defmodule Phoenix.HTML.Tag do
     end)
   end
 
-  defp build_attrs(_tag, []), do: []
-  defp build_attrs(tag, attrs), do: build_attrs(tag, attrs, [])
+  defp build_attrs([]), do: []
+  defp build_attrs(attrs), do: build_attrs(attrs, [])
 
-  defp build_attrs(_tag, [], acc), do: acc |> Enum.sort() |> tag_attrs
+  defp build_attrs([], acc), do: acc |> Enum.sort() |> tag_attrs
 
-  defp build_attrs(tag, [{k, v} | t], acc) when k in @tag_prefixes and is_list(v) do
-    build_attrs(tag, t, nested_attrs(dasherize(k), v, acc))
+  defp build_attrs([{k, v} | t], acc) when k in @tag_prefixes and is_list(v) do
+    build_attrs(t, nested_attrs(dasherize(k), v, acc))
   end
 
-  defp build_attrs(tag, [{k, true} | t], acc) do
-    build_attrs(tag, t, [dasherize(k) | acc])
+  defp build_attrs([{k, true} | t], acc) do
+    build_attrs(t, [dasherize(k) | acc])
   end
 
-  defp build_attrs(tag, [{_, false} | t], acc) do
-    build_attrs(tag, t, acc)
+  defp build_attrs([{_, false} | t], acc) do
+    build_attrs(t, acc)
   end
 
-  defp build_attrs(tag, [{_, nil} | t], acc) do
-    build_attrs(tag, t, acc)
+  defp build_attrs([{_, nil} | t], acc) do
+    build_attrs(t, acc)
   end
 
-  defp build_attrs(tag, [{k, v} | t], acc) do
-    build_attrs(tag, t, [{dasherize(k), v} | acc])
+  defp build_attrs([{k, v} | t], acc) do
+    build_attrs(t, [{dasherize(k), v} | acc])
   end
 
   defp dasherize(value) when is_atom(value), do: dasherize(Atom.to_string(value))
