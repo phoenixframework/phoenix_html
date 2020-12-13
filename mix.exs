@@ -8,7 +8,7 @@ defmodule PhoenixHtml.Mixfile do
     [
       app: :phoenix_html,
       version: @version,
-      elixir: "~> 1.6",
+      elixir: "~> 1.7",
       deps: deps(),
       name: "Phoenix.HTML",
       description: "Phoenix view functions for working with HTML templates",
