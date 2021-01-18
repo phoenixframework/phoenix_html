@@ -10,6 +10,7 @@ defmodule Phoenix.HTML.TagTest do
 
     assert tag(:input, name: ~s("<3")) |> safe_to_string() == ~s(<input name="&quot;&lt;3&quot;">)
     assert tag(:input, name: raw("<3")) |> safe_to_string() == ~s(<input name="<3">)
+    assert tag(:input, name: ["foo", raw("b<r")]) |> safe_to_string() == ~s(<input name="foob<r">)
     assert tag(:input, name: :hello) |> safe_to_string() == ~s(<input name="hello">)
 
     assert tag(:input, type: "text", name: "user_id") |> safe_to_string() ==
@@ -19,6 +20,8 @@ defmodule Phoenix.HTML.TagTest do
              ~s(<input data-toggle="dropdown">)
 
     assert tag(:input, my_attr: "blah") |> safe_to_string() == ~s(<input my-attr="blah">)
+    assert tag(:input, [{"my_<_attr", "blah"}]) |> safe_to_string() == ~s(<input my_&lt;_attr="blah">)
+    assert tag(:input, [{{:safe, "my_<_attr"}, "blah"}]) |> safe_to_string() == ~s(<input my_<_attr="blah">)
 
     assert tag(:input, data: [my_attr: "blah"]) |> safe_to_string() ==
              ~s(<input data-my-attr="blah">)

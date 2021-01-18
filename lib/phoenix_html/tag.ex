@@ -90,44 +90,17 @@ defmodule Phoenix.HTML.Tag do
     {:safe, [?<, name, build_attrs(attrs), ?>, escaped, ?<, ?/, name, ?>]}
   end
 
-  defp tag_attrs([]), do: []
-
-  defp tag_attrs(attrs) do
-    for a <- attrs do
-      case a do
-        {k, v} -> [?\s, k, ?=, ?", attr_escape(v), ?"]
-        k -> [?\s, k]
-      end
-    end
-  end
-
-  defp attr_escape({:safe, data}), do: data
-  defp attr_escape(nil), do: []
-  defp attr_escape(other) when is_binary(other), do: Phoenix.HTML.Engine.encode_to_iodata!(other)
-  defp attr_escape(other), do: Phoenix.HTML.Safe.to_iodata(other)
-
-  defp nested_attrs(attr, dict, acc) do
-    Enum.reduce(dict, acc, fn {k, v}, acc ->
-      attr_name = "#{attr}-#{dasherize(k)}"
-
-      case is_list(v) do
-        true -> nested_attrs(attr_name, v, acc)
-        false -> [{attr_name, v} | acc]
-      end
-    end)
-  end
-
   defp build_attrs([]), do: []
   defp build_attrs(attrs), do: build_attrs(attrs, [])
 
-  defp build_attrs([], acc), do: acc |> Enum.sort() |> tag_attrs
+  defp build_attrs([], acc), do: acc |> Enum.sort() |> tag_attrs()
 
   defp build_attrs([{k, v} | t], acc) when k in @tag_prefixes and is_list(v) do
-    build_attrs(t, nested_attrs(dasherize(k), v, acc))
+    build_attrs(t, nested_attrs(key_escape(k), v, acc))
   end
 
   defp build_attrs([{k, true} | t], acc) do
-    build_attrs(t, [dasherize(k) | acc])
+    build_attrs(t, [key_escape(k) | acc])
   end
 
   defp build_attrs([{_, false} | t], acc) do
@@ -139,11 +112,38 @@ defmodule Phoenix.HTML.Tag do
   end
 
   defp build_attrs([{k, v} | t], acc) do
-    build_attrs(t, [{dasherize(k), v} | acc])
+    build_attrs(t, [{key_escape(k), v} | acc])
   end
 
-  defp dasherize(value) when is_atom(value), do: dasherize(Atom.to_string(value))
-  defp dasherize(value) when is_binary(value), do: String.replace(value, "_", "-")
+  defp tag_attrs([]), do: []
+
+  defp tag_attrs(attrs) do
+    for a <- attrs do
+      case a do
+        {k, v} -> [?\s, k, ?=, ?", attr_escape(v), ?"]
+        k -> [?\s, k]
+      end
+    end
+  end
+
+  defp nested_attrs(attr, dict, acc) do
+    Enum.reduce(dict, acc, fn {k, v}, acc ->
+      attr_name = "#{attr}-#{key_escape(k)}"
+
+      case is_list(v) do
+        true -> nested_attrs(attr_name, v, acc)
+        false -> [{attr_name, v} | acc]
+      end
+    end)
+  end
+
+  defp key_escape(value) when is_atom(value), do: String.replace(Atom.to_string(value), "_", "-")
+  defp key_escape(value), do: attr_escape(value)
+
+  defp attr_escape({:safe, data}), do: data
+  defp attr_escape(nil), do: []
+  defp attr_escape(other) when is_binary(other), do: Phoenix.HTML.Engine.encode_to_iodata!(other)
+  defp attr_escape(other), do: Phoenix.HTML.Safe.to_iodata(other)
 
   @doc ~S"""
   Generates a form tag.
