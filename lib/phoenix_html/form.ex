@@ -260,6 +260,7 @@ defmodule Phoenix.HTML.Form do
 
   @type field :: atom | String.t()
 
+  # TODO v3.2: Remove me once form_for without anonymous function has been deprecated
   defimpl Phoenix.HTML.Safe do
     def to_iodata(%{action: action, options: options}) do
       {:safe, contents} = form_tag(action, options)
@@ -291,16 +292,8 @@ defmodule Phoenix.HTML.Form do
     bin |> String.replace("_", " ") |> String.capitalize()
   end
 
-  @doc """
-  Generates a form tag with a form builder **without** options or an anonymous function.
-
-      <%= f = form_for @changeset, Routes.user_path(@conn, :create) %>
-        Name: <%= text_input f, :name %>
-      </form>
-
-  A shortcut for `form_for(changeset, url, [])`.
-  """
-  @spec form_for(Phoenix.HTML.FormData.t(), String.t()) :: Phoenix.HTML.Form.t()
+  # TODO v3.1: Effectively deprecate and remove me in future versions
+  @doc false
   def form_for(form_data, action) do
     form_for(form_data, action, [])
   end
@@ -321,8 +314,8 @@ defmodule Phoenix.HTML.Form do
 
   See `form_for/4` for the available options.
   """
-  @spec form_for(Phoenix.HTML.FormData.t(), String.t(), Keyword.t()) ::
-          Phoenix.HTML.Form.t()
+  # TODO v3.1: Effectively deprecate and remove me in future versions
+  @doc deprecated: "This functionality is deprecated in favor of form_for with a function"
   def form_for(form_data, action, options) when is_list(options) do
     %{Phoenix.HTML.FormData.to_form(form_data, options) | action: action}
   end
