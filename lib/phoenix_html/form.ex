@@ -1685,7 +1685,8 @@ defmodule Phoenix.HTML.Form do
   All given options are forwarded to the underlying tag.
   A default value is provided for `for` attribute but can
   be overriden if you pass a value to the `for` option.
-  Text content would be inferred from `field` if not specified.
+  Text content would be inferred from `field` if not specified
+  as either a function argument or string value in a block.
 
   To wrap a label around an input, see `label/1`.
 
@@ -1708,6 +1709,9 @@ defmodule Phoenix.HTML.Form do
         "E-mail Address"
       end
       #=> <label for="user_email">E-mail Address</label>
+
+      label :user, :email, "E-mail Address", class: "control-label"
+      #=> <label class="control-label" for="user_email">E-mail Address</label>
 
       label :user, :email, class: "control-label" do
         "E-mail Address"
