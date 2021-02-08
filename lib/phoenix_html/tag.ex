@@ -8,7 +8,8 @@ defmodule Phoenix.HTML.Tag do
 
   import Phoenix.HTML
 
-  @tag_prefixes [:aria, :data]
+  @special_attributes ["data", "aria", "class"]
+
   @csrf_param "_csrf_token"
   @method_param "_method"
 
@@ -49,7 +50,7 @@ defmodule Phoenix.HTML.Tag do
   def tag(name), do: tag(name, [])
 
   def tag(name, attrs) when is_list(attrs) do
-    {:safe, [?<, to_string(name), build_attrs(attrs), ?>]}
+    {:safe, [?<, to_string(name), build_attrs(attrs) |> Enum.sort() |> tag_attrs(), ?>]}
   end
 
   @doc ~S"""
@@ -87,16 +88,46 @@ defmodule Phoenix.HTML.Tag do
   def content_tag(name, content, attrs) when is_list(attrs) do
     name = to_string(name)
     {:safe, escaped} = html_escape(content)
-    {:safe, [?<, name, build_attrs(attrs), ?>, escaped, ?<, ?/, name, ?>]}
+
+    {:safe,
+     [?<, name, build_attrs(attrs) |> Enum.sort() |> tag_attrs(), ?>, escaped, ?<, ?/, name, ?>]}
+  end
+
+  @doc """
+  Escapes a list of attributes, returning iodata.
+
+      iex> attributes_escape(title: "the title", id: "the id", selected: true)
+      {:safe,
+       [
+         [32, "title", 61, 34, "the title", 34],
+         [32, "id", 61, 34, "the id", 34],
+         [32, "selected"]
+       ]}
+
+  """
+  def attributes_escape(attrs) do
+    {:safe, attrs |> build_attrs() |> Enum.reverse() |> tag_attrs()}
   end
 
   defp build_attrs([]), do: []
   defp build_attrs(attrs), do: build_attrs(attrs, [])
 
-  defp build_attrs([], acc), do: acc |> Enum.sort() |> tag_attrs()
+  defp build_attrs([], acc), do: acc
 
-  defp build_attrs([{k, v} | t], acc) when k in @tag_prefixes and is_list(v) do
-    build_attrs(t, nested_attrs(key_escape(k), v, acc))
+  defp build_attrs([{k, v} | t], acc) when k in @special_attributes do
+    build_attrs([{String.to_atom(k), v} | t], acc)
+  end
+
+  defp build_attrs([{:data, v} | t], acc) when is_list(v) do
+    build_attrs(t, nested_attrs("data", v, acc))
+  end
+
+  defp build_attrs([{:aria, v} | t], acc) when is_list(v) do
+    build_attrs(t, nested_attrs("aria", v, acc))
+  end
+
+  defp build_attrs([{:class, v} | t], acc) when is_list(v) do
+    build_attrs(t, [{"class", class_value(v)} | acc])
   end
 
   defp build_attrs([{k, true} | t], acc) do
@@ -135,6 +166,16 @@ defmodule Phoenix.HTML.Tag do
         false -> [{attr_name, v} | acc]
       end
     end)
+  end
+
+  defp class_value(value) when is_list(value) do
+    value
+    |> Enum.filter(& &1)
+    |> Enum.join(" ")
+  end
+
+  defp class_value(value) do
+    value
   end
 
   defp key_escape(value) when is_atom(value), do: String.replace(Atom.to_string(value), "_", "-")
