@@ -5,6 +5,61 @@ defmodule Phoenix.HTML.TagTest do
   import Phoenix.HTML.Tag
   doctest Phoenix.HTML.Tag
 
+  describe "attributes_escape" do
+    test "key as atom" do
+      assert attributes_escape([{:title, "the title"}]) |> safe_to_string() ==
+               ~s( title="the title")
+    end
+
+    test "key as string" do
+      assert attributes_escape([{"title", "the title"}]) |> safe_to_string() ==
+               ~s( title="the title")
+    end
+
+    test "convert snake_case keys into kebab-case when key is atom" do
+      assert attributes_escape([{:my_attr, "value"}]) |> safe_to_string() == ~s( my-attr="value")
+    end
+
+    test "keep snake_case keys when key is string" do
+      assert attributes_escape([{"my_attr", "value"}]) |> safe_to_string() == ~s( my_attr="value")
+    end
+
+    test "multiple attributes" do
+      assert attributes_escape([{:title, "the title"}, {:id, "the id"}]) |> safe_to_string() ==
+               ~s( title="the title" id="the id")
+    end
+
+    test "handle nested data" do
+      assert attributes_escape([{"data", [a: "1", b: "2"]}]) |> safe_to_string() ==
+               ~s( data-a="1" data-b="2")
+
+      assert attributes_escape([{"aria", [a: "1", b: "2"]}]) |> safe_to_string() ==
+               ~s( aria-a="1" aria-b="2")
+    end
+
+    test "handle class value as string" do
+      assert attributes_escape([{:class, "btn"}]) |> safe_to_string() == ~s( class="btn")
+    end
+
+    test "handle class value as list" do
+      assert attributes_escape([{:class, ["btn", nil, false, "active"]}]) |> safe_to_string() ==
+               ~s( class="btn active")
+    end
+
+    test "handle class key as string" do
+      assert attributes_escape([{"class", "btn"}]) |> safe_to_string() == ~s( class="btn")
+    end
+
+    test "supress attribute when value is falsy" do
+      assert attributes_escape([{"title", nil}]) |> safe_to_string() == ~s()
+      assert attributes_escape([{"title", false}]) |> safe_to_string() == ~s()
+    end
+
+    test "supress value when value is true" do
+      assert attributes_escape([{"selected", true}]) |> safe_to_string() == ~s( selected)
+    end
+  end
+
   test "tag" do
     assert tag(:br) |> safe_to_string() == ~s(<br>)
 
@@ -20,8 +75,12 @@ defmodule Phoenix.HTML.TagTest do
              ~s(<input data-toggle="dropdown">)
 
     assert tag(:input, my_attr: "blah") |> safe_to_string() == ~s(<input my-attr="blah">)
-    assert tag(:input, [{"my_<_attr", "blah"}]) |> safe_to_string() == ~s(<input my_&lt;_attr="blah">)
-    assert tag(:input, [{{:safe, "my_<_attr"}, "blah"}]) |> safe_to_string() == ~s(<input my_<_attr="blah">)
+
+    assert tag(:input, [{"my_<_attr", "blah"}]) |> safe_to_string() ==
+             ~s(<input my_&lt;_attr="blah">)
+
+    assert tag(:input, [{{:safe, "my_<_attr"}, "blah"}]) |> safe_to_string() ==
+             ~s(<input my_<_attr="blah">)
 
     assert tag(:input, data: [my_attr: "blah"]) |> safe_to_string() ==
              ~s(<input data-my-attr="blah">)
