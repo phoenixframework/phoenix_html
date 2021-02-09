@@ -96,6 +96,9 @@ defmodule Phoenix.HTML.Tag do
   @doc """
   Escapes a list of attributes, returning iodata.
 
+  Pay attention that, unlike `Phoenix.HTML.Tag.tag/2` and `Phoenix.HTML.Tag.content_tag/2`, this
+  function does not sort the attributes.
+
       iex> attributes_escape(title: "the title", id: "the id", selected: true)
       {:safe,
        [
