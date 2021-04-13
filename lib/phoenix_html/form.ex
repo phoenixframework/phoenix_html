@@ -161,7 +161,7 @@ defmodule Phoenix.HTML.Form do
 
   The form generates a CSRF token by default. Your application should
   check this token on the server to avoid attackers from making requests
-  on your server in behalf of other users. Phoenix by default checks
+  on your server on behalf of other users. Phoenix by default checks
   this token.
 
   When posting a form with a host in its address, such as "//host.com/path"
