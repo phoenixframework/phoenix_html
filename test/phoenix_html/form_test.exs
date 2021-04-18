@@ -104,7 +104,7 @@ defmodule Phoenix.HTML.FormTest do
         |> html_escape()
         |> safe_to_string()
 
-      assert form_content  =~ ~s(<form action="/" id="form_id" method="post">)
+      assert form_content =~ ~s(<form action="/" id="form_id" method="post">)
       assert input_content =~ ~s(<input id="form_id_name" name="search[name]" type="text">)
     end
 
@@ -123,7 +123,7 @@ defmodule Phoenix.HTML.FormTest do
         |> html_escape()
         |> safe_to_string()
 
-      assert form_content  =~ ~s(<form action="/" method="post">)
+      assert form_content =~ ~s(<form action="/" method="post">)
       assert contents =~ ~s(<input id="search_name" name="search[name]" type="text">)
     end
   end
