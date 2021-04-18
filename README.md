@@ -1,4 +1,4 @@
-## Phoenix.HTML
+# Phoenix.HTML
 
 Collection of helpers to generate and manipulate HTML contents.
 
