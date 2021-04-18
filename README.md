@@ -1,5 +1,7 @@
 ## Phoenix.HTML
 
+[![Build Status](https://github.com/phoenixframework/phoenix_html/workflows/Tests/badge.svg)](https://github.com/phoenixframework/phoenix_html/actions?query=workflow%3ATests)
+
 Collection of helpers to generate and manipulate HTML contents.
 
 Although this project was originally extracted from Phoenix,
