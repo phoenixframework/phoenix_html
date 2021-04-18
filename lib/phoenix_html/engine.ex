@@ -184,7 +184,7 @@ defmodule Phoenix.HTML.Engine do
 
       :error ->
         raise ArgumentError, """
-        assign @#{key} not available in eex template.
+        assign @#{key} not available in template.
 
         Please make sure all proper assigns have been set. If this
         is a child template, ensure assigns are given explicitly by

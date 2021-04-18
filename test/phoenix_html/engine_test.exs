@@ -65,7 +65,7 @@ defmodule Phoenix.HTML.EngineTest do
 
   test "raises ArgumentError for missing assigns" do
     assert_raise ArgumentError,
-                 ~r/assign @foo not available in eex template.*Available assigns: \[:bar\]/s,
+                 ~r/assign @foo not available in EEx template.*Available assigns: \[:bar\]/s,
                  fn -> eval("<%= @foo %>", %{bar: true}) end
   end
 
