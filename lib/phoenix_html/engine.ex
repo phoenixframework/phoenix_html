@@ -134,7 +134,8 @@ defmodule Phoenix.HTML.Engine do
   defp line_from_expr(_), do: 0
 
   # We can do the work at compile time
-  defp to_safe(literal, _line) when is_binary(literal) or is_atom(literal) or is_number(literal) do
+  defp to_safe(literal, _line)
+       when is_binary(literal) or is_atom(literal) or is_number(literal) do
     literal
     |> Phoenix.HTML.Safe.to_iodata()
     |> IO.iodata_to_binary()
