@@ -41,12 +41,15 @@ jobs:
         restore-keys: |
           deps-${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}
 
+    - name: Install dependencies
+      run: mix deps.get --only test
+
     - name: Check source code format
       run: mix format --check-formatted
       if: ${{ matrix.lint }}
 
     - name: Check unused dependencies
-      run: mix deps.get && mix deps.unlock --check-unused
+      run: mix deps.unlock --check-unused
       if: ${{ matrix.lint }}
 
     - name: Remove compiled application files
