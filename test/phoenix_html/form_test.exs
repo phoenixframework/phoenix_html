@@ -723,7 +723,7 @@ defmodule Phoenix.HTML.FormTest do
              datetime_local_input(
                :search,
                :key,
-               value: ~U[2021-05-13 04:20:20.836851Z],
+               value: DateTime.from_naive!(~N[2021-05-13 04:20:20.836851], "Etc/UTC"),
                id: "key",
                name: "search[key][]"
              )
