@@ -718,6 +718,19 @@ defmodule Phoenix.HTML.FormTest do
              ~s(<input id="key" name="search[key][]" type="datetime-local" value="2017-09-21T20:21">)
   end
 
+  test "datetime_local_input/3 with %DateTime{}" do
+    assert safe_to_string(
+             datetime_local_input(
+               :search,
+               :key,
+               value: ~U[2021-05-13 04:20:20.836851Z],
+               id: "key",
+               name: "search[key][]"
+             )
+           ) ==
+             ~s(<input id="key" name="search[key][]" type="datetime-local" value="2021-05-13T04:20">)
+  end
+
   test "datetime_local_input/3 with form" do
     assert safe_form(&datetime_local_input(&1, :key)) ==
              ~s(<input id="search_key" name="search[key]" type="datetime-local" value="value">)
