@@ -755,9 +755,8 @@ defmodule Phoenix.HTML.Form do
     generic_input(:"datetime-local", form, field, opts)
   end
 
-  defp datetime_local_input_value(%NaiveDateTime{} = value) do
-    <<date::10-binary, ?\s, hour_minute::5-binary, _rest::binary>> =
-      NaiveDateTime.to_string(value)
+  defp datetime_local_input_value(%struct{} = value) when struct in [NaiveDateTime, DateTime] do
+    <<date::10-binary, ?\s, hour_minute::5-binary, _rest::binary>> = struct.to_string(value)
 
     [date, ?T, hour_minute]
   end
