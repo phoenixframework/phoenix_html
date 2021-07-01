@@ -282,7 +282,7 @@ defmodule Phoenix.HTML.Tag do
         {extra <> ~s'<input name="#{@csrf_param}" type="hidden" value="#{csrf_token}">', opts}
 
       {true, opts} ->
-        csrf_token = csrf_token(to)
+        csrf_token = csrf_token_value(to)
         {extra <> ~s'<input name="#{@csrf_param}" type="hidden" value="#{csrf_token}">', opts}
 
       {false, opts} ->
@@ -290,7 +290,12 @@ defmodule Phoenix.HTML.Tag do
     end
   end
 
-  defp csrf_token(to) do
+  @doc """
+  Returns the csrf_token value to be used by forms, meta tags, etc.
+
+  By default, CSRF tokens are generated through `Plug.CSRFProtection`.
+  """
+  def csrf_token_value(to) do
     {mod, fun, args} = Application.fetch_env!(:phoenix_html, :csrf_token_reader)
     apply(mod, fun, [to | args])
   end
@@ -310,7 +315,7 @@ defmodule Phoenix.HTML.Tag do
       :meta,
       charset: "UTF-8",
       name: "csrf-token",
-      content: csrf_token(%URI{host: nil}),
+      content: csrf_token_value(%URI{host: nil}),
       "csrf-param": @csrf_param,
       "method-param": @method_param
     )

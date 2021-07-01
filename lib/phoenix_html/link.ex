@@ -231,16 +231,11 @@ defmodule Phoenix.HTML.Link do
         {[csrf: csrf], opts}
 
       {true, opts} ->
-        {[csrf: csrf_token(to)], opts}
+        {[csrf: Phoenix.HTML.Tag.csrf_token_value(to)], opts}
 
       {false, opts} ->
         {[], opts}
     end
-  end
-
-  defp csrf_token(to) do
-    {mod, fun, args} = Application.fetch_env!(:phoenix_html, :csrf_token_reader)
-    apply(mod, fun, [to | args])
   end
 
   defp pop_required_option!(opts, key, error_message) do

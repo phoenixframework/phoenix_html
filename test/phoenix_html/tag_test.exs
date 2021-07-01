@@ -223,4 +223,20 @@ defmodule Phoenix.HTML.TagTest do
     assert safe_to_string(csrf_meta_tag()) ==
              ~s(<meta charset="UTF-8" content="#{csrf_token}" csrf-param="_csrf_token" method-param="_method" name="csrf-token">)
   end
+
+  describe "csrf_token_value" do
+    def custom_csrf(to, extra), do: "#{extra}:#{to}"
+
+    test "with default" do
+      assert csrf_token_value("/") == Plug.CSRFProtection.get_csrf_token()
+    end
+
+    @default_reader Application.fetch_env!(:phoenix_html, :csrf_token_reader)
+    test "with configured MFA" do
+      Application.put_env(:phoenix_html, :csrf_token_reader, {__MODULE__, :custom_csrf, ["extra"]})
+      assert csrf_token_value("/foo") == "extra:/foo"
+    after
+      Application.put_env(:phoenix_html, :csrf_token_reader, @default_reader)
+    end
+  end
 end

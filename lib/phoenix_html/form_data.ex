@@ -149,12 +149,11 @@ defimpl Phoenix.HTML.FormData, for: [Plug.Conn, Atom] do
 
   def input_value(_conn_or_atom, %{data: data, params: params}, field)
       when is_atom(field) or is_binary(field) do
-    case Map.fetch(params, field_to_string(field)) do
-      {:ok, value} ->
-        value
+    key = field_to_string(field)
 
-      :error ->
-        Map.get(data, field)
+    case params do
+      %{^key => value} -> value
+      %{} -> Map.get(data, field)
     end
   end
 
