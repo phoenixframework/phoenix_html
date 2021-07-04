@@ -166,6 +166,11 @@ defmodule Phoenix.HTML.Link do
     link(contents, opts)
   end
 
+  def mail_to(email_address), do: mail_to(email_address, email_address)
+  def mail_to(email_address, name) do
+    link(name, to: "mailto:#{email_address}")
+  end
+
   @doc """
   Generates a button tag that uses the Javascript function handleClick()
   (see phoenix_html.js) to submit the form data.
