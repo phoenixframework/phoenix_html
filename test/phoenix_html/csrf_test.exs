@@ -34,9 +34,4 @@ defmodule Phoenix.HTML.CSRFTest do
                 <input\ name="_csrf_token"\ type="hidden"\ value="[^"]+">
               )mx
   end
-
-  test "csrf_meta_tag" do
-    assert safe_to_string(csrf_meta_tag()) =~
-             ~r(<meta charset="UTF-8" content="[^"]+" csrf-param="_csrf_token" method-param="_method" name="csrf-token">)
-  end
 end

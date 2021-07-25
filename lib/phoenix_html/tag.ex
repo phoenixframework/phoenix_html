@@ -303,22 +303,10 @@ defmodule Phoenix.HTML.Tag do
   @doc """
   Generates a meta tag with CSRF information.
 
-  ## Tag attributes
-
-    * `content` - a valid csrf token
-    * `csrf-param` - a request parameter where expected csrf token
-    * `method-param` - a request parameter where expected a custom HTTP method
-
+  Additional options to the tag can be given.
   """
-  def csrf_meta_tag do
-    tag(
-      :meta,
-      charset: "UTF-8",
-      name: "csrf-token",
-      content: csrf_token_value(%URI{host: nil}),
-      "csrf-param": @csrf_param,
-      "method-param": @method_param
-    )
+  def csrf_meta_tag(opts \\ []) do
+    tag(:meta, [name: "csrf-token", content: csrf_token_value(%URI{host: nil})] ++ opts)
   end
 
   @doc """
