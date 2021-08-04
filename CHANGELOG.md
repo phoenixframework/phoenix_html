@@ -3,10 +3,12 @@
 # v3.0.0-dev
 
 * Enhancements
-  * Allow extra html attributes with on the :prompt option in `select`
+  * Allow extra html attributes on the `:prompt` option in `select`
   * Make `Plug` an optional dependency
-  * Prefix form id on inputs when it is given to `form_for/3`
-  * Allow `%URI{}` to be passed to `link/2` and `button/2` as :to
+  * Prefix form id on inputs when it is given to `form_for/3`
+  * Allow `%URI{}` to be passed to `link/2` and `button/2` as `:to`
+  * Expose `Phoenix.HTML.Tag.csrf_token_value/1`
+  * Add `Phoenix.HTML.Tag.attributes_escape/1`
 
 * Bug fixes
   * Honor the `form` attribute when creating hidden checkbox input
@@ -17,8 +19,9 @@
 
 * Backwards incompatible changes
   * Strings given as attributes in `tag` and `content_tag` are now emitted as is (without being dasherized) and are also HTML escaped
-  * Prefix form id on inputs when it is given to `form_for/3`
+  * Prefix form id on inputs when it is given to `form_for/3`
   * By default dates and times will format to the `to_iso8601` functions provided by their implementation
+  * Do not include `csrf-param` and `method-param` in generated `csrf_meta_tag`
   * Remove deprecated `escape_javascript` in favor of `javascript_escape`
   * Remove deprecated `field_value` in favor of `input_value`
   * Remove deprecated `field_name` in favor of `input_name`

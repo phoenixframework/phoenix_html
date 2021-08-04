@@ -293,9 +293,13 @@ defmodule Phoenix.HTML.Tag do
   @doc """
   Returns the csrf_token value to be used by forms, meta tags, etc.
 
-  By default, CSRF tokens are generated through `Plug.CSRFProtection`.
+  By default, CSRF tokens are generated through `Plug.CSRFProtection`
+  which is capable of generating a separate token per host. Therefore
+  it is recommended to pass the `URI` of the destination as argument.
+  If none is given `%URI{host: nil}` is used, which implies a local
+  request is being done.
   """
-  def csrf_token_value(to) do
+  def csrf_token_value(to \\ %URI{host: nil}) do
     {mod, fun, args} = Application.fetch_env!(:phoenix_html, :csrf_token_reader)
     apply(mod, fun, [to | args])
   end
@@ -306,7 +310,7 @@ defmodule Phoenix.HTML.Tag do
   Additional options to the tag can be given.
   """
   def csrf_meta_tag(opts \\ []) do
-    tag(:meta, [name: "csrf-token", content: csrf_token_value(%URI{host: nil})] ++ opts)
+    tag(:meta, [name: "csrf-token", content: csrf_token_value()] ++ opts)
   end
 
   @doc """
