@@ -1657,7 +1657,7 @@ defmodule Phoenix.HTML.Form do
       label do
         radio_button :user, :choice, "Choice"
       end
-      #=> <label class="control-label">...</label>
+      #=> <label>...</label>
 
       label class: "control-label" do
         radio_button :user, :choice, "Choice"
