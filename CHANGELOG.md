@@ -1,6 +1,6 @@
 # Changelog
 
-# v3.0.0-dev
+# v3.0.0 (2020-08-06)
 
 * Enhancements
   * Allow extra html attributes on the `:prompt` option in `select`
