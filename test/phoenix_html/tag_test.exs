@@ -227,6 +227,17 @@ defmodule Phoenix.HTML.TagTest do
              ~s(<meta content="#{csrf_token}" foo="bar" name="csrf-token">)
   end
 
+  test "csrf_input_tag" do
+    url = "/example"
+    csrf_token = Plug.CSRFProtection.get_csrf_token_for(url)
+
+    assert safe_to_string(csrf_input_tag(url)) ==
+             ~s(<input name="_csrf_token" type="hidden" value="#{csrf_token}">)
+
+    assert safe_to_string(csrf_input_tag(url, foo: "bar")) ==
+             ~s(<input foo="bar" name="_csrf_token" type="hidden" value="#{csrf_token}">)
+  end
+
   describe "csrf_token_value" do
     def custom_csrf(to, extra), do: "#{extra}:#{to}"
 
