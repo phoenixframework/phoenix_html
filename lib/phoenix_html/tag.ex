@@ -291,7 +291,7 @@ defmodule Phoenix.HTML.Tag do
   end
 
   @doc """
-  Returns the csrf_token value to be used by forms, meta tags, etc.
+  Returns the `csrf_token` value to be used by forms, meta tags, etc.
 
   By default, CSRF tokens are generated through `Plug.CSRFProtection`
   which is capable of generating a separate token per host. Therefore
@@ -311,6 +311,30 @@ defmodule Phoenix.HTML.Tag do
   """
   def csrf_meta_tag(opts \\ []) do
     tag(:meta, [name: "csrf-token", content: csrf_token_value()] ++ opts)
+  end
+
+  @doc """
+  Generates a hidden input tag with a CSRF token.
+
+  This could be used when writing a form without the use of tag
+  helpers like `form_tag/3` or `form_for/4`, while maintaining
+  CSRF protection.
+
+  The `to` argument should be the same as the form action.
+
+  ## Example
+
+      <form action="/login" method="POST">
+        <%= csrf_input_tag("/login") %>
+
+        etc.
+      </form>
+
+  Additional options to the tag can be given.
+  """
+  def csrf_input_tag(to, opts \\ []) do
+    csrf_token = csrf_token_value(to)
+    tag(:input, [type: "hidden", name: @csrf_param, value: csrf_token] ++ opts)
   end
 
   @doc """
