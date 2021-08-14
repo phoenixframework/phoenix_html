@@ -2,8 +2,24 @@ defmodule Phoenix.HTML.Tag do
   @moduledoc ~S"""
   Helpers related to producing HTML tags within templates.
 
-  Note the examples in this module use `safe_to_string/1`
-  imported from `Phoenix.HTML` for readability.
+  > Note: the examples in this module use `safe_to_string/1`
+  > imported from `Phoenix.HTML` for readability.
+
+  > Note: with the addition of the HEEx template engine to
+  > Phoenix applications, the functions in this module have
+  > lost a bit of relevance. Whenever possible, prefer to use
+  > the HEEx template engine instead of the functions here.
+  > For example, instead of:
+  >
+  >     <%= content_tag :div, class: @class do %>
+  >       Hello
+  >     <% end %>
+  >
+  > Do:
+  >
+  >     <div class={@class}>
+  >       Hello
+  >     </div>
   """
 
   import Phoenix.HTML
@@ -190,9 +206,8 @@ defmodule Phoenix.HTML.Tag do
   @doc ~S"""
   Generates a form tag.
 
-  This function generates the `<form>` tag without its
-  closing part. Check `form_tag/3` for generating an
-  enclosing tag.
+  This function generates the `<form>` tag without its closing part.
+  Check `form_tag/3` for generating an enclosing tag.
 
   ## Examples
 
