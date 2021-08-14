@@ -291,7 +291,7 @@ defmodule Phoenix.HTML.Tag do
   end
 
   @doc """
-  Returns the csrf_token value to be used by forms, meta tags, etc.
+  Returns the `csrf_token` value to be used by forms, meta tags, etc.
 
   By default, CSRF tokens are generated through `Plug.CSRFProtection`
   which is capable of generating a separate token per host. Therefore
@@ -314,9 +314,11 @@ defmodule Phoenix.HTML.Tag do
   end
 
   @doc """
-  Generates a hidden input tag with a CSRF token. This could be used when
-  writing a form without the use of tag helpers like `form_tag/3` or
-  `form_for/4`, but while maintaining CSRF protection.
+  Generates a hidden input tag with a CSRF token.
+
+  This could be used when writing a form without the use of tag
+  helpers like `form_tag/3` or `form_for/4`, while maintaining
+  CSRF protection.
 
   The `to` argument should be the same as the form action.
 
