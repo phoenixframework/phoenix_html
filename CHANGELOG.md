@@ -1,5 +1,10 @@
 # Changelog
 
+# v3.0.1 (2020-08-14)
+
+* Enhancements
+  * Add `Phoenix.HTML.Tag.csrf_input_tag/2`
+
 # v3.0.0 (2020-08-06)
 
 * Enhancements
