@@ -9,9 +9,7 @@ defmodule Phoenix.HTML.Tag do
   import Phoenix.HTML
 
   @special_attributes ["data", "aria", "class"]
-
   @csrf_param "_csrf_token"
-  @method_param "_method"
 
   @doc ~S"""
   Creates an HTML tag with the given name and options.
@@ -238,18 +236,14 @@ defmodule Phoenix.HTML.Tag do
           {"", opts}
 
         "post" ->
-          csrf_token_tag(
-            action,
-            Keyword.put(opts, :method, "post"),
-            ""
-          )
+          {csrf, opts} = csrf_form_tag(action, opts)
+          {csrf, Keyword.put(opts, :method, "post")}
 
         _ ->
-          csrf_token_tag(
-            action,
-            Keyword.put(opts, :method, "post"),
-            ~s'<input name="#{@method_param}" type="hidden" value="#{method}">'
-          )
+          {csrf, opts} = csrf_form_tag(action, opts)
+
+          {[~s'<input name="_method" type="hidden" value="', to_string(method), ~s'">' | csrf],
+           Keyword.put(opts, :method, "post")}
       end
 
     opts =
@@ -276,17 +270,17 @@ defmodule Phoenix.HTML.Tag do
     html_escape([form_tag(action, options), block, raw("</form>")])
   end
 
-  defp csrf_token_tag(to, opts, extra) do
+  defp csrf_form_tag(to, opts) do
     case Keyword.pop(opts, :csrf_token, true) do
       {csrf_token, opts} when is_binary(csrf_token) ->
-        {extra <> ~s'<input name="#{@csrf_param}" type="hidden" value="#{csrf_token}">', opts}
+        {[~s'<input name="#{@csrf_param}" type="hidden" value="', csrf_token, ~s'">'], opts}
 
       {true, opts} ->
         csrf_token = csrf_token_value(to)
-        {extra <> ~s'<input name="#{@csrf_param}" type="hidden" value="#{csrf_token}">', opts}
+        {[~s'<input name="#{@csrf_param}" type="hidden" value="', csrf_token, ~s'">'], opts}
 
       {false, opts} ->
-        {extra, opts}
+        {[], opts}
     end
   end
 
