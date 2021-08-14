@@ -174,25 +174,20 @@ defmodule Phoenix.HTML.Form do
 
   ## Phoenix.LiveView integration
 
-  Because `Phoenix.LiveView` is unable to compute diffs inside
-  anonymous functions, Phoenix.HTML provides `form_for/3` that works
-  without passing an anonymous function. Inside live views, instead of
+  Phoenix.LiveView builds on top of this function to [provide a function
+  component named `form`](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.Helpers.html#form/1).
+  Inside your HEEx templates, instead of doing this:
 
       <%= form_for @changeset, url, opts, fn f -> %>
         <%= text_input f, :name %>
       <% end %>
 
-  you would write
+  you should import `Phoenix.LiveView.Helpers` and then write:
 
-      <%= f = form_for @changeset, url, opts %>
+      <.form let={f} for={@changeset}>
         <%= text_input f, :name %>
-      </form>
+      </.form>
 
-  In the second case, the `form_for` emits only the opening of the
-  `<form>` tag, which then needs to be closed explicitly in HTML.
-  Since the anonymous function has been removed, `Phoenix.LiveView`
-  is able to optimize forms too. Although outside of live views,
-  we recommend using the first construct.
   """
 
   alias Phoenix.HTML.Form
@@ -355,10 +350,7 @@ defmodule Phoenix.HTML.Form do
     * `:id` - the ID of the form attribute. If an ID is given, all form inputs
       will also be prefixed by the given ID
 
-    * Other options will be passed as html attributes, such as `class: "foo"`
-
-  See `Phoenix.HTML.Tag.form_tag/2` for more information on the
-  options above.
+  All other options will be passed as html attributes, such as `class: "foo"`.
   """
   @spec form_for(Phoenix.HTML.FormData.t(), String.t(), (t -> Phoenix.HTML.unsafe())) ::
           Phoenix.HTML.safe()
