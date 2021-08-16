@@ -108,10 +108,11 @@ defmodule Phoenix.HTML.Tag do
   end
 
   @doc """
-  Escapes a list of attributes, returning iodata.
+  Escapes an enumerable of attributes, returning iodata.
 
   Pay attention that, unlike `tag/2` and `content_tag/2`, this
-  function does not sort the attributes.
+  function does not sort the attributes. However if given a map,
+  note also that the key ordering may change.
 
       iex> attributes_escape(title: "the title", id: "the id", selected: true)
       {:safe,
@@ -121,13 +122,20 @@ defmodule Phoenix.HTML.Tag do
          [32, "selected"]
        ]}
 
+      iex> attributes_escape(%{data: [phx: [value: [foo: "bar"]]], class: "foo"})
+      {:safe,
+       [
+         [32, "class", 61, 34, "foo", 34],
+         [32, "data-phx-value-foo", 61, 34, "bar", 34]
+       ]}
+
   """
   def attributes_escape(attrs) do
     {:safe, attrs |> build_attrs() |> Enum.reverse() |> tag_attrs()}
   end
 
   defp build_attrs([]), do: []
-  defp build_attrs(attrs), do: build_attrs(attrs, [])
+  defp build_attrs(attrs), do: attrs |> Enum.to_list() |> build_attrs([])
 
   defp build_attrs([], acc), do: acc
 
