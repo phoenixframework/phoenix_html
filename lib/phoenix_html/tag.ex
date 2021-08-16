@@ -135,6 +135,7 @@ defmodule Phoenix.HTML.Tag do
   end
 
   defp build_attrs([]), do: []
+  defp build_attrs([_ | _] = attrs), do: build_attrs(attrs, [])
   defp build_attrs(attrs), do: attrs |> Enum.to_list() |> build_attrs([])
 
   defp build_attrs([], acc), do: acc
