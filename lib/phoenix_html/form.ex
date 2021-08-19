@@ -311,6 +311,7 @@ defmodule Phoenix.HTML.Form do
   """
   # TODO v3.1: Effectively deprecate and remove me in future versions
   @doc deprecated: "This functionality is deprecated in favor of form_for with a function"
+  @spec form_for(Phoenix.HTML.FormData.t(), String.t(), Keyword.t()) :: Phoenix.HTML.Form.t()
   def form_for(form_data, action, options) when is_list(options) do
     %{Phoenix.HTML.FormData.to_form(form_data, options) | action: action}
   end
