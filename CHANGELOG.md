@@ -1,5 +1,10 @@
 # Changelog
 
+# v3.0.2 (2020-08-19)
+
+* Enhancements
+  * Support maps on `Phoenix.HTML.Tag.attributes_escape/1`
+
 # v3.0.1 (2020-08-14)
 
 * Enhancements
