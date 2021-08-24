@@ -28,7 +28,7 @@
   * `form_for` without an anonymous function has been deprecated. v3.0 has deprecated the usage, v3.1 will emit warnings, and v3.2 will fully remove the functionality
 
 * Backwards incompatible changes
-  * Strings given as attributes in `tag` and `content_tag` are now emitted as is (without being dasherized) and are also HTML escaped
+  * Strings given as attributes keys in `tag` and `content_tag` are now emitted as is (without being dasherized) and are also HTML escaped
   * Prefix form id on inputs when it is given to `form_for/3`
   * By default dates and times will format to the `to_iso8601` functions provided by their implementation
   * Do not include `csrf-param` and `method-param` in generated `csrf_meta_tag`
