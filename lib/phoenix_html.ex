@@ -132,7 +132,7 @@ defmodule Phoenix.HTML do
   def raw(value) when is_binary(value) or is_list(value), do: {:safe, value}
 
   @doc """
-  Escapes the HTML entities in the given term, returning iodata.
+  Escapes the HTML entities in the given term, returning safe iodata.
 
       iex> html_escape("<hello>")
       {:safe, [[[] | "&lt;"], "hello" | "&gt;"]}
@@ -156,6 +156,11 @@ defmodule Phoenix.HTML do
 
   Fails if the result is not safe. In such cases, you can
   invoke `html_escape/1` or `raw/1` accordingly before.
+
+  You can combine `html_escape/1` and `safe_to_string/1`
+  to convert a data structure to a escaped string:
+
+      data |> html_escape() |> safe_to_string()
   """
   @spec safe_to_string(safe) :: String.t()
   def safe_to_string({:safe, iodata}) do
