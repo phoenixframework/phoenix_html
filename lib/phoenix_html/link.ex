@@ -153,7 +153,7 @@ defmodule Phoenix.HTML.Link do
     else
       {csrf_data, opts} = csrf_data(to, opts)
       opts = Keyword.put_new(opts, :rel, "nofollow")
-      content_tag(:a, text, [href: to, data: [method: method, to: to] ++ csrf_data] ++ opts)
+      content_tag(:a, text, [data: csrf_data ++ [method: method, to: to], href: to] ++ opts)
     end
   end
 
@@ -217,7 +217,7 @@ defmodule Phoenix.HTML.Link do
       content_tag(:button, text, [data: [method: method, to: to]] ++ opts)
     else
       {csrf_data, opts} = csrf_data(to, opts)
-      content_tag(:button, text, [data: [method: method, to: to] ++ csrf_data] ++ opts)
+      content_tag(:button, text, [data: csrf_data ++ [method: method, to: to]] ++ opts)
     end
   end
 

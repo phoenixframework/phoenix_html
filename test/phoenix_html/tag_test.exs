@@ -85,7 +85,7 @@ defmodule Phoenix.HTML.TagTest do
     assert tag(:input, data: [my_attr: "blah"]) |> safe_to_string() ==
              ~s(<input data-my-attr="blah">)
 
-    assert tag(:input, data: [toggle: [target: "#parent", attr: "blah"]]) |> safe_to_string() ==
+    assert tag(:input, data: [toggle: [attr: "blah", target: "#parent"]]) |> safe_to_string() ==
              ~s(<input data-toggle-attr="blah" data-toggle-target="#parent">)
 
     assert tag(:audio, autoplay: "autoplay") |> safe_to_string() ==

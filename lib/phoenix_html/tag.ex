@@ -24,7 +24,6 @@ defmodule Phoenix.HTML.Tag do
 
   import Phoenix.HTML
 
-  @special_attributes ["data", "aria", "class"]
   @csrf_param "_csrf_token"
 
   @doc ~S"""
@@ -64,7 +63,7 @@ defmodule Phoenix.HTML.Tag do
   def tag(name), do: tag(name, [])
 
   def tag(name, attrs) when is_list(attrs) do
-    {:safe, [?<, to_string(name), build_attrs(attrs) |> Enum.sort() |> tag_attrs(), ?>]}
+    {:safe, [?<, to_string(name), sorted_attrs(attrs), ?>]}
   end
 
   @doc ~S"""
@@ -103,96 +102,71 @@ defmodule Phoenix.HTML.Tag do
     name = to_string(name)
     {:safe, escaped} = html_escape(content)
 
-    {:safe,
-     [?<, name, build_attrs(attrs) |> Enum.sort() |> tag_attrs(), ?>, escaped, ?<, ?/, name, ?>]}
+    {:safe, [?<, name, sorted_attrs(attrs), ?>, escaped, ?<, ?/, name, ?>]}
   end
 
-  @doc """
+  @doc ~S"""
   Escapes an enumerable of attributes, returning iodata.
 
   Pay attention that, unlike `tag/2` and `content_tag/2`, this
   function does not sort the attributes. However if given a map,
   note also that the key ordering may change.
 
-      iex> attributes_escape(title: "the title", id: "the id", selected: true)
-      {:safe,
-       [
-         [32, "title", 61, 34, "the title", 34],
-         [32, "id", 61, 34, "the id", 34],
-         [32, "selected"]
-       ]}
+      iex> safe_to_string attributes_escape(title: "the title", id: "the id", selected: true)
+      " title=\"the title\" id=\"the id\" selected"
 
-      iex> attributes_escape(%{data: [phx: [value: [foo: "bar"]]], class: "foo"})
-      {:safe,
-       [
-         [32, "class", 61, 34, "foo", 34],
-         [32, "data-phx-value-foo", 61, 34, "bar", 34]
-       ]}
+      iex> safe_to_string attributes_escape(%{data: [phx: [value: [foo: "bar"]]], class: "foo"})
+      " class=\"foo\" data-phx-value-foo=\"bar\""
 
   """
-  def attributes_escape(attrs) do
-    {:safe, attrs |> build_attrs() |> Enum.reverse() |> tag_attrs()}
+  def attributes_escape(attrs) when is_list(attrs) do
+    {:safe, build_attrs(attrs)}
   end
+
+  def attributes_escape(attrs) do
+    {:safe, attrs |> Enum.to_list() |> build_attrs()}
+  end
+
+  defp build_attrs([{"data", v} | t]) when is_list(v),
+    do: nested_attrs(v, " data", t)
+
+  defp build_attrs([{"aria", v} | t]) when is_list(v),
+    do: nested_attrs(v, " aria", t)
+
+  defp build_attrs([{"class", v} | t]) when is_list(v),
+    do: [" class=\"", class_value(v), ?" | build_attrs(t)]
+
+  defp build_attrs([{:data, v} | t]) when is_list(v),
+    do: nested_attrs(v, " data", t)
+
+  defp build_attrs([{:aria, v} | t]) when is_list(v),
+    do: nested_attrs(v, " aria", t)
+
+  defp build_attrs([{:class, v} | t]) when is_list(v),
+    do: [" class=\"", class_value(v), ?" | build_attrs(t)]
+
+  defp build_attrs([{k, true} | t]),
+    do: [?\s, key_escape(k) | build_attrs(t)]
+
+  defp build_attrs([{_, false} | t]),
+    do: build_attrs(t)
+
+  defp build_attrs([{_, nil} | t]),
+    do: build_attrs(t)
+
+  defp build_attrs([{k, v} | t]),
+    do: [?\s, key_escape(k), ?=, ?", attr_escape(v), ?" | build_attrs(t)]
 
   defp build_attrs([]), do: []
-  defp build_attrs([_ | _] = attrs), do: build_attrs(attrs, [])
-  defp build_attrs(attrs), do: attrs |> Enum.to_list() |> build_attrs([])
 
-  defp build_attrs([], acc), do: acc
+  defp nested_attrs([{k, v} | kv], attr, t) when is_list(v),
+    do: [nested_attrs(v, "#{attr}-#{key_escape(k)}", []) | nested_attrs(kv, attr, t)]
 
-  defp build_attrs([{k, v} | t], acc) when k in @special_attributes do
-    build_attrs([{String.to_atom(k), v} | t], acc)
-  end
+  defp nested_attrs([{k, v} | kv], attr, t),
+    do: [attr, ?-, key_escape(k), ?=, ?", attr_escape(v), ?" | nested_attrs(kv, attr, t)]
 
-  defp build_attrs([{:data, v} | t], acc) when is_list(v) do
-    build_attrs(t, nested_attrs("data", v, acc))
-  end
-
-  defp build_attrs([{:aria, v} | t], acc) when is_list(v) do
-    build_attrs(t, nested_attrs("aria", v, acc))
-  end
-
-  defp build_attrs([{:class, v} | t], acc) when is_list(v) do
-    build_attrs(t, [{"class", class_value(v)} | acc])
-  end
-
-  defp build_attrs([{k, true} | t], acc) do
-    build_attrs(t, [key_escape(k) | acc])
-  end
-
-  defp build_attrs([{_, false} | t], acc) do
-    build_attrs(t, acc)
-  end
-
-  defp build_attrs([{_, nil} | t], acc) do
-    build_attrs(t, acc)
-  end
-
-  defp build_attrs([{k, v} | t], acc) do
-    build_attrs(t, [{key_escape(k), v} | acc])
-  end
-
-  defp tag_attrs([]), do: []
-
-  defp tag_attrs(attrs) do
-    for a <- attrs do
-      case a do
-        {k, v} -> [?\s, k, ?=, ?", attr_escape(v), ?"]
-        k -> [?\s, k]
-      end
-    end
-  end
-
-  defp nested_attrs(attr, dict, acc) do
-    Enum.reduce(dict, acc, fn {k, v}, acc ->
-      attr_name = "#{attr}-#{key_escape(k)}"
-
-      case is_list(v) do
-        true -> nested_attrs(attr_name, v, acc)
-        false -> [{attr_name, v} | acc]
-      end
-    end)
-  end
+  defp nested_attrs([], _attr, t),
+    do: build_attrs(t)
 
   defp class_value(value) when is_list(value) do
     value
@@ -211,6 +185,16 @@ defmodule Phoenix.HTML.Tag do
   defp attr_escape(nil), do: []
   defp attr_escape(other) when is_binary(other), do: Phoenix.HTML.Engine.encode_to_iodata!(other)
   defp attr_escape(other), do: Phoenix.HTML.Safe.to_iodata(other)
+
+  defp sorted_attrs(attrs) when is_list(attrs),
+    do: attrs |> normalize_attrs() |> Enum.sort() |> build_attrs()
+
+  defp sorted_attrs(attrs),
+    do: attrs |> Enum.to_list() |> sorted_attrs()
+
+  defp normalize_attrs([{k, v} | tail]), do: [{k, v} | normalize_attrs(tail)]
+  defp normalize_attrs([k | tail]), do: [{k, true} | normalize_attrs(tail)]
+  defp normalize_attrs([]), do: []
 
   @doc ~S"""
   Generates a form tag.
