@@ -1,5 +1,10 @@
 # Changelog
 
+# v3.0.3 (2020-09-04)
+
+* Bug fix
+  * Fix sorting of attributes in `tag`/`content_tag`
+
 # v3.0.2 (2020-08-19)
 
 * Enhancements
