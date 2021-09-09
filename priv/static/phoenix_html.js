@@ -74,4 +74,11 @@
       e.preventDefault();
     }
   }, false);
+
+  window.addEventListener("DOMContentLoaded", function () {
+    var links = document.querySelectorAll("a[data-load-disabled='true']");
+    for (var i = 0; i < links.length; i++) {
+      links[i].removeAttribute('disabled')
+    }
+  }, false);
 })();

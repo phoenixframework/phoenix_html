@@ -27,7 +27,7 @@ defmodule Phoenix.HTML.Link do
 
       # If you supply a method other than `:get`:
       link("delete", to: "/everything", method: :delete)
-      #=> <a href="/everything" data-csrf="csrf_token" data-method="delete" data-to="/everything">delete</a>
+      #=> <a href="/everything" data-csrf="csrf_token" data-method="delete" data-to="/everything" data-load-disabled="true">delete</a>
 
       # You can use a `do ... end` block too:
       link to: "/hello" do
@@ -111,6 +111,13 @@ defmodule Phoenix.HTML.Link do
   ## CSRF Protection
 
   By default, CSRF tokens are generated through `Plug.CSRFProtection`.
+
+  ## Disabled while loading
+
+  All links with methods other than `:get` are by default disabled until `Phoenix.HTML`
+  is loaded. This prevents them from being clicked (thus using the `:get` method).
+
+  If you already provide the `disabled` option, this feature is ignored.
   """
   @valid_uri_schemes [
     "http:",
@@ -153,7 +160,20 @@ defmodule Phoenix.HTML.Link do
     else
       {csrf_data, opts} = csrf_data(to, opts)
       opts = Keyword.put_new(opts, :rel, "nofollow")
-      content_tag(:a, text, [data: csrf_data ++ [method: method, to: to], href: to] ++ opts)
+
+      {extra_data, extra_opts} =
+        if Keyword.has_key?(opts, :disabled) do
+          {[], []}
+        else
+          {[load_disabled: "true"], [disabled: "disabled"]}
+        end
+
+      content_tag(
+        :a,
+        text,
+        [data: csrf_data ++ [method: method, to: to] ++ extra_data, href: to] ++
+          opts ++ extra_opts
+      )
     end
   end
 
