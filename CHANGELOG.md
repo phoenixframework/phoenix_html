@@ -1,5 +1,10 @@
 # Changelog
 
+# v3.0.4 (2021-09-23)
+
+* Bug fix
+  * Ensure `class={@class}` in HEEx templates and `:class` attribute in `content_tag` are properly escaped against XSS
+
 # v3.0.3 (2021-09-04)
 
 * Bug fix
