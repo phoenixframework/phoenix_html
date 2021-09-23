@@ -127,6 +127,15 @@ defmodule Phoenix.HTML.Tag do
     {:safe, attrs |> Enum.to_list() |> build_attrs()}
   end
 
+  defp build_attrs([{k, true} | t]),
+    do: [?\s, key_escape(k) | build_attrs(t)]
+
+  defp build_attrs([{_, false} | t]),
+    do: build_attrs(t)
+
+  defp build_attrs([{_, nil} | t]),
+    do: build_attrs(t)
+
   defp build_attrs([{"data", v} | t]) when is_list(v),
     do: nested_attrs(v, " data", t)
 
@@ -144,15 +153,6 @@ defmodule Phoenix.HTML.Tag do
 
   defp build_attrs([{:class, v} | t]) when is_list(v),
     do: [" class=\"", class_value(v), ?" | build_attrs(t)]
-
-  defp build_attrs([{k, true} | t]),
-    do: [?\s, key_escape(k) | build_attrs(t)]
-
-  defp build_attrs([{_, false} | t]),
-    do: build_attrs(t)
-
-  defp build_attrs([{_, nil} | t]),
-    do: build_attrs(t)
 
   defp build_attrs([{k, v} | t]),
     do: [?\s, key_escape(k), ?=, ?", attr_escape(v), ?" | build_attrs(t)]
@@ -172,10 +172,11 @@ defmodule Phoenix.HTML.Tag do
     value
     |> Enum.filter(& &1)
     |> Enum.join(" ")
+    |> attr_escape()
   end
 
   defp class_value(value) do
-    value
+    attr_escape(value)
   end
 
   defp key_escape(value) when is_atom(value), do: String.replace(Atom.to_string(value), "_", "-")

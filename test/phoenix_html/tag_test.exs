@@ -39,11 +39,18 @@ defmodule Phoenix.HTML.TagTest do
 
     test "handle class value as string" do
       assert attributes_escape([{:class, "btn"}]) |> safe_to_string() == ~s( class="btn")
+      assert attributes_escape([{:class, "<active>"}]) |> safe_to_string() == ~s( class="&lt;active&gt;")
     end
 
     test "handle class value as list" do
-      assert attributes_escape([{:class, ["btn", nil, false, "active"]}]) |> safe_to_string() ==
-               ~s( class="btn active")
+      assert attributes_escape([{:class, ["btn", nil, false, "<active>"]}]) |> safe_to_string() ==
+               ~s( class="btn &lt;active&gt;")
+    end
+
+    test "handle class value as false/nil/true" do
+      assert attributes_escape([{:class, false}]) |> safe_to_string() == ~s()
+      assert attributes_escape([{:class, nil}]) |> safe_to_string() == ~s()
+      assert attributes_escape([{:class, true}]) |> safe_to_string() == ~s( class)
     end
 
     test "handle class key as string" do
