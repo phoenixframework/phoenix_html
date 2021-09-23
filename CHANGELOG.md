@@ -1,21 +1,21 @@
 # Changelog
 
-# v3.0.3 (2020-09-04)
+# v3.0.3 (2021-09-04)
 
 * Bug fix
   * Fix sorting of attributes in `tag`/`content_tag`
 
-# v3.0.2 (2020-08-19)
+# v3.0.2 (2021-08-19)
 
 * Enhancements
   * Support maps on `Phoenix.HTML.Tag.attributes_escape/1`
 
-# v3.0.1 (2020-08-14)
+# v3.0.1 (2021-08-14)
 
 * Enhancements
   * Add `Phoenix.HTML.Tag.csrf_input_tag/2`
 
-# v3.0.0 (2020-08-06)
+# v3.0.0 (2021-08-06)
 
 * Enhancements
   * Allow extra html attributes on the `:prompt` option in `select`
