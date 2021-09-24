@@ -59,12 +59,12 @@ defmodule Phoenix.HTML.TagTest do
       assert attributes_escape([{"class", "btn"}]) |> safe_to_string() == ~s( class="btn")
     end
 
-    test "supress attribute when value is falsy" do
+    test "suppress attribute when value is falsy" do
       assert attributes_escape([{"title", nil}]) |> safe_to_string() == ~s()
       assert attributes_escape([{"title", false}]) |> safe_to_string() == ~s()
     end
 
-    test "supress value when value is true" do
+    test "suppress value when value is true" do
       assert attributes_escape([{"selected", true}]) |> safe_to_string() == ~s( selected)
     end
   end

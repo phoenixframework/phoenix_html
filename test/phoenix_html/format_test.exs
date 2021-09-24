@@ -88,7 +88,7 @@ defmodule Phoenix.HTML.FormatTest do
            """
   end
 
-  test "doesnt add brs" do
+  test "doesn't add brs" do
     formatted =
       format(
         """
