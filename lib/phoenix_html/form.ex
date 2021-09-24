@@ -704,7 +704,7 @@ defmodule Phoenix.HTML.Form do
   Generates a color input.
 
   Warning: this feature isn't available in all browsers.
-  Check `http://caniuse.com/#feat=input-color` for further informations.
+  Check `http://caniuse.com/#feat=input-color` for further information.
 
   See `text_input/3` for example and docs.
   """
@@ -725,7 +725,7 @@ defmodule Phoenix.HTML.Form do
   Generates a date input.
 
   Warning: this feature isn't available in all browsers.
-  Check `http://caniuse.com/#feat=input-datetime` for further informations.
+  Check `http://caniuse.com/#feat=input-datetime` for further information.
 
   See `text_input/3` for example and docs.
   """
@@ -737,7 +737,7 @@ defmodule Phoenix.HTML.Form do
   Generates a datetime-local input.
 
   Warning: this feature isn't available in all browsers.
-  Check `http://caniuse.com/#feat=input-datetime` for further informations.
+  Check `http://caniuse.com/#feat=input-datetime` for further information.
 
   See `text_input/3` for example and docs.
   """
@@ -760,7 +760,7 @@ defmodule Phoenix.HTML.Form do
   Generates a time input.
 
   Warning: this feature isn't available in all browsers.
-  Check `http://caniuse.com/#feat=input-datetime` for further informations.
+  Check `http://caniuse.com/#feat=input-datetime` for further information.
 
   ## Options
 
@@ -1153,7 +1153,7 @@ defmodule Phoenix.HTML.Form do
   ## Options
 
     * `:prompt` - an option to include at the top of the options. It may be
-      a string or a keyword list of atttributes and the `:key`
+      a string or a keyword list of attributes and the `:key`
 
     * `:selected` - the default value to use when none was sent as parameter
 
@@ -1676,7 +1676,7 @@ defmodule Phoenix.HTML.Form do
 
   All given options are forwarded to the underlying tag.
   A default value is provided for `for` attribute but can
-  be overriden if you pass a value to the `for` option.
+  be overridden if you pass a value to the `for` option.
   Text content would be inferred from `field` if not specified
   as either a function argument or string value in a block.
 
