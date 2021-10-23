@@ -1,5 +1,13 @@
 # Changelog
 
+# v3.1.0 (2021-10-23)
+
+* Bug fix
+  * Do not submit data-method links if default has been prevented
+* Deprecations
+  * Deprecate `~E` and `Phoenix.HTML.Tag.attributes_escape/1`
+  * Remove deprecated `Phoenix.HTML.Link.link/1`
+
 # v3.0.4 (2021-09-23)
 
 * Bug fix
