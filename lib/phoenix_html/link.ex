@@ -157,15 +157,6 @@ defmodule Phoenix.HTML.Link do
     end
   end
 
-  @doc false
-  # No docs since this function is only called when a `do` block is passed as
-  # `do:` instead of `do...end` (and that case is documented in `link/2`).
-  def link(opts) when is_list(opts) do
-    error = "link/2 requires a text as first argument or contents in the :do block"
-    {contents, opts} = pop_required_option!(opts, :do, error)
-    link(contents, opts)
-  end
-
   @doc """
   Generates a button tag that uses the Javascript function handleClick()
   (see phoenix_html.js) to submit the form data.

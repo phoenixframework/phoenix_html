@@ -43,7 +43,7 @@ defmodule Phoenix.HTML.LinkTest do
                end
              )
 
-    assert safe_to_string(link(to: "/hello", do: "world")) == ~s[<a href="/hello">world</a>]
+    assert safe_to_string(link(to: "/hello") do "world" end) == ~s[<a href="/hello">world</a>]
   end
 
   test "link with scheme" do
@@ -77,12 +77,6 @@ defmodule Phoenix.HTML.LinkTest do
 
     assert_raise ArgumentError, msg, fn ->
       link("foo", "/login")
-    end
-
-    msg = "link/2 requires a text as first argument or contents in the :do block"
-
-    assert_raise ArgumentError, msg, fn ->
-      link(to: "/hello-world")
     end
 
     assert_raise ArgumentError, ~r"unsupported scheme given to link/2", fn ->

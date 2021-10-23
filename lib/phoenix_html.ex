@@ -52,7 +52,7 @@ defmodule Phoenix.HTML do
       import Phoenix.HTML
       import Phoenix.HTML.Form
       import Phoenix.HTML.Link
-      import Phoenix.HTML.Tag
+      import Phoenix.HTML.Tag, except: [attributes_escape: 1]
       import Phoenix.HTML.Format
     end
   end
@@ -74,6 +74,7 @@ defmodule Phoenix.HTML do
       {:safe, ["Hello ", "world", "\\n"]}
 
   """
+  @deprecated "use the ~H sigil instead"
   defmacro sigil_e(expr, opts) do
     handle_sigil(expr, opts, __CALLER__)
   end
@@ -90,6 +91,7 @@ defmodule Phoenix.HTML do
       {:safe, ["Hello ", "world", "\\n"]}
 
   """
+  @deprecated "use the ~H sigil instead"
   defmacro sigil_E(expr, opts) do
     handle_sigil(expr, opts, __CALLER__)
   end
@@ -166,6 +168,88 @@ defmodule Phoenix.HTML do
   def safe_to_string({:safe, iodata}) do
     IO.iodata_to_binary(iodata)
   end
+
+  @doc ~S"""
+  Escapes an enumerable of attributes, returning iodata.
+
+  Pay attention that, unlike `tag/2` and `content_tag/2`, this
+  function does not sort the attributes. However if given a map,
+  note also that the key ordering may change.
+
+      iex> safe_to_string attributes_escape(title: "the title", id: "the id", selected: true)
+      " title=\"the title\" id=\"the id\" selected"
+
+      iex> safe_to_string attributes_escape(%{data: [phx: [value: [foo: "bar"]]], class: "foo"})
+      " class=\"foo\" data-phx-value-foo=\"bar\""
+
+  """
+  def attributes_escape(attrs) when is_list(attrs) do
+    {:safe, build_attrs(attrs)}
+  end
+
+  def attributes_escape(attrs) do
+    {:safe, attrs |> Enum.to_list() |> build_attrs()}
+  end
+
+  defp build_attrs([{k, true} | t]),
+    do: [?\s, key_escape(k) | build_attrs(t)]
+
+  defp build_attrs([{_, false} | t]),
+    do: build_attrs(t)
+
+  defp build_attrs([{_, nil} | t]),
+    do: build_attrs(t)
+
+  defp build_attrs([{"data", v} | t]) when is_list(v),
+    do: nested_attrs(v, " data", t)
+
+  defp build_attrs([{"aria", v} | t]) when is_list(v),
+    do: nested_attrs(v, " aria", t)
+
+  defp build_attrs([{"class", v} | t]) when is_list(v),
+    do: [" class=\"", class_value(v), ?" | build_attrs(t)]
+
+  defp build_attrs([{:data, v} | t]) when is_list(v),
+    do: nested_attrs(v, " data", t)
+
+  defp build_attrs([{:aria, v} | t]) when is_list(v),
+    do: nested_attrs(v, " aria", t)
+
+  defp build_attrs([{:class, v} | t]) when is_list(v),
+    do: [" class=\"", class_value(v), ?" | build_attrs(t)]
+
+  defp build_attrs([{k, v} | t]),
+    do: [?\s, key_escape(k), ?=, ?", attr_escape(v), ?" | build_attrs(t)]
+
+  defp build_attrs([]), do: []
+
+  defp nested_attrs([{k, v} | kv], attr, t) when is_list(v),
+    do: [nested_attrs(v, "#{attr}-#{key_escape(k)}", []) | nested_attrs(kv, attr, t)]
+
+  defp nested_attrs([{k, v} | kv], attr, t),
+    do: [attr, ?-, key_escape(k), ?=, ?", attr_escape(v), ?" | nested_attrs(kv, attr, t)]
+
+  defp nested_attrs([], _attr, t),
+    do: build_attrs(t)
+
+  defp class_value(value) when is_list(value) do
+    value
+    |> Enum.filter(& &1)
+    |> Enum.join(" ")
+    |> attr_escape()
+  end
+
+  defp class_value(value) do
+    attr_escape(value)
+  end
+
+  defp key_escape(value) when is_atom(value), do: String.replace(Atom.to_string(value), "_", "-")
+  defp key_escape(value), do: attr_escape(value)
+
+  defp attr_escape({:safe, data}), do: data
+  defp attr_escape(nil), do: []
+  defp attr_escape(other) when is_binary(other), do: Phoenix.HTML.Engine.encode_to_iodata!(other)
+  defp attr_escape(other), do: Phoenix.HTML.Safe.to_iodata(other)
 
   @doc """
   Escapes HTML content to be inserted a JavaScript string.

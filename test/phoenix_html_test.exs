@@ -18,12 +18,6 @@ defmodule Phoenix.HTMLTest do
            """ == {:safe, ["foo", "\n"]}
   end
 
-  test "html_escape/1 entities" do
-    assert html_escape("foo") == {:safe, "foo"}
-    assert html_escape("<foo>") == {:safe, [[[] | "&lt;"], "foo" | "&gt;"]}
-    assert html_escape("\" & \'") == {:safe, [[[[] | "&quot;"], " " | "&amp;"], " " | "&#39;"]}
-  end
-
   test "javascript_escape/1" do
     assert javascript_escape("") == ""
     assert javascript_escape("\\Double backslash") == "\\\\Double backslash"
@@ -41,12 +35,84 @@ defmodule Phoenix.HTMLTest do
     assert javascript_escape({:safe, ["'Single quote'"]}) == {:safe, "\\'Single quote\\'"}
   end
 
-  test "only accepts valid iodata" do
-    assert Phoenix.HTML.Safe.to_iodata("foo") == "foo"
-    assert Phoenix.HTML.Safe.to_iodata('foo') == 'foo'
+  describe "html_escape" do
+    test "escapes entities" do
+      assert html_escape("foo") == {:safe, "foo"}
+      assert html_escape("<foo>") == {:safe, [[[] | "&lt;"], "foo" | "&gt;"]}
+      assert html_escape("\" & \'") == {:safe, [[[[] | "&quot;"], " " | "&amp;"], " " | "&#39;"]}
+    end
 
-    assert_raise ArgumentError, ~r/templates only support iodata/, fn ->
-      Phoenix.HTML.Safe.to_iodata('foo🐥')
+    test "only accepts valid iodata" do
+      assert html_escape("foo") == {:safe, "foo"}
+      assert html_escape('foo') == {:safe, 'foo'}
+
+      assert_raise ArgumentError, ~r/templates only support iodata/, fn ->
+        html_escape('foo🐥')
+      end
+    end
+  end
+
+  describe "attributes_escape" do
+    test "key as atom" do
+      assert attributes_escape([{:title, "the title"}]) |> safe_to_string() ==
+               ~s( title="the title")
+    end
+
+    test "key as string" do
+      assert attributes_escape([{"title", "the title"}]) |> safe_to_string() ==
+               ~s( title="the title")
+    end
+
+    test "convert snake_case keys into kebab-case when key is atom" do
+      assert attributes_escape([{:my_attr, "value"}]) |> safe_to_string() == ~s( my-attr="value")
+    end
+
+    test "keep snake_case keys when key is string" do
+      assert attributes_escape([{"my_attr", "value"}]) |> safe_to_string() == ~s( my_attr="value")
+    end
+
+    test "multiple attributes" do
+      assert attributes_escape([{:title, "the title"}, {:id, "the id"}]) |> safe_to_string() ==
+               ~s( title="the title" id="the id")
+    end
+
+    test "handle nested data" do
+      assert attributes_escape([{"data", [a: "1", b: "2"]}]) |> safe_to_string() ==
+               ~s( data-a="1" data-b="2")
+
+      assert attributes_escape([{"aria", [a: "1", b: "2"]}]) |> safe_to_string() ==
+               ~s( aria-a="1" aria-b="2")
+    end
+
+    test "handle class value as string" do
+      assert attributes_escape([{:class, "btn"}]) |> safe_to_string() == ~s( class="btn")
+
+      assert attributes_escape([{:class, "<active>"}]) |> safe_to_string() ==
+               ~s( class="&lt;active&gt;")
+    end
+
+    test "handle class value as list" do
+      assert attributes_escape([{:class, ["btn", nil, false, "<active>"]}]) |> safe_to_string() ==
+               ~s( class="btn &lt;active&gt;")
+    end
+
+    test "handle class value as false/nil/true" do
+      assert attributes_escape([{:class, false}]) |> safe_to_string() == ~s()
+      assert attributes_escape([{:class, nil}]) |> safe_to_string() == ~s()
+      assert attributes_escape([{:class, true}]) |> safe_to_string() == ~s( class)
+    end
+
+    test "handle class key as string" do
+      assert attributes_escape([{"class", "btn"}]) |> safe_to_string() == ~s( class="btn")
+    end
+
+    test "suppress attribute when value is falsy" do
+      assert attributes_escape([{"title", nil}]) |> safe_to_string() == ~s()
+      assert attributes_escape([{"title", false}]) |> safe_to_string() == ~s()
+    end
+
+    test "suppress value when value is true" do
+      assert attributes_escape([{"selected", true}]) |> safe_to_string() == ~s( selected)
     end
   end
 end
