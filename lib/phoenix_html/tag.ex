@@ -106,7 +106,8 @@ defmodule Phoenix.HTML.Tag do
   end
 
   @doc false
-  @deprecated "Use Phoenix.HTML.attributes_escape/1 instead"
+  # TODO: Deprecate on v3.2
+  # @deprecated "Use Phoenix.HTML.attributes_escape/1 instead"
   defdelegate attributes_escape(attrs), to: Phoenix.HTML
 
   defp sorted_attrs(attrs) when is_list(attrs),
