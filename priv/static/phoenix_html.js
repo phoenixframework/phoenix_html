@@ -46,10 +46,7 @@
 
   window.addEventListener("click", function(e) {
     var element = e.target;
-
-    if (e.defaultPrevented) {
-      return;
-    }
+    if (e.defaultPrevented) return;
 
     while (element && element.getAttribute) {
       var phoenixLinkEvent = new PolyfillEvent('phoenix.link.click', {
