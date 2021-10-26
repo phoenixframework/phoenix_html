@@ -108,7 +108,7 @@ defmodule Phoenix.HTML.Tag do
 
   defp nested_attrs(attr, dict, acc) do
     Enum.reduce(dict, acc, fn {k, v}, acc ->
-      attr_name = "#{attr}-#{dasherize(k)}"
+      attr_name = "#{attr}-#{convert_attribute_name(k)}"
 
       case is_list(v) do
         true -> nested_attrs(attr_name, v, acc)
@@ -123,11 +123,11 @@ defmodule Phoenix.HTML.Tag do
   defp build_attrs(_tag, [], acc), do: acc |> Enum.sort() |> tag_attrs
 
   defp build_attrs(tag, [{k, v} | t], acc) when k in @tag_prefixes and is_list(v) do
-    build_attrs(tag, t, nested_attrs(dasherize(k), v, acc))
+    build_attrs(tag, t, nested_attrs(convert_attribute_name(k), v, acc))
   end
 
   defp build_attrs(tag, [{k, true} | t], acc) do
-    build_attrs(tag, t, [dasherize(k) | acc])
+    build_attrs(tag, t, [convert_attribute_name(k) | acc])
   end
 
   defp build_attrs(tag, [{_, false} | t], acc) do
@@ -139,11 +139,25 @@ defmodule Phoenix.HTML.Tag do
   end
 
   defp build_attrs(tag, [{k, v} | t], acc) do
-    build_attrs(tag, t, [{dasherize(k), v} | acc])
+    build_attrs(tag, t, [{convert_attribute_name(k), v} | acc])
   end
 
-  defp dasherize(value) when is_atom(value), do: dasherize(Atom.to_string(value))
-  defp dasherize(value) when is_binary(value), do: String.replace(value, "_", "-")
+  defp convert_attribute_name(value) when is_atom(value), do: dasherize(Atom.to_string(value))
+
+  defp convert_attribute_name(value) when is_binary(value) do
+    result = dasherize(value)
+    future_result = Phoenix.HTML.Safe.to_iodata(value)
+
+    if result != future_result do
+      IO.warn(
+        "Deprecation: `content_tag`/`tag` converts the attribute name '#{value}' to '#{result}' but will convert it to '#{future_result}' in v3"
+      )
+    end
+
+    result
+  end
+
+  defp dasherize(string), do: String.replace(string, "_", "-")
 
   @doc ~S"""
   Generates a form tag.

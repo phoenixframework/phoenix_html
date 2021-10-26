@@ -32,6 +32,12 @@ defmodule Phoenix.HTML.TagTest do
     assert tag(:audio, autoplay: true) |> safe_to_string() == ~s(<audio autoplay>)
     assert tag(:audio, autoplay: false) |> safe_to_string() == ~s(<audio>)
     assert tag(:audio, autoplay: nil) |> safe_to_string() == ~s(<audio>)
+
+    assert ExUnit.CaptureIO.capture_io(:stderr, fn ->
+             assert tag(:input, [{"data_foo", "bar"}]) |> safe_to_string() ==
+                      ~s(<input data-foo="bar">)
+           end) =~
+             "converts the attribute name 'data_foo' to 'data-foo' but will convert it to 'data_foo' in v3"
   end
 
   test "content_tag" do
