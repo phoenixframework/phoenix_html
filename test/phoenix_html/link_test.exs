@@ -43,7 +43,11 @@ defmodule Phoenix.HTML.LinkTest do
                end
              )
 
-    assert safe_to_string(link(to: "/hello") do "world" end) == ~s[<a href="/hello">world</a>]
+    assert safe_to_string(
+             link(to: "/hello") do
+               "world"
+             end
+           ) == ~s[<a href="/hello">world</a>]
   end
 
   test "link with scheme" do
