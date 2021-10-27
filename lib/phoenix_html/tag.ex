@@ -150,7 +150,7 @@ defmodule Phoenix.HTML.Tag do
 
     if result != future_result do
       IO.warn(
-        "Deprecation: `content_tag`/`tag` converts the attribute name '#{value}' to '#{result}' but will convert it to '#{future_result}' in v3"
+        "content_tag/tag converts the attribute name '#{value}' to '#{result}' but will convert it to '#{future_result}' in v3"
       )
     end
 
