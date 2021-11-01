@@ -509,6 +509,17 @@ defmodule Phoenix.HTML.FormTest do
 
       assert hidden_inputs_for(form) == [hidden_input(form, :id, value: 1)]
     end
+
+    test "generates hidden fields for lists from the given form" do
+      form = %{form_for(conn(), "/") | hidden: [field: ["a", "b", "c"]]}
+
+      assert hidden_inputs_for(form) ==
+               [
+                 hidden_input(form, :field, name: "field[]", id: "field_0", value: "a"),
+                 hidden_input(form, :field, name: "field[]", id: "field_1", value: "b"),
+                 hidden_input(form, :field, name: "field[]", id: "field_2", value: "c")
+               ]
+    end
   end
 
   ## email_input/3
