@@ -77,11 +77,27 @@ defmodule Phoenix.HTMLTest do
     end
 
     test "handle nested data" do
-      assert attributes_escape([{"data", [a: "1", b: "2"]}]) |> safe_to_string() ==
+      assert attributes_escape([{"data", [{"a", "1"}, {"b", "2"}]}]) |> safe_to_string() ==
                ~s( data-a="1" data-b="2")
 
-      assert attributes_escape([{"aria", [a: "1", b: "2"]}]) |> safe_to_string() ==
+      assert attributes_escape([{:data, [a: "1", b: "2"]}]) |> safe_to_string() ==
+               ~s( data-a="1" data-b="2")
+
+      assert attributes_escape([{"aria", [{"a", "1"}, {"b", "2"}]}]) |> safe_to_string() ==
                ~s( aria-a="1" aria-b="2")
+
+      assert attributes_escape([{:aria, [a: "1", b: "2"]}]) |> safe_to_string() ==
+               ~s( aria-a="1" aria-b="2")
+
+      assert attributes_escape([{:phx, [click: "save", value: [user_id: 1, foo: :bar]]}])
+             |> safe_to_string() ==
+               ~s( phx-click="save" phx-value-user-id="1" phx-value-foo="bar")
+
+      assert attributes_escape([
+               {"phx", [{"click", "save"}, {"value", [{"user_id", 1}, {"foo", "bar"}]}]}
+             ])
+             |> safe_to_string() ==
+               ~s( phx-click="save" phx-value-user_id="1" phx-value-foo="bar")
     end
 
     test "handle class value as string" do
