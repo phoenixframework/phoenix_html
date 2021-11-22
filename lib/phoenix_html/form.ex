@@ -1462,9 +1462,11 @@ defmodule Phoenix.HTML.Form do
 
       def my_datetime_select(form, field, opts \\ []) do
         builder = fn b ->
-          ~e"""
-          Date: <%= b.(:day, []) %> / <%= b.(:month, []) %> / <%= b.(:year, []) %>
-          Time: <%= b.(:hour, []) %> : <%= b.(:minute, []) %>
+          assigns = %{b: b}
+
+          ~H"""
+          Date: <%= @b.(:day, []) %> / <%= @b.(:month, []) %> / <%= @b.(:year, []) %>
+          Time: <%= @b.(:hour, []) %> : <%= @b.(:minute, []) %>
           """
         end
 
