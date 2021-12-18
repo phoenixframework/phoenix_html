@@ -44,6 +44,24 @@ defmodule Phoenix.HTML do
 
       <p>&lt;hello&gt;</p>
 
+  ## JavaScript library
+
+  This project ships with a tiny bit of JavaScript that listens
+  to all click events to:
+
+    * Support `data-confirm="message"` attributes, which shows
+      a confirmation modal with the given message
+
+    * Support `data-method="patch|post|put|delete"` attributes,
+      which sends the current click as a PATCH/POST/PUT/DELETE
+      HTTP request. You will need to add `data-to` with the URL
+      and `data-csrf` with the CSRF token value
+
+    * Dispatch a "phoenix.link.click" event. You can listen to this
+      event to customize the behaviour above. Returning false from
+      this event will disable `data-method`. Stopping propagation
+      will disable `data-confirm`
+
   """
 
   @doc false
@@ -161,14 +179,14 @@ defmodule Phoenix.HTML do
 
   Furthemore, the following attributes provide behaviour:
 
-    * `:data` and `:aria` - they accept a keyword list as value.
-      `data: [confirm: "are you sure?"]` is converted to
+    * `:aria`, `:data`, and `:phx` - they accept a keyword list as
+      value. `data: [confirm: "are you sure?"]` is converted to
       `data-confirm="are you sure?"`.
 
     * `:class` - it accepts a list of classes as argument. Each
-      element in the list is separated by space. Nil or false
-      elements are discarded. `class: ["foo", nil, "bar"]`
-      then becomes `class="foo bar"`.
+      element in the list is separated by space. `nil` and `false`
+      elements are discarded. `class: ["foo", nil, "bar"]` then
+      becomes `class="foo bar"`.
 
     * `:id` - it is validated raise if a number is given as ID,
       which is not allowed by the HTML spec and leads to unpredictable
