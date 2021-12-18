@@ -101,24 +101,19 @@ defmodule Phoenix.HTML.Tag do
   def content_tag(name, content, attrs) when is_list(attrs) do
     name = to_string(name)
     {:safe, escaped} = html_escape(content)
-
     {:safe, [?<, name, sorted_attrs(attrs), ?>, escaped, ?<, ?/, name, ?>]}
   end
+
+  defp sorted_attrs(attrs) when is_list(attrs),
+    do: attrs |> Enum.sort() |> attributes_escape() |> elem(1)
+
+  defp sorted_attrs(attrs),
+    do: attrs |> Enum.to_list() |> sorted_attrs()
 
   @doc false
   # TODO: Deprecate on v3.2
   # @deprecated "Use Phoenix.HTML.attributes_escape/1 instead"
   defdelegate attributes_escape(attrs), to: Phoenix.HTML
-
-  defp sorted_attrs(attrs) when is_list(attrs),
-    do: attrs |> normalize_attrs() |> Enum.sort() |> attributes_escape() |> elem(1)
-
-  defp sorted_attrs(attrs),
-    do: attrs |> Enum.to_list() |> sorted_attrs()
-
-  defp normalize_attrs([{k, v} | tail]), do: [{k, v} | normalize_attrs(tail)]
-  defp normalize_attrs([k | tail]), do: [{k, true} | normalize_attrs(tail)]
-  defp normalize_attrs([]), do: []
 
   @doc ~S"""
   Generates a form tag.

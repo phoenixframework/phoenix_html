@@ -122,6 +122,12 @@ defmodule Phoenix.HTMLTest do
       assert attributes_escape([{"class", "btn"}]) |> safe_to_string() == ~s( class="btn")
     end
 
+    test "raises on number id" do
+      assert_raise ArgumentError, ~r/attempting to set id attribute to 3/, fn ->
+        attributes_escape([{"id", 3}])
+      end
+    end
+
     test "suppress attribute when value is falsy" do
       assert attributes_escape([{"title", nil}]) |> safe_to_string() == ~s()
       assert attributes_escape([{"title", false}]) |> safe_to_string() == ~s()

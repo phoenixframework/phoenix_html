@@ -63,34 +63,13 @@ defmodule Phoenix.HTML do
   @typedoc "May be safe or unsafe (i.e. it needs to be converted)"
   @type unsafe :: Phoenix.HTML.Safe.t()
 
-  @doc """
-  Provides `~e` sigil with HTML safe EEx syntax inside source files.
-
-  Raises on attempts to interpolate with `\#{}`, so `~E` should be preferred.
-
-      iex> ~e"\""
-      ...> Hello <%= "world" %>
-      ...> "\""
-      {:safe, ["Hello ", "world", "\\n"]}
-
-  """
+  @doc false
   @deprecated "use the ~H sigil instead"
   defmacro sigil_e(expr, opts) do
     handle_sigil(expr, opts, __CALLER__)
   end
 
-  @doc """
-  Provides `~E` sigil with HTML safe EEx syntax inside source files.
-
-  Does not raise on attempts to interpolate with `\#{}`, but rather shows those
-  characters literally, so it should be preferred over `~e`.
-
-      iex> ~E"\""
-      ...> Hello <%= "world" %>
-      ...> "\""
-      {:safe, ["Hello ", "world", "\\n"]}
-
-  """
+  @doc false
   @deprecated "use the ~H sigil instead"
   defmacro sigil_E(expr, opts) do
     handle_sigil(expr, opts, __CALLER__)
@@ -172,9 +151,30 @@ defmodule Phoenix.HTML do
   @doc ~S"""
   Escapes an enumerable of attributes, returning iodata.
 
-  Pay attention that, unlike `tag/2` and `content_tag/2`, this
-  function does not sort the attributes. However if given a map,
-  note also that the key ordering may change.
+  The attributes are rendered in the given order. Note if
+  a map is given, the key ordering is not guaranteed.
+
+  The keys and values can be of any shape, as long as they
+  implement the `Phoenix.HTML.Safe` protocol. In addition,
+  if the key is an atom, it will be "dasherized". In other
+  words, `:phx_value_id` will be converted to `phx-value-id`.
+
+  Furthemore, the following attributes provide behaviour:
+
+    * `:data` and `:aria` - they accept a keyword list as value.
+      `data: [confirm: "are you sure?"]` is converted to
+      `data-confirm="are you sure?"`.
+
+    * `:class` - it accepts a list of classes as argument. Each
+      element in the list is separated by space. Nil or false
+      elements are discarded. `class: ["foo", nil, "bar"]`
+      then becomes `class="foo bar"`.
+
+    * `:id` - it is validated raise if a number is given as ID,
+      which is not allowed by the HTML spec and leads to unpredictable
+      behaviour.
+
+  ## Examples
 
       iex> safe_to_string attributes_escape(title: "the title", id: "the id", selected: true)
       " title=\"the title\" id=\"the id\" selected"
@@ -203,29 +203,35 @@ defmodule Phoenix.HTML do
   defp build_attrs([{_, nil} | t]),
     do: build_attrs(t)
 
-  defp build_attrs([{"data", v} | t]) when is_list(v),
-    do: nested_attrs(v, " data", t)
+  defp build_attrs([{:id, v} | t]),
+    do: [" id=\"", id_value(v), ?" | build_attrs(t)]
 
-  defp build_attrs([{"aria", v} | t]) when is_list(v),
-    do: nested_attrs(v, " aria", t)
-
-  defp build_attrs([{"phx", v} | t]) when is_list(v),
-    do: nested_attrs(v, " phx", t)
-
-  defp build_attrs([{"class", v} | t]) when is_list(v),
+  defp build_attrs([{:class, v} | t]),
     do: [" class=\"", class_value(v), ?" | build_attrs(t)]
-
-  defp build_attrs([{:data, v} | t]) when is_list(v),
-    do: nested_attrs(v, " data", t)
 
   defp build_attrs([{:aria, v} | t]) when is_list(v),
     do: nested_attrs(v, " aria", t)
 
+  defp build_attrs([{:data, v} | t]) when is_list(v),
+    do: nested_attrs(v, " data", t)
+
   defp build_attrs([{:phx, v} | t]) when is_list(v),
     do: nested_attrs(v, " phx", t)
 
-  defp build_attrs([{:class, v} | t]) when is_list(v),
+  defp build_attrs([{"id", v} | t]),
+    do: [" id=\"", id_value(v), ?" | build_attrs(t)]
+
+  defp build_attrs([{"class", v} | t]),
     do: [" class=\"", class_value(v), ?" | build_attrs(t)]
+
+  defp build_attrs([{"aria", v} | t]) when is_list(v),
+    do: nested_attrs(v, " aria", t)
+
+  defp build_attrs([{"data", v} | t]) when is_list(v),
+    do: nested_attrs(v, " data", t)
+
+  defp build_attrs([{"phx", v} | t]) when is_list(v),
+    do: nested_attrs(v, " phx", t)
 
   defp build_attrs([{k, v} | t]),
     do: [?\s, key_escape(k), ?=, ?", attr_escape(v), ?" | build_attrs(t)]
@@ -240,6 +246,15 @@ defmodule Phoenix.HTML do
 
   defp nested_attrs([], _attr, t),
     do: build_attrs(t)
+
+  defp id_value(value) when is_number(value) do
+    raise ArgumentError,
+          "attempting to set id attribute to #{value}, but the DOM ID cannot be set to a number"
+  end
+
+  defp id_value(value) do
+    attr_escape(value)
+  end
 
   defp class_value(value) when is_list(value) do
     value
