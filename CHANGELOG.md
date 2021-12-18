@@ -1,5 +1,12 @@
 # Changelog
 
+# v3.2.0 (2021-12-18)
+
+* Enhancements
+  * Raise if the `id` attribute is set to a number. This is actually an invalid value according to the HTML spec and it can lead to problematic client behaviour, especially in LiveView and other client frameworks.
+  * Allow `phx` attributes to be nested, similar to `aria` and `data` attributes
+  * Allow hidden fields in forms to be a list of values
+
 # v3.1.0 (2021-10-23)
 
 * Bug fix
