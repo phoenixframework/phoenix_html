@@ -1055,16 +1055,14 @@ defmodule Phoenix.HTML.Form do
     # We html escape all values to be sure we are comparing
     # apples to apples. After all we may have true in the data
     # but "true" in the params and both need to match.
-    value = html_escape(value)
     checked_value = html_escape(checked_value)
     unchecked_value = html_escape(unchecked_value)
 
     opts =
-      if value == checked_value do
-        Keyword.put_new(opts, :checked, true)
-      else
-        opts
-      end
+      Keyword.put_new_lazy(opts, :checked, fn ->
+        value = html_escape(value)
+        value == checked_value
+      end)
 
     if hidden_input do
       hidden_opts = [type: "hidden", value: unchecked_value]

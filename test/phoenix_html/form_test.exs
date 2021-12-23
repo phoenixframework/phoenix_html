@@ -892,6 +892,18 @@ defmodule Phoenix.HTML.FormTest do
 
     assert safe_to_string(checkbox(:search, :key, value: 1, hidden_input: false)) ==
              ~s(<input id="search_key" name="search[key]" type="checkbox" value="true">)
+
+    # Mimick a field of type {:array, Ecto.Enum}, for which `field_value` returns an array of atoms:
+    assert safe_to_string(
+             checkbox(:search, :key,
+               name: "search[key][]",
+               value: [:a, :b],
+               checked_value: "c",
+               checked: false,
+               hidden_input: false
+             )
+           ) ==
+             ~s(<input id="search_key" name="search[key][]" type="checkbox" value="c">)
   end
 
   test "checkbox/3 with form" do
