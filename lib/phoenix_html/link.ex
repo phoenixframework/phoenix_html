@@ -33,6 +33,7 @@ defmodule Phoenix.HTML.Link do
       link to: "/hello" do
         "world"
       end
+      #=> <a href="/hello">world<a>
 
   ## Options
 
