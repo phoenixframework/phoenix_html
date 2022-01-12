@@ -7,12 +7,12 @@ defmodule Phoenix.HTML.CSRFTest do
 
   test "link with post using a custom csrf token" do
     assert safe_to_string(link("hello", to: "/world", method: :post)) =~
-             ~r(<a data-csrf="[^"]+" data-method="post" data-to="/world" href="/world" rel="nofollow">hello</a>)
+             ~r(<a data-csrf="[^"]+" data-method="post" data-to="/world" data-load-disabled="true" disabled="disabled" href="/world" rel="nofollow">hello</a>)
   end
 
   test "link with put/delete using a custom csrf token" do
     assert safe_to_string(link("hello", to: "/world", method: :put)) =~
-             ~r(<a data-csrf="[^"]+" data-method="put" data-to="/world" href="/world" rel="nofollow">hello</a>)
+             ~r(<a data-csrf="[^"]+" data-method="put" data-to="/world" data-load-disabled="true" disabled="disabled" href="/world" rel="nofollow">hello</a>)
   end
 
   test "button with post using a custom csrf token" do
