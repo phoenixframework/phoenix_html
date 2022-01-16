@@ -256,9 +256,13 @@ defmodule Phoenix.HTML.Form do
 
   @type field :: atom | String.t()
 
-  # TODO v3.2: Remove me once form_for without anonymous function has been deprecated
   defimpl Phoenix.HTML.Safe do
     def to_iodata(%{action: action, options: options}) do
+      IO.warn(
+        "form_for/3 without an anonymous function is deprecated. " <>
+          "If you are using Phoenix.LiveView, use the new Phoenix.LiveView.Helpers.form/1 component"
+      )
+
       {:safe, contents} = form_tag(action, options)
       contents
     end
@@ -288,7 +292,6 @@ defmodule Phoenix.HTML.Form do
     bin |> String.replace("_", " ") |> String.capitalize()
   end
 
-  # TODO v3.1: Effectively deprecate and remove me in future versions
   @doc false
   def form_for(form_data, action) do
     form_for(form_data, action, [])
@@ -310,10 +313,14 @@ defmodule Phoenix.HTML.Form do
 
   See `form_for/4` for the available options.
   """
-  # TODO v3.1: Effectively deprecate and remove me in future versions
-  @doc deprecated: "This functionality is deprecated in favor of form_for with a function"
+  @doc deprecated: "Use Phoenix.LiveView.Helpers.form/1 instead"
   @spec form_for(Phoenix.HTML.FormData.t(), String.t(), Keyword.t()) :: Phoenix.HTML.Form.t()
   def form_for(form_data, action, options) when is_list(options) do
+    IO.warn(
+      "form_for/3 without an anonymous function is deprecated. " <>
+        "If you are using Phoenix.LiveView, use the new Phoenix.LiveView.Helpers.form/1 component"
+    )
+
     %{Phoenix.HTML.FormData.to_form(form_data, options) | action: action}
   end
 
@@ -359,8 +366,8 @@ defmodule Phoenix.HTML.Form do
   @spec form_for(Phoenix.HTML.FormData.t(), String.t(), Keyword.t(), (t -> Phoenix.HTML.unsafe())) ::
           Phoenix.HTML.safe()
   def form_for(form_data, action, options \\ [], fun) when is_function(fun, 1) do
-    %{action: action, options: options} = form = form_for(form_data, action, options)
-    html_escape([form_tag(action, options), fun.(form), raw("</form>")])
+    form = %{Phoenix.HTML.FormData.to_form(form_data, options) | action: action}
+    html_escape([form_tag(action, form.options), fun.(form), raw("</form>")])
   end
 
   @doc """

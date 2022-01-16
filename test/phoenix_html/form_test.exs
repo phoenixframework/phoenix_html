@@ -43,91 +43,6 @@ defmodule Phoenix.HTML.FormTest do
     }
   end
 
-  ## form_for/3
-
-  describe "form_for/3 with connection" do
-    test "without options" do
-      form = form_for(conn(), "/")
-      assert %Phoenix.HTML.Form{} = form
-
-      contents = form |> html_escape() |> safe_to_string()
-      assert contents =~ ~s(<form action="/" method="post">)
-    end
-
-    test "with custom options" do
-      form = form_for(conn(), "/", as: :search, method: :put, multipart: true)
-      assert %Phoenix.HTML.Form{} = form
-
-      contents = form |> html_escape() |> safe_to_string()
-      assert contents =~ ~s(<form action="/" enctype="multipart/form-data" method="post">)
-      assert contents =~ ~s(method="post")
-      assert contents =~ ~s(<input name="_method" type="hidden" value="put">)
-      refute contents =~ ~s(</form>)
-    end
-  end
-
-  describe "form_for/3 with atom" do
-    test "without options" do
-      form = form_for(:search, "/", [])
-      assert %Phoenix.HTML.Form{} = form
-
-      contents = form |> html_escape() |> safe_to_string()
-      assert contents =~ ~s(<form action="/" method="post">)
-    end
-
-    test "with custom options" do
-      form = form_for(:search, "/", method: :put, multipart: true)
-      assert %Phoenix.HTML.Form{} = form
-
-      contents = form |> html_escape() |> safe_to_string()
-
-      assert contents =~
-               ~s(<form action="/" enctype="multipart/form-data" method="post">)
-
-      assert contents =~ ~s(method="post")
-      assert contents =~ ~s(<input name="_method" type="hidden" value="put">)
-      refute contents =~ ~s(</form>)
-    end
-
-    test "with id prefix the form id in the input id" do
-      form = form_for(:search, "/", id: "form_id")
-      assert %Phoenix.HTML.Form{} = form
-
-      form_content =
-        form
-        |> html_escape()
-        |> safe_to_string()
-
-      input_content =
-        form
-        |> text_input(:name)
-        |> html_escape()
-        |> safe_to_string()
-
-      assert form_content =~ ~s(<form action="/" id="form_id" method="post">)
-      assert input_content =~ ~s(<input id="form_id_name" name="search[name]" type="text">)
-    end
-
-    test "without id prefix the form name in the input id" do
-      form = form_for(:search, "/")
-      assert %Phoenix.HTML.Form{} = form
-
-      form_content =
-        form
-        |> html_escape()
-        |> safe_to_string()
-
-      contents =
-        form
-        |> text_input(:name)
-        |> html_escape()
-        |> safe_to_string()
-
-      assert form_content =~ ~s(<form action="/" method="post">)
-      assert contents =~ ~s(<input id="search_name" name="search[name]" type="text">)
-    end
-  end
-
   describe "form_for/4 with connection" do
     test "with :as" do
       conn = conn()
@@ -342,7 +257,7 @@ defmodule Phoenix.HTML.FormTest do
     end
 
     test "support atom or binary field" do
-      form = form_for(:user, "/")
+      form = Phoenix.HTML.FormData.to_form(:user, [])
 
       [f] = inputs_for(form, :key)
       assert f.name == "user[key]"
@@ -505,13 +420,13 @@ defmodule Phoenix.HTML.FormTest do
 
   describe "hidden_inputs_for/1" do
     test "generates hidden fields from the given form" do
-      form = %{form_for(conn(), "/") | hidden: [id: 1]}
+      form = %{Phoenix.HTML.FormData.to_form(conn(), []) | hidden: [id: 1]}
 
       assert hidden_inputs_for(form) == [hidden_input(form, :id, value: 1)]
     end
 
     test "generates hidden fields for lists from the given form" do
-      form = %{form_for(conn(), "/") | hidden: [field: ["a", "b", "c"]]}
+      form = %{Phoenix.HTML.FormData.to_form(conn(), []) | hidden: [field: ["a", "b", "c"]]}
 
       assert hidden_inputs_for(form) ==
                [
