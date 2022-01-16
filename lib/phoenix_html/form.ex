@@ -35,7 +35,7 @@ defmodule Phoenix.HTML.Form do
   where `User.changeset/2` is defined as follows:
 
       def changeset(user, params \\ %{}) do
-        cast(user, params, [:name, :age])
+        Ecto.Changeset.cast(user, params, [:name, :age])
       end
 
   Now a `@changeset` assign is available in views which we
@@ -159,10 +159,11 @@ defmodule Phoenix.HTML.Form do
 
   ## CSRF protection
 
-  The form generates a CSRF token by default. Your application should
-  check this token on the server to avoid attackers from making requests
-  on your server on behalf of other users. Phoenix by default checks
-  this token.
+  CSRF protection is a mechanism to ensure that the user who rendered
+  the form is the one actually submitting it. This module generates a
+  CSRF token by default. Your application should check this token on
+  the server to avoid attackers from making requests on your server on
+  behalf of other users. Phoenix by default checks this token.
 
   When posting a form with a host in its address, such as "//host.com/path"
   instead of only "/path", Phoenix will include the host signature in the

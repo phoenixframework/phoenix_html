@@ -1,22 +1,17 @@
 defmodule Phoenix.HTML do
   @moduledoc """
-  Helpers for working with HTML strings and templates.
+  The default building blocks for working with HTML safely
+  in Phoenix.
 
-  When used, it imports the given modules:
+  This library provides three main functionalities:
 
-    * `Phoenix.HTML` - functions to handle HTML safety;
+    * HTML safety
+    * Form handling (with CSRF protection)
+    * A tiny JavaScript library to enhance applications
 
-    * `Phoenix.HTML.Tag` - functions for generating HTML tags;
+  ## HTML safety
 
-    * `Phoenix.HTML.Form` - functions for working with forms;
-
-    * `Phoenix.HTML.Link` - functions for generating links and urls;
-
-    * `Phoenix.HTML.Format` - functions for formatting text;
-
-  ## HTML Safe
-
-  One of the main responsibilities of this module is to
+  One of the main responsibilities of this package is to
   provide convenience functions for escaping and marking
   HTML code as safe.
 
@@ -44,6 +39,10 @@ defmodule Phoenix.HTML do
 
       <p>&lt;hello&gt;</p>
 
+  ## Form handling
+
+  See `Phoenix.HTML.Form`.
+
   ## JavaScript library
 
   This project ships with a tiny bit of JavaScript that listens
@@ -55,7 +54,9 @@ defmodule Phoenix.HTML do
     * Support `data-method="patch|post|put|delete"` attributes,
       which sends the current click as a PATCH/POST/PUT/DELETE
       HTTP request. You will need to add `data-to` with the URL
-      and `data-csrf` with the CSRF token value. See `link_attributes/2`
+      and `data-csrf` with the CSRF token value. See
+      `link_attributes/2` for a function that wraps it all up
+      for you
 
     * Dispatch a "phoenix.link.click" event. You can listen to this
       event to customize the behaviour above. Returning false from
@@ -393,9 +394,10 @@ defmodule Phoenix.HTML do
     * `:method` - the HTTP method for the link. Defaults to `:get`.
 
     * `:csrf_token` - a custom token to use when method is not `:get`.
-      By default, CSRF tokens are generated through `Plug.CSRFProtection`.
-      You can set this option to `false`, to disable token generation,
-      or set it to your own token.
+      This is used to ensure the request was sent by the user who
+      rendered the page. By default, CSRF tokens are generated through
+      `Plug.CSRFProtection`. You can set this option to `false`, to
+      disable token generation, or set it to your own token.
 
   When the `:method` is set to `:get` and the `:to` URL contains query
   parameters the generated form element will strip the parameters in
