@@ -62,26 +62,6 @@ defmodule Phoenix.HTML.Link do
 
   By default, CSRF tokens are generated through `Plug.CSRFProtection`.
   """
-  @valid_uri_schemes [
-    "http:",
-    "https:",
-    "ftp:",
-    "ftps:",
-    "mailto:",
-    "news:",
-    "irc:",
-    "gopher:",
-    "nntp:",
-    "feed:",
-    "telnet:",
-    "mms:",
-    "rtsp:",
-    "svn:",
-    "tel:",
-    "fax:",
-    "xmpp:"
-  ]
-
   def link(text, opts)
 
   def link(opts, do: contents) when is_list(opts) do
