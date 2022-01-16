@@ -6,15 +6,7 @@ defmodule Phoenix.HTMLTest do
 
   test "~E sigil" do
     assert ~E"""
-           <%= %>
-           """ == {:safe, ["", "\n"]}
-
-    assert ~E"""
            <%= "foo" %>
-           """ == {:safe, ["foo", "\n"]}
-
-    assert ~E"""
-           <%= {:safe, "foo"} %>
            """ == {:safe, ["foo", "\n"]}
   end
 

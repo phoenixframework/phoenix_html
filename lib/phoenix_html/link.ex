@@ -49,13 +49,7 @@ defmodule Phoenix.HTML.Link do
 
   All other options are forwarded to the underlying `<a>` tag.
 
-  ## JavaScript dependency
-
-  In order to support links where `:method` is not `:get` or use the above
-  data attributes, `Phoenix.HTML` relies on JavaScript. You can load
-  `priv/static/phoenix_html.js` into your build tool.
-
-  ### Data attributes
+  ## Data attributes
 
   Data attributes are added as a keyword list passed to the `data` key.
   The following data attributes are supported:
@@ -63,51 +57,6 @@ defmodule Phoenix.HTML.Link do
     * `data-confirm` - shows a confirmation prompt before
       generating and submitting the form when `:method`
       is not `:get`.
-
-  ### Overriding the default confirm behaviour
-
-  `phoenix_html.js` does trigger a custom event `phoenix.link.click` on the
-  clicked DOM element when a click happened. This allows you to intercept the
-  event on it's way bubbling up to `window` and do your own custom logic to
-  enhance or replace how the `data-confirm` attribute is handled.
-
-  You could for example replace the browsers `confirm()` behavior with a
-  custom javascript implementation:
-
-  ```javascript
-  // listen on document.body, so it's executed before the default of
-  // phoenix_html, which is listening on the window object
-  document.body.addEventListener('phoenix.link.click', function (e) {
-    // Prevent default implementation
-    e.stopPropagation();
-
-    // Introduce alternative implementation
-    var message = e.target.getAttribute("data-confirm");
-    if(!message){ return true; }
-    vex.dialog.confirm({
-      message: message,
-      callback: function (value) {
-        if (value == false) { e.preventDefault(); }
-      }
-    })
-  }, false);
-  ```
-
-  Or you could attach your own custom behavior.
-
-  ```javascript
-  window.addEventListener('phoenix.link.click', function (e) {
-    // Introduce custom behaviour
-    var message = e.target.getAttribute("data-prompt");
-    var answer = e.target.getAttribute("data-prompt-answer");
-    if(message && answer && (answer != window.prompt(message))) {
-      e.preventDefault();
-    }
-  }, false);
-  ```
-
-  The latter could also be bound to any `click` event, but this way you can be
-  sure your custom code is only executed when the code of `phoenix_html.js` is run.
 
   ## CSRF Protection
 
@@ -145,16 +94,17 @@ defmodule Phoenix.HTML.Link do
 
   def link(text, opts) do
     {to, opts} = pop_required_option!(opts, :to, "expected non-nil value for :to in link/2")
-    to = valid_destination!(to, "link/2")
     {method, opts} = Keyword.pop(opts, :method, :get)
 
     if method == :get do
-      opts = skip_csrf(opts)
-      content_tag(:a, text, [href: to] ++ opts)
+      # Call link attributes to validate `to`
+      [data: data] = Phoenix.HTML.link_attributes(to, [])
+      content_tag(:a, text, [href: data[:to]] ++ Keyword.delete(opts, :csrf_token))
     else
-      {csrf_data, opts} = csrf_data(to, opts)
+      {csrf_token, opts} = Keyword.pop(opts, :csrf_token, true)
       opts = Keyword.put_new(opts, :rel, "nofollow")
-      content_tag(:a, text, [data: csrf_data ++ [method: method, to: to], href: to] ++ opts)
+      [data: data] = Phoenix.HTML.link_attributes(to, method: method, csrf_token: csrf_token)
+      content_tag(:a, text, [data: data, href: data[:to]] ++ opts)
     end
   end
 
@@ -200,34 +150,14 @@ defmodule Phoenix.HTML.Link do
 
   def button(text, opts) do
     {to, opts} = pop_required_option!(opts, :to, "option :to is required in button/2")
-    {method, opts} = Keyword.pop(opts, :method, :post)
 
-    to = valid_destination!(to, "button/2")
+    {link_opts, opts} =
+      opts
+      |> Keyword.put_new(:method, :post)
+      |> Keyword.split([:method, :csrf_token])
 
-    if method == :get do
-      opts = skip_csrf(opts)
-      content_tag(:button, text, [data: [method: method, to: to]] ++ opts)
-    else
-      {csrf_data, opts} = csrf_data(to, opts)
-      content_tag(:button, text, [data: csrf_data ++ [method: method, to: to]] ++ opts)
-    end
-  end
-
-  defp skip_csrf(opts) do
-    Keyword.delete(opts, :csrf_token)
-  end
-
-  defp csrf_data(to, opts) do
-    case Keyword.pop(opts, :csrf_token, true) do
-      {csrf, opts} when is_binary(csrf) ->
-        {[csrf: csrf], opts}
-
-      {true, opts} ->
-        {[csrf: Phoenix.HTML.Tag.csrf_token_value(to)], opts}
-
-      {false, opts} ->
-        {[], opts}
-    end
+    link_attributes = Phoenix.HTML.link_attributes(to, link_opts)
+    content_tag(:button, text, link_attributes ++ opts)
   end
 
   defp pop_required_option!(opts, key, error_message) do
@@ -238,36 +168,5 @@ defmodule Phoenix.HTML.Link do
     end
 
     {value, opts}
-  end
-
-  defp valid_destination!(%URI{} = uri, context) do
-    valid_destination!(URI.to_string(uri), context)
-  end
-
-  defp valid_destination!({:safe, to}, context) do
-    {:safe, valid_string_destination!(IO.iodata_to_binary(to), context)}
-  end
-
-  defp valid_destination!({other, to}, _context) when is_atom(other) do
-    [Atom.to_string(other), ?:, to]
-  end
-
-  defp valid_destination!(to, context) do
-    valid_string_destination!(IO.iodata_to_binary(to), context)
-  end
-
-  for scheme <- @valid_uri_schemes do
-    defp valid_string_destination!(unquote(scheme) <> _ = string, _context), do: string
-  end
-
-  defp valid_string_destination!(to, context) do
-    if not match?("/" <> _, to) and String.contains?(to, ":") do
-      raise ArgumentError, """
-      unsupported scheme given to #{context}. In case you want to link to an
-      unknown or unsafe scheme, such as javascript, use a tuple: {:javascript, rest}
-      """
-    else
-      to
-    end
   end
 end

@@ -83,15 +83,15 @@ defmodule Phoenix.HTML.LinkTest do
       link("foo", "/login")
     end
 
-    assert_raise ArgumentError, ~r"unsupported scheme given to link/2", fn ->
+    assert_raise ArgumentError, ~r"unsupported scheme given as link", fn ->
       link("foo", to: "javascript:alert(1)")
     end
 
-    assert_raise ArgumentError, ~r"unsupported scheme given to link/2", fn ->
+    assert_raise ArgumentError, ~r"unsupported scheme given as link", fn ->
       link("foo", to: {:safe, "javascript:alert(1)"})
     end
 
-    assert_raise ArgumentError, ~r"unsupported scheme given to link/2", fn ->
+    assert_raise ArgumentError, ~r"unsupported scheme given as link", fn ->
       link("foo", to: {:safe, 'javascript:alert(1)'})
     end
   end
@@ -142,12 +142,7 @@ defmodule Phoenix.HTML.LinkTest do
   end
 
   test "button with invalid args" do
-    msg = """
-    unsupported scheme given to button/2. In case you want to link to an
-    unknown or unsafe scheme, such as javascript, use a tuple: {:javascript, rest}
-    """
-
-    assert_raise ArgumentError, msg, fn ->
+    assert_raise ArgumentError, ~r/unsupported scheme given as link/, fn ->
       button("foo", to: "javascript:alert(1)", method: :get)
     end
   end
