@@ -295,7 +295,7 @@ defmodule Phoenix.HTML do
 
   defp id_value(value) when is_number(value) do
     raise ArgumentError,
-          "attempting to set id attribute to #{value}, "
+          "attempting to set id attribute to #{value}, " <>
             "but setting the DOM ID to a number can lead to unpredictable behaviour. " <>
             "Instead consider prefixing the id with a string, such as \"user-#{value}\" or similar"
   end
