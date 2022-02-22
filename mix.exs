@@ -2,6 +2,7 @@ defmodule PhoenixHtml.Mixfile do
   use Mix.Project
 
   # Also change package.json version
+  @source_url "https://github.com/phoenixframework/phoenix_html"
   @version "3.2.0"
 
   def project do
@@ -14,9 +15,11 @@ defmodule PhoenixHtml.Mixfile do
       description: "Phoenix view functions for working with HTML templates",
       package: package(),
       docs: [
+        extras: ["CHANGELOG.md"],
+        source_url: @source_url,
         source_ref: "v#{@version}",
         main: "Phoenix.HTML",
-        source_url: "https://github.com/phoenixframework/phoenix_html"
+        skip_undefined_reference_warnings_on: ["CHANGELOG.md"]
       ]
     ]
   end
@@ -39,8 +42,11 @@ defmodule PhoenixHtml.Mixfile do
     [
       maintainers: ["Chris McCord", "José Valim"],
       licenses: ["MIT"],
-      links: %{github: "https://github.com/phoenixframework/phoenix_html"},
-      files: ~w(lib priv CHANGELOG.md LICENSE mix.exs package.json README.md)
+      files: ~w(lib priv CHANGELOG.md LICENSE mix.exs package.json README.md),
+      links: %{
+        Changelog: "https://hexdocs.pm/phoenix_html/changelog.html",
+        GitHub: @source_url
+      }
     ]
   end
 end

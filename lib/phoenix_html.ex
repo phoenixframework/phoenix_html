@@ -205,7 +205,7 @@ defmodule Phoenix.HTML do
   if the key is an atom, it will be "dasherized". In other
   words, `:phx_value_id` will be converted to `phx-value-id`.
 
-  Furthemore, the following attributes provide behaviour:
+  Furthermore, the following attributes provide behaviour:
 
     * `:aria`, `:data`, and `:phx` - they accept a keyword list as
       value. `data: [confirm: "are you sure?"]` is converted to
