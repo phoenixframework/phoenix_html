@@ -485,18 +485,7 @@ defmodule Phoenix.HTML.Form do
   @spec input_value(t | atom, field) :: term
   def input_value(%{source: source, impl: impl} = form, field)
       when is_atom(field) or is_binary(field) do
-    try do
-      impl.input_value(source, form, field)
-    rescue
-      UndefinedFunctionError ->
-        case Map.fetch(form.params, field_to_string(field)) do
-          {:ok, value} ->
-            value
-
-          :error ->
-            Map.get(form.data, field)
-        end
-    end
+    impl.input_value(source, form, field)
   end
 
   def input_value(name, _field) when is_atom(name), do: nil
