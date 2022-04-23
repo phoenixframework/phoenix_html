@@ -58,7 +58,7 @@ defmodule Phoenix.HTML.Format do
   defp not_blank?(_), do: true
 
   defp wrap_paragraph(text, tag, attributes, insert_brs?) do
-    [Phoenix.HTML.Tag.content_tag(tag, insert_brs(text, insert_brs?), attributes), ?\n]
+    [Phoenix.HTML.content_tag(tag, insert_brs(text, insert_brs?), attributes), ?\n]
   end
 
   defp insert_brs(text, false) do
@@ -72,7 +72,7 @@ defmodule Phoenix.HTML.Format do
     text
     |> split_lines()
     |> Enum.map(&Phoenix.HTML.raw/1)
-    |> Enum.intersperse([Phoenix.HTML.Tag.tag(:br), ?\n])
+    |> Enum.intersperse([Phoenix.HTML.tag(:br), ?\n])
   end
 
   defp split_lines(text) do

@@ -39,7 +39,7 @@ defmodule Phoenix.HTML.LinkTest do
     assert ~s[<a href="/hello"><p>world</p></a>] ==
              safe_to_string(
                link to: "/hello" do
-                 Phoenix.HTML.Tag.content_tag(:p, "world")
+                 Phoenix.HTML.content_tag(:p, "world")
                end
              )
 

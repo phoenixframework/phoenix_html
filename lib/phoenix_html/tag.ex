@@ -22,93 +22,22 @@ defmodule Phoenix.HTML.Tag do
   >     </div>
   """
 
-  import Phoenix.HTML, except: [attributes_escape: 1]
+  import Phoenix.HTML,
+    except: [attributes_escape: 1, tag: 1, tag: 2, content_tag: 2, content_tag: 3]
 
   @csrf_param "_csrf_token"
 
-  @doc ~S"""
-  Creates an HTML tag with the given name and options.
+  @doc false
+  defdelegate tag(name), to: Phoenix.HTML
 
-      iex> safe_to_string tag(:br)
-      "<br>"
-      iex> safe_to_string tag(:input, type: "text", name: "user_id")
-      "<input name=\"user_id\" type=\"text\">"
+  @doc false
+  defdelegate tag(name, attrs), to: Phoenix.HTML
 
-  ## Data attributes
+  @doc false
+  defdelegate content_tag(name, content), to: Phoenix.HTML
 
-  In order to add custom data attributes you need to pass
-  a tuple containing :data atom and a keyword list
-  with data attributes' names and values as the first element
-  in the tag's attributes keyword list:
-
-      iex> safe_to_string tag(:input, [data: [foo: "bar"], id: "some_id"])
-      "<input data-foo=\"bar\" id=\"some_id\">"
-
-  ## Boolean values
-
-  In case an attribute contains a boolean value, its key
-  is repeated when it is true, as expected in HTML, or
-  the attribute is completely removed if it is false:
-
-      iex> safe_to_string tag(:audio, autoplay: "autoplay")
-      "<audio autoplay=\"autoplay\">"
-      iex> safe_to_string tag(:audio, autoplay: true)
-      "<audio autoplay>"
-      iex> safe_to_string tag(:audio, autoplay: false)
-      "<audio>"
-
-  If you want the boolean attribute to be sent as is,
-  you can explicitly convert it to a string before.
-  """
-  def tag(name), do: tag(name, [])
-
-  def tag(name, attrs) when is_list(attrs) do
-    {:safe, [?<, to_string(name), sorted_attrs(attrs), ?>]}
-  end
-
-  @doc ~S"""
-  Creates an HTML tag with given name, content, and attributes.
-
-  See `Phoenix.HTML.Tag.tag/2` for more information and examples.
-
-      iex> safe_to_string content_tag(:p, "Hello")
-      "<p>Hello</p>"
-
-      iex> safe_to_string content_tag(:p, "<Hello>", class: "test")
-      "<p class=\"test\">&lt;Hello&gt;</p>"
-
-      iex> safe_to_string(content_tag :p, class: "test" do
-      ...>   "Hello"
-      ...> end)
-      "<p class=\"test\">Hello</p>"
-
-      iex> safe_to_string content_tag(:option, "Display Value", [{:data, [foo: "bar"]}, value: "value"])
-      "<option data-foo=\"bar\" value=\"value\">Display Value</option>"
-
-  """
-  def content_tag(name, do: block) do
-    content_tag(name, block, [])
-  end
-
-  def content_tag(name, content) do
-    content_tag(name, content, [])
-  end
-
-  def content_tag(name, attrs, do: block) when is_list(attrs) do
-    content_tag(name, block, attrs)
-  end
-
-  def content_tag(name, content, attrs) when is_list(attrs) do
-    name = to_string(name)
-    {:safe, escaped} = html_escape(content)
-    {:safe, [?<, name, sorted_attrs(attrs), ?>, escaped, ?<, ?/, name, ?>]}
-  end
-
-  defp sorted_attrs(attrs) when is_list(attrs),
-    do: attrs |> Enum.sort() |> attributes_escape() |> elem(1)
-
-  defp sorted_attrs(attrs),
-    do: attrs |> Enum.to_list() |> sorted_attrs()
+  @doc false
+  defdelegate content_tag(name, content, attrs), to: Phoenix.HTML
 
   @doc false
   defdelegate attributes_escape(attrs), to: Phoenix.HTML

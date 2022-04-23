@@ -119,7 +119,7 @@ defmodule Phoenix.HTML.FormTest do
         safe_to_string(
           form_for(conn(), "/", [errors: errors], fn f ->
             for {field, {message, _}} <- f.errors do
-              Phoenix.HTML.Tag.content_tag(:span, humanize(field) <> " " <> message,
+              Phoenix.HTML.content_tag(:span, humanize(field) <> " " <> message,
                 class: "errors"
               )
             end
@@ -204,7 +204,7 @@ defmodule Phoenix.HTML.FormTest do
         safe_to_string(
           form_for(conn(), "/", [errors: errors], fn f ->
             for {field, {message, _}} <- f.errors do
-              Phoenix.HTML.Tag.content_tag(:span, humanize(field) <> " " <> message,
+              Phoenix.HTML.content_tag(:span, humanize(field) <> " " <> message,
                 class: "errors"
               )
             end

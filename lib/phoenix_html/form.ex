@@ -193,7 +193,7 @@ defmodule Phoenix.HTML.Form do
 
   alias Phoenix.HTML.Form
   import Phoenix.HTML
-  import Phoenix.HTML.Tag
+  import Phoenix.HTML.Tag, except: [tag: 1, tag: 2, content_tag: 2, content_tag: 3]
 
   @doc """
   Defines the Phoenix.HTML.Form struct.
