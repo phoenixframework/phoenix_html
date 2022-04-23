@@ -519,7 +519,6 @@ defmodule Phoenix.HTML do
       </form>
 
   Note that the `to` argument should be the same as the form action.
-
   """
   def csrf_token_value(to \\ %URI{host: nil}) do
     {mod, fun, args} = Application.fetch_env!(:phoenix_html, :csrf_token_reader)
