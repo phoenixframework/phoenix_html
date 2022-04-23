@@ -129,4 +129,28 @@ defmodule Phoenix.HTMLTest do
       assert attributes_escape([{"selected", true}]) |> safe_to_string() == ~s( selected)
     end
   end
+
+  describe "csrf_token_value" do
+    def custom_csrf(to, extra), do: "#{extra}:#{to}"
+
+    test "with default" do
+      assert csrf_token_value("/") == Plug.CSRFProtection.get_csrf_token()
+    end
+
+    test "with configured MFA" do
+      default_reader = Application.fetch_env!(:phoenix_html, :csrf_token_reader)
+
+      try do
+        Application.put_env(
+          :phoenix_html,
+          :csrf_token_reader,
+          {__MODULE__, :custom_csrf, ["extra"]}
+        )
+
+        assert csrf_token_value("/foo") == "extra:/foo"
+      after
+        Application.put_env(:phoenix_html, :csrf_token_reader, default_reader)
+      end
+    end
+  end
 end

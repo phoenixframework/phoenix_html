@@ -22,7 +22,7 @@ defmodule Phoenix.HTML.Tag do
   >     </div>
   """
 
-  import Phoenix.HTML, except: [attributes_escape: 1]
+  import Phoenix.HTML, except: [attributes_escape: 1, csrf_token_value: 0, csrf_token_value: 1]
 
   @csrf_param "_csrf_token"
 
@@ -201,7 +201,7 @@ defmodule Phoenix.HTML.Tag do
         {[~s'<input name="#{@csrf_param}" type="hidden" value="', csrf_token, ~s'">'], opts}
 
       {true, opts} ->
-        csrf_token = csrf_token_value(to)
+        csrf_token = Phoenix.HTML.csrf_token_value(to)
         {[~s'<input name="#{@csrf_param}" type="hidden" value="', csrf_token, ~s'">'], opts}
 
       {false, opts} ->
@@ -209,50 +209,20 @@ defmodule Phoenix.HTML.Tag do
     end
   end
 
-  @doc """
-  Returns the `csrf_token` value to be used by forms, meta tags, etc.
+  @doc false
+  defdelegate csrf_token_value(), to: Phoenix.HTML
 
-  By default, CSRF tokens are generated through `Plug.CSRFProtection`
-  which is capable of generating a separate token per host. Therefore
-  it is recommended to pass the `URI` of the destination as argument.
-  If none is given `%URI{host: nil}` is used, which implies a local
-  request is being done.
-  """
-  def csrf_token_value(to \\ %URI{host: nil}) do
-    {mod, fun, args} = Application.fetch_env!(:phoenix_html, :csrf_token_reader)
-    apply(mod, fun, [to | args])
-  end
+  @doc false
+  defdelegate csrf_token_value(value), to: Phoenix.HTML
 
-  @doc """
-  Generates a meta tag with CSRF information.
-
-  Additional options to the tag can be given.
-  """
+  @doc false
   def csrf_meta_tag(opts \\ []) do
-    tag(:meta, [name: "csrf-token", content: csrf_token_value()] ++ opts)
+    tag(:meta, [name: "csrf-token", content: Phoenix.HTML.csrf_token_value()] ++ opts)
   end
 
-  @doc """
-  Generates a hidden input tag with a CSRF token.
-
-  This could be used when writing a form without the use of tag
-  helpers like `form_tag/3` or `form_for/4`, while maintaining
-  CSRF protection.
-
-  The `to` argument should be the same as the form action.
-
-  ## Example
-
-      <form action="/login" method="POST">
-        <%= csrf_input_tag("/login") %>
-
-        etc.
-      </form>
-
-  Additional options to the tag can be given.
-  """
+  @doc false
   def csrf_input_tag(to, opts \\ []) do
-    csrf_token = csrf_token_value(to)
+    csrf_token = Phoenix.HTML.csrf_token_value(to)
     tag(:input, [type: "hidden", name: @csrf_param, value: csrf_token] ++ opts)
   end
 
