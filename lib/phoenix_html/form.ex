@@ -1041,7 +1041,6 @@ defmodule Phoenix.HTML.Form do
     opts =
       opts
       |> Keyword.put_new(:type, "checkbox")
-      |> Keyword.put_new(:id, input_id(form, field))
       |> Keyword.put_new(:name, input_name(form, field))
 
     {value, opts} = Keyword.pop(opts, :value, input_value(form, field))
@@ -1056,9 +1055,15 @@ defmodule Phoenix.HTML.Form do
     unchecked_value = html_escape(unchecked_value)
 
     opts =
-      Keyword.put_new_lazy(opts, :checked, fn ->
+      opts
+      |> Keyword.put_new_lazy(:checked, fn ->
         value = html_escape(value)
         value == checked_value
+      end)
+      |> Keyword.put_new_lazy(:id, fn ->
+        if String.ends_with?(opts[:name], "[]"),
+          do: input_id(form, field, checked_value),
+          else: input_id(form, field)
       end)
 
     if hidden_input do
