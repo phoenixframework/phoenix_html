@@ -818,7 +818,7 @@ defmodule Phoenix.HTML.FormTest do
                hidden_input: false
              )
            ) ==
-             ~s(<input id="search_key" name="search[key][]" type="checkbox" value="c">)
+             ~s(<input id="search_key_c" name="search[key][]" type="checkbox" value="c">)
   end
 
   test "checkbox/3 with form" do
