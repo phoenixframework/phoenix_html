@@ -78,12 +78,12 @@ defmodule Phoenix.HTML.Link do
 
     if method == :get do
       # Call link attributes to validate `to`
-      [data: data] = Phoenix.HTML.link_attributes(to, [])
+      [data: data] = link_attributes(to, [])
       content_tag(:a, text, [href: data[:to]] ++ Keyword.delete(opts, :csrf_token))
     else
       {csrf_token, opts} = Keyword.pop(opts, :csrf_token, true)
       opts = Keyword.put_new(opts, :rel, "nofollow")
-      [data: data] = Phoenix.HTML.link_attributes(to, method: method, csrf_token: csrf_token)
+      [data: data] = link_attributes(to, method: method, csrf_token: csrf_token)
       content_tag(:a, text, [data: data, href: data[:to]] ++ opts)
     end
   end
@@ -136,8 +136,7 @@ defmodule Phoenix.HTML.Link do
       |> Keyword.put_new(:method, :post)
       |> Keyword.split([:method, :csrf_token])
 
-    link_attributes = Phoenix.HTML.link_attributes(to, link_opts)
-    content_tag(:button, text, link_attributes ++ opts)
+    content_tag(:button, text, link_attributes(to, link_opts) ++ opts)
   end
 
   defp pop_required_option!(opts, key, error_message) do
@@ -148,5 +147,58 @@ defmodule Phoenix.HTML.Link do
     end
 
     {value, opts}
+  end
+
+  defp link_attributes(to, opts) do
+    to = valid_destination!(to)
+    method = Keyword.get(opts, :method, :get)
+    data = [method: method, to: to]
+
+    data =
+      if method == :get do
+        data
+      else
+        case Keyword.get(opts, :csrf_token, true) do
+          true -> [csrf: Phoenix.HTML.Tag.csrf_token_value(to)] ++ data
+          false -> data
+          csrf when is_binary(csrf) -> [csrf: csrf] ++ data
+        end
+      end
+
+    [data: data]
+  end
+
+  defp valid_destination!(%URI{} = uri) do
+    valid_destination!(URI.to_string(uri))
+  end
+
+  defp valid_destination!({:safe, to}) do
+    {:safe, valid_string_destination!(IO.iodata_to_binary(to))}
+  end
+
+  defp valid_destination!({other, to}) when is_atom(other) do
+    [Atom.to_string(other), ?:, to]
+  end
+
+  defp valid_destination!(to) do
+    valid_string_destination!(IO.iodata_to_binary(to))
+  end
+
+  @valid_uri_schemes ~w(http: https: ftp: ftps: mailto: news: irc: gopher:) ++
+                       ~w(nntp: feed: telnet: mms: rtsp: svn: tel: fax: xmpp:)
+
+  for scheme <- @valid_uri_schemes do
+    defp valid_string_destination!(unquote(scheme) <> _ = string), do: string
+  end
+
+  defp valid_string_destination!(to) do
+    if not match?("/" <> _, to) and String.contains?(to, ":") do
+      raise ArgumentError, """
+      unsupported scheme given as link. In case you want to link to an
+      unknown or unsafe scheme, such as javascript, use a tuple: {:javascript, rest}\
+      """
+    else
+      to
+    end
   end
 end
