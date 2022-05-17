@@ -98,10 +98,7 @@ defmodule Phoenix.HTML do
       import Phoenix.HTML
       import Phoenix.HTML.Form
       import Phoenix.HTML.Link
-
-      import Phoenix.HTML.Tag,
-        except: [attributes_escape: 1, csrf_token_value: 0, csrf_token_value: 1]
-
+      import Phoenix.HTML.Tag, except: [attributes_escape: 1]
       import Phoenix.HTML.Format
     end
   end
@@ -450,7 +447,7 @@ defmodule Phoenix.HTML do
         data
       else
         case Keyword.get(opts, :csrf_token, true) do
-          true -> [csrf: csrf_token_value(to)] ++ data
+          true -> [csrf: Phoenix.HTML.Tag.csrf_token_value(to)] ++ data
           false -> data
           csrf when is_binary(csrf) -> [csrf: csrf] ++ data
         end
@@ -491,37 +488,5 @@ defmodule Phoenix.HTML do
     else
       to
     end
-  end
-
-  @doc """
-  Returns the `csrf_token` value to be used by forms, meta tags, etc.
-
-  By default, CSRF tokens are generated through `Plug.CSRFProtection`
-  which is capable of generating a separate token per host. Therefore
-  it is recommended to pass the `URI` of the destination as argument.
-  If none is given `%URI{host: nil}` is used, which implies a local
-  request is being done.
-
-  This function is more often used to generate CSRF tokens to be used
-  on the "csrf-token" meta tag or to be used on hidden inputs to
-  protect forms.
-
-  For example, to generate a token for a meta tag:
-
-      <meta name="csrf-token" content={csrf_token_value()}>
-
-  If you're writing a form without the use of tag helpers like
-  `Phoenix.HTML.Tag.form_tag/3` or `Phoenix.HTML.Form.form_for/4`,
-  you can add a hidden input with the generated token to maintain CSRF protection:
-
-      <form action="/login" method="POST">
-        <input type="hidden" name="_csrf_token" value={csrf_token_value("/login")}>
-      </form>
-
-  Note that the `to` argument should be the same as the form action.
-  """
-  def csrf_token_value(to \\ %URI{host: nil}) do
-    {mod, fun, args} = Application.fetch_env!(:phoenix_html, :csrf_token_reader)
-    apply(mod, fun, [to | args])
   end
 end
