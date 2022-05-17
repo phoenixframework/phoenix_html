@@ -1,5 +1,11 @@
 # Changelog
 
+# v3.3.0-dev
+
+* Bug fix
+  * Generate unique IDs for checkboxes based on the value
+  * Use artificial button click instead of `form.submit` in JavaScript to trigger all relevant events
+
 # v3.2.0 (2021-12-18)
 
 * Enhancements
