@@ -61,4 +61,15 @@ defmodule Phoenix.HTML.SafeTest do
 
     assert Safe.to_iodata(datetime) == "2000-01-01T12:13:14+00:30"
   end
+
+  test "impl for URI" do
+    uri = %URI{scheme: "http", host: "www.example.org", path: "/foo", query: "secret=<a&b>"}
+
+    expected = [
+      [[[], "http://www.example.org/foo?secret=" | "&lt;"], "a" | "&amp;"],
+      "b" | "&gt;"
+    ]
+
+    assert Safe.to_iodata(uri) == expected
+  end
 end
