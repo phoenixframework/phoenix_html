@@ -65,11 +65,7 @@ defmodule Phoenix.HTML.SafeTest do
   test "impl for URI" do
     uri = %URI{scheme: "http", host: "www.example.org", path: "/foo", query: "secret=<a&b>"}
 
-    expected = [
-      [[[], "http://www.example.org/foo?secret=" | "&lt;"], "a" | "&amp;"],
-      "b" | "&gt;"
-    ]
-
-    assert Safe.to_iodata(uri) == expected
+    assert uri |> Safe.to_iodata() |> IO.iodata_to_binary() ==
+             "http://www.example.org/foo?secret=&lt;a&amp;b&gt;"
   end
 end
