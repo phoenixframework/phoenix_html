@@ -85,13 +85,11 @@ defimpl Phoenix.HTML.Safe, for: List do
 end
 
 defimpl Phoenix.HTML.Safe, for: Integer do
-  def to_iodata(data), do: Integer.to_string(data)
+  defdelegate to_iodata(data), to: Integer, as: :to_string
 end
 
 defimpl Phoenix.HTML.Safe, for: Float do
-  def to_iodata(data) do
-    IO.iodata_to_binary(:io_lib_format.fwrite_g(data))
-  end
+  defdelegate to_iodata(data), to: Float, as: :to_string
 end
 
 defimpl Phoenix.HTML.Safe, for: Tuple do
