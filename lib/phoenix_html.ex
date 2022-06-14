@@ -304,17 +304,23 @@ defmodule Phoenix.HTML do
 
   defp class_value(value) when is_list(value) do
     value
-    |> Enum.flat_map(fn
-      inner when is_list(inner) -> inner
-      other -> [other]
-    end)
-    |> Enum.filter(& &1)
-    |> Enum.join(" ")
+    |> list_class_value()
     |> attr_escape()
   end
 
   defp class_value(value) do
     attr_escape(value)
+  end
+
+  defp list_class_value(value) do
+    value
+    |> Enum.flat_map(fn
+      nil -> []
+      false -> []
+      inner when is_list(inner) -> [list_class_value(inner)]
+      other -> [other]
+    end)
+    |> Enum.join(" ")
   end
 
   defp key_escape(value) when is_atom(value), do: String.replace(Atom.to_string(value), "_", "-")

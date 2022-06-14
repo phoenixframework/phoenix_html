@@ -108,6 +108,10 @@ defmodule Phoenix.HTMLTest do
       assert attributes_escape([{:class, ["btn", nil, false, ["<active>", "small"]]}])
              |> safe_to_string() ==
                ~s( class="btn &lt;active&gt; small")
+
+      assert attributes_escape([{:class, ["btn", nil, [false, ["<active>", "small"]]]}])
+             |> safe_to_string() ==
+               ~s( class="btn &lt;active&gt; small")
     end
 
     test "handle class value as false/nil/true" do
