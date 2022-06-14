@@ -104,6 +104,12 @@ defmodule Phoenix.HTMLTest do
                ~s( class="btn &lt;active&gt;")
     end
 
+    test "handle class value list with nested lists" do
+      assert attributes_escape([{:class, ["btn", nil, false, ["<active>", "small"]]}])
+             |> safe_to_string() ==
+               ~s( class="btn &lt;active&gt; small")
+    end
+
     test "handle class value as false/nil/true" do
       assert attributes_escape([{:class, false}]) |> safe_to_string() == ~s()
       assert attributes_escape([{:class, nil}]) |> safe_to_string() == ~s()
