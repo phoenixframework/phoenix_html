@@ -304,6 +304,10 @@ defmodule Phoenix.HTML do
 
   defp class_value(value) when is_list(value) do
     value
+    |> Enum.flat_map(fn
+      inner when is_list(inner) -> inner
+      other -> [other]
+    end)
     |> Enum.filter(& &1)
     |> Enum.join(" ")
     |> attr_escape()
