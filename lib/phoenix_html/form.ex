@@ -717,9 +717,6 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Generates a color input.
 
-  Warning: this feature isn't available in all browsers.
-  Check `http://caniuse.com/#feat=input-color` for further information.
-
   See `text_input/3` for example and docs.
   """
   def color_input(form, field, opts \\ []) do
@@ -738,9 +735,6 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Generates a date input.
 
-  Warning: this feature isn't available in all browsers.
-  Check `http://caniuse.com/#feat=input-datetime` for further information.
-
   See `text_input/3` for example and docs.
   """
   def date_input(form, field, opts \\ []) do
@@ -749,9 +743,6 @@ defmodule Phoenix.HTML.Form do
 
   @doc """
   Generates a datetime-local input.
-
-  Warning: this feature isn't available in all browsers.
-  Check `http://caniuse.com/#feat=input-datetime` for further information.
 
   See `text_input/3` for example and docs.
   """
@@ -772,9 +763,6 @@ defmodule Phoenix.HTML.Form do
 
   @doc """
   Generates a time input.
-
-  Warning: this feature isn't available in all browsers.
-  Check `http://caniuse.com/#feat=input-datetime` for further information.
 
   ## Options
 
@@ -1359,6 +1347,9 @@ defmodule Phoenix.HTML.Form do
   @doc ~S'''
   Generates select tags for datetime.
 
+  Warning: this functionality is best provided by browsers nowadays.
+  Consider using `datetime_local_input/3` instead.
+
   ## Examples
 
       # Assuming form contains a User schema
@@ -1512,6 +1503,9 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Generates select tags for date.
 
+  Warning: this functionality is best provided by browsers nowadays.
+  Consider using `date_input/3` instead.
+
   Check `datetime_select/3` for more information on options and supported values.
   """
   def date_select(form, field, opts \\ []) do
@@ -1545,6 +1539,9 @@ defmodule Phoenix.HTML.Form do
 
   @doc """
   Generates select tags for time.
+
+  Warning: this functionality is best provided by browsers nowadays.
+  Consider using `time_input/3` instead.
 
   Check `datetime_select/3` for more information on options and supported values.
   """
