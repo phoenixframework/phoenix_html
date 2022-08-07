@@ -1,10 +1,6 @@
 defmodule Phoenix.HTML.Engine do
   @moduledoc """
-  This is an implementation of EEx.Engine that guarantees
-  templates are HTML Safe.
-
-  The `encode_to_iodata!/1` function converts the rendered
-  template result into iodata.
+  An EEx.Engine that guarantees templates are HTML Safe.
   """
 
   @behaviour EEx.Engine

@@ -22,6 +22,8 @@ defmodule Phoenix.HTML.Tag do
   >     </div>
   """
 
+  @moduledoc deprecated: "Use ~H\"\"\" instead to generate markup"
+
   import Phoenix.HTML, except: [attributes_escape: 1]
 
   @csrf_param "_csrf_token"

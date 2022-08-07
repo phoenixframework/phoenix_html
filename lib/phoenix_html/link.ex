@@ -3,6 +3,8 @@ defmodule Phoenix.HTML.Link do
   Conveniences for working with links and URLs in HTML.
   """
 
+  @moduledoc deprecated: "Use <.link> in Phoenix.LiveView.Helpers"
+
   import Phoenix.HTML.Tag
 
   @doc """

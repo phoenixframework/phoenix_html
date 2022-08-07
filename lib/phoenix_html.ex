@@ -30,15 +30,6 @@ defmodule Phoenix.HTML do
 
       <%= raw "<hello>" %>
 
-  Keep in mind most helpers will automatically escape your data
-  and return safe content:
-
-      <%= content_tag :p, "<hello>" %>
-
-  will properly output:
-
-      <p>&lt;hello&gt;</p>
-
   ## Form handling
 
   See `Phoenix.HTML.Form`.
@@ -91,6 +82,7 @@ defmodule Phoenix.HTML do
   """
 
   @doc false
+  # TODO: Deprecate me
   defmacro __using__(_) do
     quote do
       import Phoenix.HTML
