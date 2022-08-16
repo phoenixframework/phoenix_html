@@ -62,7 +62,6 @@ defmodule Phoenix.HTML.Form do
   automatically show up as selected in the form.
 
   ### A note on `:errors`
-  
   Even if `changeset.errors` is non-empty, errors will not be displayed in a
   form if [the changeset
   `:action`](https://hexdocs.pm/ecto/Ecto.Changeset.html#module-changeset-actions)
