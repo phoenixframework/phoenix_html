@@ -320,7 +320,7 @@ defmodule Phoenix.HTML do
 
   defp attr_escape({:safe, data}), do: data
   defp attr_escape(nil), do: []
-  defp attr_escape(other) when is_binary(other), do: Phoenix.HTML.Engine.encode_to_iodata!(other)
+  defp attr_escape(other) when is_binary(other), do: Phoenix.HTML.Engine.html_escape(other)
   defp attr_escape(other), do: Phoenix.HTML.Safe.to_iodata(other)
 
   @doc """
