@@ -2,9 +2,19 @@
 
 # v3.3.0-dev
 
+* Enhancements
+  * Support deeply nested class lists
+  * Implement Phoenix.HTML.Safe for URI
+
 * Bug fix
   * Generate unique IDs for checkboxes based on the value
   * Use artificial button click instead of `form.submit` in JavaScript to trigger all relevant events
+  * Fix a bug where false/true attributes in `aria`/`data`/`phx` would emit literal `"true"` and `"false"` values
+
+* Deprecations
+  * Phoenix.HTML.Format is deprecated
+  * Phoenix.HTML.Link is soft-deprecated
+  * Phoenix.HTML.Tag is soft-deprecated
 
 # v3.2.0 (2021-12-18)
 
