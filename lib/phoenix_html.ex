@@ -274,6 +274,12 @@ defmodule Phoenix.HTML do
 
   defp build_attrs([]), do: []
 
+  defp nested_attrs([{k, true} | kv], attr, t),
+    do: [attr, ?-, key_escape(k) | nested_attrs(kv, attr, t)]
+
+  defp nested_attrs([{_, falsy} | kv], attr, t) when falsy in [false, nil],
+    do: nested_attrs(kv, attr, t)
+
   defp nested_attrs([{k, v} | kv], attr, t) when is_list(v),
     do: [nested_attrs(v, "#{attr}-#{key_escape(k)}", []) | nested_attrs(kv, attr, t)]
 

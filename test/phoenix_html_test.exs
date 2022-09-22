@@ -75,6 +75,9 @@ defmodule Phoenix.HTMLTest do
       assert attributes_escape([{:data, [a: "1", b: "2"]}]) |> safe_to_string() ==
                ~s( data-a="1" data-b="2")
 
+      assert attributes_escape([{:data, [a: false, b: true, c: nil]}]) |> safe_to_string() ==
+               ~s( data-b)
+
       assert attributes_escape([{"aria", [{"a", "1"}, {"b", "2"}]}]) |> safe_to_string() ==
                ~s( aria-a="1" aria-b="2")
 

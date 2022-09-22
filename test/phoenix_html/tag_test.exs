@@ -68,7 +68,7 @@ defmodule Phoenix.HTML.TagTest do
       end
 
     assert safe_to_string(content) ==
-             ~s(<form action="/users" data-remote="true">) <> ~s(<input name="user[name]"></form>)
+             ~s(<form action="/users" data-remote>) <> ~s(<input name="user[name]"></form>)
 
     assert content_tag(:p, do: "Hello") |> safe_to_string() == "<p>Hello</p>"
 
