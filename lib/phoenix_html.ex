@@ -55,27 +55,19 @@ defmodule Phoenix.HTML do
   To use the functionality above, you must load `priv/static/phoenix_html.js`
   into your build tool.
 
-  ### Overriding the default confirm behaviour
+  ### Overriding the default confirmation behaviour
 
-  You can override the default confirmation behaviour by hooking
+  You can override the default implementation by hooking
   into `phoenix.link.click`. Here is an example:
 
   ```javascript
-  // listen on document.body, so it's executed before the default of
-  // phoenix_html, which is listening on the window object
-  document.body.addEventListener('phoenix.link.click', function (e) {
-    // Prevent default implementation
-    e.stopPropagation();
-
-    // Introduce alternative implementation
-    var message = e.target.getAttribute("data-confirm");
-    if(!message){ return true; }
-    vex.dialog.confirm({
-      message: message,
-      callback: function (value) {
-        if (value == false) { e.preventDefault(); }
-      }
-    })
+  window.addEventListener('phoenix.link.click', function (e) {
+    // Introduce custom behaviour
+    var message = e.target.getAttribute("data-prompt");
+    var answer = e.target.getAttribute("data-prompt-answer");
+    if(message && answer && (answer != window.prompt(message))) {
+      e.preventDefault();
+    }
   }, false);
   ```
 
