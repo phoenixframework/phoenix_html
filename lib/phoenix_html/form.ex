@@ -625,6 +625,9 @@ defmodule Phoenix.HTML.Form do
 
   @doc """
   Generates hidden inputs for the given form.
+
+  These include things like `:id` fields, which are included for existing
+  records and skipped for new ones.
   """
   @spec hidden_inputs_for(t) :: list(Phoenix.HTML.safe())
   def hidden_inputs_for(form) do
