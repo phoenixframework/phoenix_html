@@ -28,7 +28,7 @@ defmodule Phoenix.HTML.Format do
     * `:insert_brs` - if `true` insert `<br>` for single line breaks (default: `true`)
 
   """
-  @deprecated "Use white-space CSS property and collapse newlines instead"
+  @doc deprecated: "Use white-space CSS property and collapse newlines instead"
   @spec text_to_html(Phoenix.HTML.unsafe(), Keyword.t()) :: Phoenix.HTML.safe()
   def text_to_html(string, opts \\ []) do
     escape? = Keyword.get(opts, :escape, true)
