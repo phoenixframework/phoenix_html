@@ -2,6 +2,14 @@
 
 # v3.3.0-dev
 
+With the addition of the HEEx template engine to Phoenix applications,
+some functions from the `Phoenix.HTML.{Format, Link, Tag}` modules lost
+relevance and are either deprecated or soft-deprecated.
+
+The functions in those modules are generally small and can be written
+as plain HTML. If you'd prefer to continue using those functions, then
+you might copy them to your application (as they are isolated).
+
 * Enhancements
   * Support deeply nested class lists
   * Implement Phoenix.HTML.Safe for URI
@@ -12,9 +20,12 @@
   * Fix a bug where false/true attributes in `aria`/`data`/`phx` would emit literal `"true"` and `"false"` values
 
 * Deprecations
-  * Phoenix.HTML.Format is deprecated
-  * Phoenix.HTML.Link is soft-deprecated
-  * Phoenix.HTML.Tag is soft-deprecated
+  * `Phoenix.HTML.Format.text_to_html/1` is deprecated in favor of plain HTML
+  * `Phoenix.HTML.Tag.attributes_escape/1` is deprecated in favor of `Phoenix.HTML.attributes_escape/1`
+  * `Phoenix.HTML.Tag.form_tag/2` is soft-deprecated in favor of plain HTML
+  * `Phoenix.HTML.Tag.img_tag/2` is soft-deprecated in favor of plain HTML
+  * `Phoenix.HTML.Link.link/2` is soft-deprecated in favor of `Phoenix.Component.link/1`
+  * `Phoenix.HTML.Link.button/2` is soft-deprecated in favor of plain HTML
 
 # v3.2.0 (2021-12-18)
 

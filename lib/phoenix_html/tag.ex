@@ -2,14 +2,13 @@ defmodule Phoenix.HTML.Tag do
   @moduledoc ~S"""
   Helpers related to producing HTML tags within templates.
 
-  > Note: the examples in this module use `safe_to_string/1`
-  > imported from `Phoenix.HTML` for readability.
-
   > Note: with the addition of the HEEx template engine to
   > Phoenix applications, the functions in this module have
-  > lost a bit of relevance. Whenever possible, prefer to use
-  > the HEEx template engine instead of the functions here.
-  > For example, instead of:
+  > lost a bit of relevance and must only be used in special
+  > circumstances.
+  >
+  > Whenever possible, prefer to use the HEEx template engine
+  > instead of the functions here. For example, instead of:
   >
   >     <%= content_tag :div, class: @class do %>
   >       Hello
@@ -20,9 +19,10 @@ defmodule Phoenix.HTML.Tag do
   >     <div class={@class}>
   >       Hello
   >     </div>
-  """
 
-  @moduledoc deprecated: "Use ~H\"\"\" instead to generate markup"
+  > Note: the examples in this module use `safe_to_string/1`
+  > imported from `Phoenix.HTML` for readability.
+  """
 
   import Phoenix.HTML, except: [attributes_escape: 1]
 
@@ -113,6 +113,7 @@ defmodule Phoenix.HTML.Tag do
     do: attrs |> Enum.to_list() |> sorted_attrs()
 
   @doc false
+  @deprecated "Use Phoenix.HTML.attributes_escape/1 instead"
   defdelegate attributes_escape(attrs), to: Phoenix.HTML
 
   @doc ~S"""
@@ -148,6 +149,7 @@ defmodule Phoenix.HTML.Tag do
 
   By default, CSRF tokens are generated through `Plug.CSRFProtection`.
   """
+  @doc deprecated: "Write <form> directly (optionally with csrf_input_tag for POST forms)"
   def form_tag(action, opts \\ [])
 
   def form_tag(action, do: block) do
@@ -193,6 +195,7 @@ defmodule Phoenix.HTML.Tag do
       <form action="/hello" method="get">...Hello...</form>
 
   """
+  @doc deprecated: "Write <form> directly (optionally with csrf_input_tag for POST forms)"
   def form_tag(action, options, do: block) do
     html_escape([form_tag(action, options), block, raw("</form>")])
   end
@@ -285,6 +288,7 @@ defmodule Phoenix.HTML.Tag do
       <img src="/logo.png" srcset="/logo.png, /logo-2x.png 2x">
 
   """
+  @doc deprecated: "Write <img> directly"
   def img_tag(src, opts \\ []) do
     opts =
       case Keyword.pop(opts, :srcset) do

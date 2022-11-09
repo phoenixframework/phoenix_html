@@ -3,8 +3,6 @@ defmodule Phoenix.HTML.Link do
   Conveniences for working with links and URLs in HTML.
   """
 
-  @moduledoc deprecated: "Use <.link> in Phoenix.LiveView.Helpers"
-
   import Phoenix.HTML.Tag
 
   @doc """
@@ -64,6 +62,7 @@ defmodule Phoenix.HTML.Link do
 
   By default, CSRF tokens are generated through `Plug.CSRFProtection`.
   """
+  @doc deprecated: "Use Phoenix.Component.link/1 instead"
   def link(text, opts)
 
   def link(opts, do: contents) when is_list(opts) do
@@ -126,6 +125,7 @@ defmodule Phoenix.HTML.Link do
     * `data-confirm` - shows a confirmation prompt before generating and
       submitting the form.
   """
+  @doc deprecated: "Use plan HTML or Phoenix.Component.link/1 (with classes to style it as a button)"
   def button(opts, do: contents) do
     button(contents, opts)
   end

@@ -260,7 +260,7 @@ defmodule Phoenix.HTML.Form do
     def to_iodata(%{action: action, options: options}) do
       IO.warn(
         "form_for/3 without an anonymous function is deprecated. " <>
-          "If you are using Phoenix.LiveView, use the new Phoenix.LiveView.Helpers.form/1 component"
+          "If you are using Phoenix.LiveView, use the new Phoenix.Component.form/1 component"
       )
 
       {:safe, contents} = form_tag(action, options)
@@ -313,12 +313,12 @@ defmodule Phoenix.HTML.Form do
 
   See `form_for/4` for the available options.
   """
-  @doc deprecated: "Use Phoenix.LiveView.Helpers.form/1 instead"
+  @doc deprecated: "Use Phoenix.Component.form/1 instead"
   @spec form_for(Phoenix.HTML.FormData.t(), String.t(), Keyword.t()) :: Phoenix.HTML.Form.t()
   def form_for(form_data, action, options) when is_list(options) do
     IO.warn(
       "form_for/3 without an anonymous function is deprecated. " <>
-        "If you are using Phoenix.LiveView, use the new Phoenix.LiveView.Helpers.form/1 component"
+        "If you are using Phoenix.LiveView, use the new Phoenix.Component.form/1 component"
     )
 
     %{Phoenix.HTML.FormData.to_form(form_data, options) | action: action}
