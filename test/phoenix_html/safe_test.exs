@@ -8,8 +8,8 @@ defmodule Phoenix.HTML.SafeTest do
   end
 
   test "impl for io data" do
-    assert Safe.to_iodata('<foo>') == ["&lt;", 102, 111, 111, "&gt;"]
-    assert Safe.to_iodata(['<foo>']) == [["&lt;", 102, 111, 111, "&gt;"]]
+    assert Safe.to_iodata(~c"<foo>") == ["&lt;", 102, 111, 111, "&gt;"]
+    assert Safe.to_iodata([~c"<foo>"]) == [["&lt;", 102, 111, 111, "&gt;"]]
     assert Safe.to_iodata([?<, "foo" | ?>]) == ["&lt;", "foo" | "&gt;"]
   end
 

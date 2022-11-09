@@ -36,10 +36,10 @@ defmodule Phoenix.HTMLTest do
 
     test "only accepts valid iodata" do
       assert html_escape("foo") == {:safe, "foo"}
-      assert html_escape('foo') == {:safe, 'foo'}
+      assert html_escape(~c"foo") == {:safe, ~c"foo"}
 
       assert_raise ArgumentError, ~r/templates only support iodata/, fn ->
-        html_escape('foo🐥')
+        html_escape(~c"foo🐥")
       end
     end
   end

@@ -125,7 +125,8 @@ defmodule Phoenix.HTML.Link do
     * `data-confirm` - shows a confirmation prompt before generating and
       submitting the form.
   """
-  @doc deprecated: "Use plan HTML or Phoenix.Component.link/1 (with classes to style it as a button)"
+  @doc deprecated:
+         "Use plan HTML or Phoenix.Component.link/1 (with classes to style it as a button)"
   def button(opts, do: contents) do
     button(contents, opts)
   end

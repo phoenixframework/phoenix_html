@@ -5,7 +5,7 @@ defmodule Phoenix.HTML.Engine do
 
   @behaviour EEx.Engine
 
-  @anno (if :erlang.system_info(:otp_release) >= '19' do
+  @anno (if :erlang.system_info(:otp_release) >= ~c"19" do
            [generated: true]
          else
            [line: -1]
