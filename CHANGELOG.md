@@ -4,7 +4,7 @@
 
 With the addition of the HEEx template engine to Phoenix applications,
 some functions from the `Phoenix.HTML.{Format, Link, Tag}` modules lost
-relevance and are either deprecated or soft-deprecated.
+relevance and are soft-deprecated.
 
 The functions in those modules are generally small and can be written
 as plain HTML. If you'd prefer to continue using those functions, then
