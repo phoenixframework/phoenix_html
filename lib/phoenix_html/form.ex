@@ -176,7 +176,7 @@ defmodule Phoenix.HTML.Form do
   ## Phoenix.LiveView integration
 
   Phoenix.LiveView builds on top of this function to [provide a function
-  component named `form`](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.Helpers.html#form/1).
+  component named `form`](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#form/1).
   Inside your HEEx templates, instead of doing this:
 
       <%= form_for @changeset, url, opts, fn f -> %>
