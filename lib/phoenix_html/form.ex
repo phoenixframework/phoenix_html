@@ -131,6 +131,12 @@ defmodule Phoenix.HTML.Form do
           field :name
           embeds_one :permalink, Permalink
         end
+
+        def changeset(user \\ %User{}, params) do
+          user
+          |> Ecto.Changeset.cast(params)
+          |> Ecto.Changeset.cast_assoc(:permalink)
+        end
       end
 
       defmodule Permalink do
@@ -1330,6 +1336,13 @@ defmodule Phoenix.HTML.Form do
 
   The `:selected` option will mark the given IDs as selected unless the form
   is being resubmitted. When resubmitted, it uses the form params as values.
+
+  When used with Ecto, you will typically do a query to retrieve the IDs from
+  the database:
+
+      from r in Role, where: r.id in ^(params["roles"] || [])
+
+  And then use `Ecto.Changeset.put_assoc/2` to insert the new roles into the user.
 
   ## Options
 
