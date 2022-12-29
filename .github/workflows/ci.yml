@@ -19,7 +19,7 @@ jobs:
             otp: 23.3
             lint: lint
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
     - name: Checkout
