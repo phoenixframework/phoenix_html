@@ -126,7 +126,7 @@ defmodule Phoenix.HTML.TagTest do
 
     assert safe_to_string(form_tag("/")) ==
              ~s(<form action="/" method="post">) <>
-               ~s(<input name="_csrf_token" type="hidden" value="#{csrf_token}">)
+               ~s(<input name="_csrf_token" type="hidden" hidden value="#{csrf_token}">)
 
     assert safe_to_string(form_tag("/", method: :post, csrf_token: false, multipart: true)) ==
              ~s(<form action="/" enctype="multipart/form-data" method="post">)
@@ -137,8 +137,8 @@ defmodule Phoenix.HTML.TagTest do
 
     assert safe_to_string(form_tag("/", method: :put)) ==
              ~s(<form action="/" method="post">) <>
-               ~s(<input name="_method" type="hidden" value="put">) <>
-               ~s(<input name="_csrf_token" type="hidden" value="#{csrf_token}">)
+               ~s(<input name="_method" type="hidden" hidden value="put">) <>
+               ~s(<input name="_csrf_token" type="hidden" hidden value="#{csrf_token}">)
   end
 
   test "form_tag with do block" do
@@ -150,7 +150,7 @@ defmodule Phoenix.HTML.TagTest do
              end
            ) ==
              ~s(<form action="/" method="post">) <>
-               ~s(<input name="_csrf_token" type="hidden" value="#{csrf_token}">) <>
+               ~s(<input name="_csrf_token" type="hidden" hidden value="#{csrf_token}">) <>
                ~s(&lt;&gt;) <> ~s(</form>)
 
     assert safe_to_string(

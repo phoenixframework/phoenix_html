@@ -171,8 +171,11 @@ defmodule Phoenix.HTML.Tag do
         _ ->
           {csrf, opts} = csrf_form_tag(action, opts)
 
-          {[~s'<input name="_method" type="hidden" value="', to_string(method), ~s'">' | csrf],
-           Keyword.put(opts, :method, "post")}
+          {[
+             ~s'<input name="_method" type="hidden" hidden value="',
+             to_string(method),
+             ~s'">' | csrf
+           ], Keyword.put(opts, :method, "post")}
       end
 
     opts =
@@ -203,11 +206,14 @@ defmodule Phoenix.HTML.Tag do
   defp csrf_form_tag(to, opts) do
     case Keyword.pop(opts, :csrf_token, true) do
       {csrf_token, opts} when is_binary(csrf_token) ->
-        {[~s'<input name="#{@csrf_param}" type="hidden" value="', csrf_token, ~s'">'], opts}
+        {[~s'<input name="#{@csrf_param}" type="hidden" hidden value="', csrf_token, ~s'">'],
+         opts}
 
       {true, opts} ->
         csrf_token = csrf_token_value(to)
-        {[~s'<input name="#{@csrf_param}" type="hidden" value="', csrf_token, ~s'">'], opts}
+
+        {[~s'<input name="#{@csrf_param}" type="hidden" hidden value="', csrf_token, ~s'">'],
+         opts}
 
       {false, opts} ->
         {[], opts}

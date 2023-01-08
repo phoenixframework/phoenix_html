@@ -23,15 +23,15 @@ defmodule Phoenix.HTML.CSRFTest do
   test "form_tag for post using a custom csrf token" do
     assert safe_to_string(form_tag("/")) =~ ~r(
                 <form\ action="/"\ method="post">
-                <input\ name="_csrf_token"\ type="hidden"\ value="[^"]+">
+                <input\ name="_csrf_token"\ type="hidden"\ hidden\ value="[^"]+">
               )mx
   end
 
   test "form_tag for other method using a custom csrf token" do
     assert safe_to_string(form_tag("/", method: :put)) =~ ~r(
                 <form\ action="/"\ method="post">
-                <input\ name="_method"\ type="hidden"\ value="put">
-                <input\ name="_csrf_token"\ type="hidden"\ value="[^"]+">
+                <input\ name="_method"\ type="hidden"\ hidden\ value="put">
+                <input\ name="_csrf_token"\ type="hidden"\ hidden\ value="[^"]+">
               )mx
   end
 end
