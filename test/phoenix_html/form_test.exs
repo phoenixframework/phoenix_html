@@ -86,7 +86,7 @@ defmodule Phoenix.HTML.FormTest do
       assert form =~
                ~s(<form action="/" enctype="multipart/form-data" method="post">)
 
-      assert form =~ ~s(<input name="_method" type="hidden" value="put">)
+      assert form =~ ~s(<input name="_method" type="hidden" hidden value="put">)
     end
 
     test "is html safe" do
@@ -171,7 +171,7 @@ defmodule Phoenix.HTML.FormTest do
       assert form =~
                ~s(<form action="/" enctype="multipart/form-data" method="post">)
 
-      assert form =~ ~s(<input name="_method" type="hidden" value="put">)
+      assert form =~ ~s(<input name="_method" type="hidden" hidden value="put">)
     end
 
     test "is html safe" do
