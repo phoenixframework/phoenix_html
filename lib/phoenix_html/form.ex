@@ -325,7 +325,6 @@ defmodule Phoenix.HTML.Form do
 
   See `form_for/4` for the available options.
   """
-  @doc deprecated: "Use Phoenix.Component.form/1 instead"
   @spec form_for(Phoenix.HTML.FormData.t(), String.t(), Keyword.t()) :: Phoenix.HTML.Form.t()
   def form_for(form_data, action, options) when is_list(options) do
     IO.warn(

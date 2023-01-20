@@ -149,7 +149,6 @@ defmodule Phoenix.HTML.Tag do
 
   By default, CSRF tokens are generated through `Plug.CSRFProtection`.
   """
-  @doc deprecated: "Write <form> directly (optionally with csrf_input_tag for POST forms)"
   def form_tag(action, opts \\ [])
 
   def form_tag(action, do: block) do
@@ -198,7 +197,6 @@ defmodule Phoenix.HTML.Tag do
       <form action="/hello" method="get">...Hello...</form>
 
   """
-  @doc deprecated: "Write <form> directly (optionally with csrf_input_tag for POST forms)"
   def form_tag(action, options, do: block) do
     html_escape([form_tag(action, options), block, raw("</form>")])
   end
@@ -294,7 +292,6 @@ defmodule Phoenix.HTML.Tag do
       <img src="/logo.png" srcset="/logo.png, /logo-2x.png 2x">
 
   """
-  @doc deprecated: "Write <img> directly"
   def img_tag(src, opts \\ []) do
     opts =
       case Keyword.pop(opts, :srcset) do
