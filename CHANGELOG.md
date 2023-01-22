@@ -11,6 +11,7 @@ those modules shall continue working in the future by adding one dependency.
 * Enhancements
   * Support deeply nested class lists
   * Implement Phoenix.HTML.Safe for URI
+  * Implement Phoenix.HTML.FormData for Map
 
 * Bug fix
   * Generate unique IDs for checkboxes based on the value

@@ -43,6 +43,93 @@ defmodule Phoenix.HTML.FormTest do
     }
   end
 
+  describe "form_for/4 with map" do
+    test "with :as" do
+      search_params = search_params()
+
+      form =
+        safe_to_string(
+          form_for(search_params, "/", [as: :search], fn f ->
+            assert f.impl == Phoenix.HTML.FormData.Map
+            assert f.name == "search"
+            assert f.source == search_params
+            assert f.params["key"] == "value"
+            ""
+          end)
+        )
+
+      assert form =~ ~s(<form action="/" method="post">)
+    end
+
+    test "without :as" do
+      form =
+        safe_to_string(
+          form_for(search_params(), "/", fn f ->
+            text_input(f, :key)
+          end)
+        )
+
+      assert form =~ ~s(<input id="key" name="key" type="text" value="value">)
+    end
+
+    test "with custom options" do
+      form =
+        safe_to_string(
+          form_for(search_params(), "/", [as: :search, method: :put, multipart: true], fn f ->
+            refute f.options[:name]
+            assert f.options[:multipart] == true
+            assert f.options[:method] == :put
+            ""
+          end)
+        )
+
+      assert form =~
+               ~s(<form action="/" enctype="multipart/form-data" method="post">)
+
+      assert form =~ ~s(<input name="_method" type="hidden" hidden value="put">)
+    end
+
+    test "is html safe" do
+      form = safe_to_string(form_for(search_params(), "/", [as: :search], fn _ -> "<>" end))
+      assert form =~ ~s(&lt;&gt;</form>)
+    end
+
+    test "with type and validations" do
+      form =
+        safe_to_string(
+          form_for(search_params(), "/", [as: :search], fn f ->
+            assert input_type(f, :hello) == :text_input
+            assert input_type(f, :email) == :email_input
+            assert input_type(f, :search) == :search_input
+            assert input_type(f, :password) == :password_input
+            assert input_type(f, :special_url) == :url_input
+            assert input_type(f, :number, %{"number" => :number_input}) == :number_input
+            assert input_validations(f, :hello) == []
+            ""
+          end)
+        )
+
+      assert form =~ "<form"
+    end
+
+    test "with errors through options" do
+      errors = [field: {"error message!", []}]
+
+      form =
+        safe_to_string(
+          form_for(search_params(), "/", [errors: errors], fn f ->
+            for {field, {message, _}} <- f.errors do
+              Phoenix.HTML.Tag.content_tag(:span, humanize(field) <> " " <> message,
+                class: "errors"
+              )
+            end
+          end)
+        )
+
+      assert form =~ ~s(<span class="errors">Field error message!</span>)
+    end
+  end
+
   describe "form_for/4 with connection" do
     test "with :as" do
       conn = conn()
@@ -229,10 +316,8 @@ defmodule Phoenix.HTML.FormTest do
 
   describe "inputs_for/3" do
     test "generate a new form builder for the given parameter" do
-      conn = conn()
-
       form =
-        form_for(conn, "/", [as: :user], fn form ->
+        form_for(%{}, "/", [as: :user], fn form ->
           for company_form <- inputs_for(form, :company) do
             text_input(company_form, :name)
           end
@@ -243,10 +328,8 @@ defmodule Phoenix.HTML.FormTest do
     end
 
     test "support options" do
-      conn = conn()
-
       form =
-        form_for(conn, "/", [as: :user], fn form ->
+        form_for(%{}, "/", [as: :user], fn form ->
           for company_form <- inputs_for(form, :company, as: :new_company, id: :custom_id) do
             text_input(company_form, :name)
           end
@@ -257,7 +340,7 @@ defmodule Phoenix.HTML.FormTest do
     end
 
     test "support atom or binary field" do
-      form = Phoenix.HTML.FormData.to_form(:user, [])
+      form = Phoenix.HTML.FormData.to_form(%{}, [as: :user])
 
       [f] = inputs_for(form, :key)
       assert f.name == "user[key]"
@@ -271,10 +354,8 @@ defmodule Phoenix.HTML.FormTest do
 
   describe "inputs_for/4" do
     test "generate a new form builder for the given parameter" do
-      conn = conn()
-
       form =
-        form_for(conn, "/", [as: :user], fn form ->
+        form_for(%{}, "/", [as: :user], fn form ->
           inputs_for(form, :company, fn company_form ->
             text_input(company_form, :name)
           end)
@@ -285,10 +366,8 @@ defmodule Phoenix.HTML.FormTest do
     end
 
     test "generate a new form builder with hidden inputs when they are present" do
-      conn = conn()
-
       form =
-        form_for(conn, "/", [as: :user], fn form ->
+        form_for(%{}, "/", [as: :user], fn form ->
           inputs_for(form, :company, [hidden: [id: 1]], fn company_form ->
             text_input(company_form, :name)
           end)
@@ -302,10 +381,8 @@ defmodule Phoenix.HTML.FormTest do
     end
 
     test "skip hidden inputs" do
-      conn = conn()
-
       form =
-        form_for(conn, "/", [as: :user], fn form ->
+        form_for(%{}, "/", [as: :user], fn form ->
           inputs_for(form, :company, [skip_hidden: true, hidden: [id: 1]], fn company_form ->
             text_input(company_form, :name)
           end)

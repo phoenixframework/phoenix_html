@@ -1,4 +1,7 @@
 defmodule Phoenix.HTML.Form do
+  # TODO: Remove action field from Form
+  # TODO: Keep only map implementation for form data
+
   @moduledoc ~S"""
   Helpers related to producing HTML forms.
 
@@ -6,12 +9,11 @@ defmodule Phoenix.HTML.Form do
   distinct scenarios:
 
     * with changeset data - when information to populate
-      the form comes from a changeset
+      the form comes from a changeset. The changeset holds
+      rich information, which helps provide conveniences
 
-    * with limited data - when a form is created without
-      an underlying data layer. In this scenario, you can
-      use the connection information (aka Plug.Conn.params)
-      or pass the form values by hand
+    * with map data - a simple map of parameters (such as
+      `Plug.Conn.params` can be given as data to the form)
 
     * outside of a form  - when the functions are used directly,
       outside of `form_for`
@@ -82,31 +84,32 @@ defmodule Phoenix.HTML.Form do
   set it to `:validate` or anything else to avoid giving the impression that a
   database operation has actually been attempted.
 
-  ## With limited data
+  ## With map data
 
   `form_for/4` expects as first argument any data structure that
   implements the `Phoenix.HTML.FormData` protocol. By default,
-  Phoenix implements this protocol for `Plug.Conn` and `Atom`.
+  Phoenix.HTML implements this protocol for `Map`.
 
   This is useful when you are creating forms that are not backed
   by any kind of data layer. Let's assume that we're submitting a
   form to the `:new` action in the `FooController`:
 
-      <%= form_for @conn, Routes.foo_path(@conn, :new), [as: :foo], fn f -> %>
-        <%= text_input f, :for %>
+      <%= form_for @conn.params, Routes.foo_path(@conn, :new), fn f -> %>
+        <%= text_input f, :contents %>
         <%= submit "Search" %>
       <% end %>
 
-  `form_for/4` uses the `Plug.Conn` to set input values from the
-  request parameters.
+  Once the form is submitted, the form contents will be set directly
+  as the parameters root, such as `conn.params["contents"]`. If you
+  prefer, you can pass the `:as` option to configure them to be nested:
 
-  Alternatively, if you don't have a connection, you can pass `:foo`
-  as the form data source and explicitly pass the value for every input:
-
-      <%= form_for :foo, Routes.foo_path(MyApp.Endpoint, :new), fn f -> %>
-        <%= text_input f, :for, value: "current value" %>
+      <%= form_for @conn.params["search"] || %{}, Routes.foo_path(@conn, :new), [as: :search], fn f -> %>
+        <%= text_input f, :contents %>
         <%= submit "Search" %>
       <% end %>
+
+  In the example above, all form contents is now set inside `conn.params["search"]`
+  thanks to the `[as: :search]` option.
 
   ## Without form data
 
@@ -226,16 +229,13 @@ defmodule Phoenix.HTML.Form do
 
     * `:data` - the field used to store lookup data
 
-    * `:params` - the parameters associated to this form in case
-      they were sent as part of a previous request
+    * `:params` - the parameters associated to this form
 
     * `:hidden` - a keyword list of fields that are required for
       submitting the form behind the scenes as hidden inputs
 
     * `:options` - a copy of the options given when creating the
       form via `form_for/4` without any form data specific key
-
-    * `:action` - the action the form is meant to submit to
 
     * `:errors` - a keyword list of errors that associated with
       the form
