@@ -5,28 +5,6 @@ defmodule Phoenix.HTML.FormTest do
   import Phoenix.HTML.Form
   doctest Phoenix.HTML.Form
 
-  @doc """
-  A function that executes `form_for/4` and
-  extracts its inner contents for assertion.
-  """
-  def safe_form(fun, opts \\ [as: :search]) do
-    mark = "--PLACEHOLDER--"
-
-    contents =
-      safe_to_string(
-        form_for(conn(), "/", opts, fn f ->
-          html_escape([mark, fun.(f), mark])
-        end)
-      )
-
-    [_, inner, _] = String.split(contents, mark)
-    inner
-  end
-
-  defp conn do
-    Plug.Test.conn(:get, "/foo", %{"search" => search_params()})
-  end
-
   defp search_params do
     %{
       "key" => "value",
@@ -41,6 +19,10 @@ defmodule Phoenix.HTML.FormTest do
       },
       "naive_datetime" => ~N[2000-01-01 10:00:42]
     }
+  end
+
+  defp form(map \\ %{}, opts \\ []) do
+    Phoenix.HTML.FormData.to_form(map, opts)
   end
 
   describe "form_for/4 with map" do
@@ -128,6 +110,151 @@ defmodule Phoenix.HTML.FormTest do
 
       assert form =~ ~s(<span class="errors">Field error message!</span>)
     end
+  end
+
+  describe "input_value/2" do
+    test "without form" do
+      assert input_value(:search, :key) == nil
+      assert input_value(:search, 1) == nil
+      assert input_value(:search, "key") == nil
+    end
+
+    test "with form" do
+      assert input_value(form(%{"key" => "value"}), :key) == "value"
+      assert input_value(form(%{"key" => "value"}), "key") == "value"
+    end
+
+    test "with form and data" do
+      form = %{form(%{"param_key" => "param"}) | data: %{data_key: "data"}}
+      assert input_value(form, :key) == nil
+      assert input_value(form, "key") == nil
+      assert input_value(form, :data_key) == "data"
+      assert input_value(form, :param_key) == "param"
+      assert input_value(form, "param_key") == "param"
+    end
+  end
+
+  describe "input_id/2" do
+    test "without form" do
+      assert input_id(:search, :key) == "search_key"
+      assert input_id(:search, "key") == "search_key"
+    end
+
+    test "with form" do
+      assert input_id(form(%{}, as: "search"), :key) == "search_key"
+      assert input_id(form(%{}, as: :search), "key") == "search_key"
+    end
+
+    test "with form with no name" do
+      assert input_id(form(), :key) == "key"
+    end
+  end
+
+  describe "input_id/3" do
+    test "without form" do
+      assert input_id(:search, :key, "") == "search_key_"
+      assert input_id(:search, :key, "foo") == "search_key_foo"
+      assert input_id(:search, :key, "foo bar") == "search_key_foo_bar"
+      assert input_id(:search, :key, "Foo baR") == "search_key_Foo_baR"
+      assert input_id(:search, :key, "F✓o]o%b+a'R") == "search_key_F_o_o_b_a__39_R"
+      assert input_id(:search, :key, nil) == "search_key_"
+      assert input_id(:search, :key, 37) == "search_key_37"
+      assert input_id(:search, :key, 0) == "search_key_0"
+      assert input_id(:search, :key, -1) == "search_key__1"
+    end
+
+    test "with form with no name" do
+      assert input_id(form(), :key, :value) == "key_value"
+    end
+  end
+
+  describe "input_name/2" do
+    test "without form" do
+      assert input_name(:search, :key) == "search[key]"
+      assert input_name(:search, "key") == "search[key]"
+    end
+
+    test "with form" do
+      assert input_name(form(%{}, as: :search), :key) == "search[key]"
+      assert input_name(form(%{}, as: :search), "key") == "search[key]"
+    end
+
+    test "with form with no name" do
+      assert input_name(form(), :key) == "key"
+      assert input_name(form(), "key") == "key"
+    end
+  end
+
+  describe "normalize_value/2" do
+    test "for checkbox" do
+      assert normalize_value("checkbox", true) == true
+      assert normalize_value("checkbox", "true") == true
+      assert normalize_value("checkbox", 1) == false
+      assert normalize_value("checkbox", nil) == false
+      assert normalize_value("checkbox", false) == false
+      assert normalize_value("checkbox", "truthy") == false
+    end
+
+    test "for datetime-local" do
+      assert normalize_value("datetime-local", ~N[2017-09-21 20:21:53]) ==
+               {:safe, ["2017-09-21", ?T, "20:21"]}
+
+      assert normalize_value("datetime-local", "2017-09-21 20:21:53") == "2017-09-21 20:21:53"
+      assert normalize_value("datetime-local", "other") == "other"
+    end
+
+    test "for textarea" do
+      assert safe_to_string(normalize_value("textarea", "<other>")) == "\n&lt;other&gt;"
+      assert safe_to_string(normalize_value("textarea", "string")) == "\nstring"
+      assert safe_to_string(normalize_value("textarea", 1234)) == "\n1234"
+      assert safe_to_string(normalize_value("textarea", nil)) == "\n"
+    end
+  end
+
+  describe "access" do
+    test "without name" do
+      form = form(%{"key" => "value"})
+
+      assert form[:key] == %Phoenix.HTML.FormField{
+               id: "key",
+               form: form,
+               value: "value",
+               name: "key",
+               errors: []
+             }
+    end
+
+    test "with name" do
+      form = form(%{"key" => "value"}, as: :search)
+
+      assert form[:key] == %Phoenix.HTML.FormField{
+               id: "search_key",
+               form: form,
+               value: "value",
+               name: "search[key]",
+               errors: []
+             }
+    end
+  end
+
+  ## TODO: Move on v4.0
+
+  defp conn do
+    Plug.Test.conn(:get, "/foo", %{"search" => search_params()})
+  end
+
+  def conn_form(fun, opts \\ [as: :search]) do
+    mark = "--PLACEHOLDER--"
+
+    contents =
+      safe_to_string(
+        form_for(conn(), "/", opts, fn f ->
+          html_escape([mark, fun.(f), mark])
+        end)
+      )
+
+    [_, inner, _] = String.split(contents, mark)
+    inner
   end
 
   describe "form_for/4 with connection" do
@@ -340,7 +467,7 @@ defmodule Phoenix.HTML.FormTest do
     end
 
     test "support atom or binary field" do
-      form = Phoenix.HTML.FormData.to_form(%{}, [as: :user])
+      form = Phoenix.HTML.FormData.to_form(%{}, as: :user)
 
       [f] = inputs_for(form, :key)
       assert f.name == "user[key]"
@@ -408,18 +535,18 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "text_input/3 with form" do
-    assert safe_form(&text_input(&1, :key)) ==
+    assert conn_form(&text_input(&1, :key)) ==
              ~s(<input id="search_key" name="search[key]" type="text" value="value">)
 
-    assert safe_form(&text_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+    assert conn_form(&text_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
              ~s(<input id="key" name="search[key][]" type="text" value="foo">)
   end
 
   test "text_input/3 with form and data" do
-    assert safe_form(&text_input(put_in(&1.data[:key], "original"), :key)) ==
+    assert conn_form(&text_input(put_in(&1.data[:key], "original"), :key)) ==
              ~s(<input id="search_key" name="search[key]" type="text" value="value">)
 
-    assert safe_form(&text_input(put_in(&1.data[:no_key], "original"), :no_key)) ==
+    assert conn_form(&text_input(put_in(&1.data[:no_key], "original"), :no_key)) ==
              ~s(<input id="search_no_key" name="search[no_key]" type="text" value="original">)
   end
 
@@ -437,15 +564,15 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "textarea/3 with form" do
-    assert safe_form(&textarea(&1, :key)) ==
+    assert conn_form(&textarea(&1, :key)) ==
              ~s(<textarea id="search_key" name="search[key]">\nvalue</textarea>)
 
-    assert safe_form(&textarea(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+    assert conn_form(&textarea(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
              ~s(<textarea id="key" name="search[key][]">\nfoo</textarea>)
   end
 
   test "textarea/3 with non-binary type" do
-    assert safe_form(&textarea(&1, :key, value: :atom_value)) ==
+    assert conn_form(&textarea(&1, :key, value: :atom_value)) ==
              ~s(<textarea id="search_key" name="search[key]">\natom_value</textarea>)
   end
 
@@ -461,10 +588,10 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "number_input/3 with form" do
-    assert safe_form(&number_input(&1, :key)) ==
+    assert conn_form(&number_input(&1, :key)) ==
              ~s(<input id="search_key" name="search[key]" type="number" value="value">)
 
-    assert safe_form(&number_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+    assert conn_form(&number_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
              ~s(<input id="key" name="search[key][]" type="number" value="foo">)
   end
 
@@ -488,10 +615,10 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "hidden_input/3 with form" do
-    assert safe_form(&hidden_input(&1, :key)) ==
+    assert conn_form(&hidden_input(&1, :key)) ==
              ~s(<input id="search_key" name="search[key]" type="hidden" value="value">)
 
-    assert safe_form(&hidden_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+    assert conn_form(&hidden_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
              ~s(<input id="key" name="search[key][]" type="hidden" value="foo">)
   end
 
@@ -526,10 +653,10 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "email_input/3 with form" do
-    assert safe_form(&email_input(&1, :key)) ==
+    assert conn_form(&email_input(&1, :key)) ==
              ~s(<input id="search_key" name="search[key]" type="email" value="value">)
 
-    assert safe_form(&email_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+    assert conn_form(&email_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
              ~s(<input id="key" name="search[key][]" type="email" value="foo">)
   end
 
@@ -545,10 +672,10 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "password_input/3 with form" do
-    assert safe_form(&password_input(&1, :key)) ==
+    assert conn_form(&password_input(&1, :key)) ==
              ~s(<input id="search_key" name="search[key]" type="password">)
 
-    assert safe_form(&password_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+    assert conn_form(&password_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
              ~s(<input id="key" name="search[key][]" type="password" value="foo">)
   end
 
@@ -567,10 +694,10 @@ defmodule Phoenix.HTML.FormTest do
 
   test "file_input/3 with form" do
     assert_raise ArgumentError, fn ->
-      safe_form(&file_input(&1, :key))
+      conn_form(&file_input(&1, :key))
     end
 
-    assert safe_form(&file_input(&1, :key), multipart: true, as: :search) ==
+    assert conn_form(&file_input(&1, :key), multipart: true, as: :search) ==
              ~s(<input id="search_key" name="search[key]" type="file">)
   end
 
@@ -586,10 +713,10 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "url_input/3 with form" do
-    assert safe_form(&url_input(&1, :key)) ==
+    assert conn_form(&url_input(&1, :key)) ==
              ~s(<input id="search_key" name="search[key]" type="url" value="value">)
 
-    assert safe_form(&url_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+    assert conn_form(&url_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
              ~s(<input id="key" name="search[key][]" type="url" value="foo">)
   end
 
@@ -605,10 +732,10 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "search_input/3 with form" do
-    assert safe_form(&search_input(&1, :key)) ==
+    assert conn_form(&search_input(&1, :key)) ==
              ~s(<input id="search_key" name="search[key]" type="search" value="value">)
 
-    assert safe_form(&search_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+    assert conn_form(&search_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
              ~s(<input id="key" name="search[key][]" type="search" value="foo">)
   end
 
@@ -624,10 +751,10 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "color_input/3 with form" do
-    assert safe_form(&color_input(&1, :key)) ==
+    assert conn_form(&color_input(&1, :key)) ==
              ~s(<input id="search_key" name="search[key]" type="color" value="value">)
 
-    assert safe_form(&color_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+    assert conn_form(&color_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
              ~s(<input id="key" name="search[key][]" type="color" value="foo">)
   end
 
@@ -643,10 +770,10 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "telephone_input/3 with form" do
-    assert safe_form(&telephone_input(&1, :key)) ==
+    assert conn_form(&telephone_input(&1, :key)) ==
              ~s(<input id="search_key" name="search[key]" type="tel" value="value">)
 
-    assert safe_form(&telephone_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+    assert conn_form(&telephone_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
              ~s(<input id="key" name="search[key][]" type="tel" value="foo">)
   end
 
@@ -662,10 +789,10 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "range_input/3 with form" do
-    assert safe_form(&range_input(&1, :key)) ==
+    assert conn_form(&range_input(&1, :key)) ==
              ~s(<input id="search_key" name="search[key]" type="range" value="value">)
 
-    assert safe_form(&range_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+    assert conn_form(&range_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
              ~s(<input id="key" name="search[key][]" type="range" value="foo">)
   end
 
@@ -685,13 +812,13 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "date_input/3 with form" do
-    assert safe_form(&date_input(&1, :key)) ==
+    assert conn_form(&date_input(&1, :key)) ==
              ~s(<input id="search_key" name="search[key]" type="date" value="value">)
 
-    assert safe_form(&date_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+    assert conn_form(&date_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
              ~s(<input id="key" name="search[key][]" type="date" value="foo">)
 
-    assert safe_form(
+    assert conn_form(
              &date_input(&1, :key, value: ~D[2017-09-21], id: "key", name: "search[key][]")
            ) == ~s(<input id="key" name="search[key][]" type="date" value="2017-09-21">)
   end
@@ -702,7 +829,7 @@ defmodule Phoenix.HTML.FormTest do
     assert safe_to_string(datetime_local_input(:search, :key)) ==
              ~s(<input id="search_key" name="search[key]" type="datetime-local">)
 
-    assert safe_form(&datetime_local_input(&1, :naive_datetime)) ==
+    assert conn_form(&datetime_local_input(&1, :naive_datetime)) ==
              ~s(<input id="search_naive_datetime" name="search[naive_datetime]" type="datetime-local" value="2000-01-01T10:00">)
 
     assert safe_to_string(
@@ -735,14 +862,14 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "datetime_local_input/3 with form" do
-    assert safe_form(&datetime_local_input(&1, :key)) ==
+    assert conn_form(&datetime_local_input(&1, :key)) ==
              ~s(<input id="search_key" name="search[key]" type="datetime-local" value="value">)
 
-    assert safe_form(
+    assert conn_form(
              &datetime_local_input(&1, :key, value: "foo", id: "key", name: "search[key][]")
            ) == ~s(<input id="key" name="search[key][]" type="datetime-local" value="foo">)
 
-    assert safe_form(
+    assert conn_form(
              &datetime_local_input(
                &1,
                :key,
@@ -770,22 +897,22 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "time_input/3 with form" do
-    assert safe_form(&time_input(&1, :key)) ==
+    assert conn_form(&time_input(&1, :key)) ==
              ~s(<input id="search_key" name="search[key]" type="time" value="value">)
 
-    assert safe_form(&time_input(&1, :time)) ==
+    assert conn_form(&time_input(&1, :time)) ==
              ~s(<input id="search_time" name="search[time]" type="time" value="01:02">)
 
-    assert safe_form(&time_input(&1, :time, precision: :second)) ==
+    assert conn_form(&time_input(&1, :time, precision: :second)) ==
              ~s(<input id="search_time" name="search[time]" type="time" value="01:02:03">)
 
-    assert safe_form(&time_input(&1, :time, precision: :millisecond)) ==
+    assert conn_form(&time_input(&1, :time, precision: :millisecond)) ==
              ~s(<input id="search_time" name="search[time]" type="time" value="01:02:03.004">)
 
-    assert safe_form(&time_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
+    assert conn_form(&time_input(&1, :key, value: "foo", id: "key", name: "search[key][]")) ==
              ~s(<input id="key" name="search[key][]" type="time" value="foo">)
 
-    assert safe_form(
+    assert conn_form(
              &time_input(&1, :key, value: ~T[23:00:07.001], id: "key", name: "search[key][]")
            ) == ~s(<input id="key" name="search[key][]" type="time" value="23:00">)
   end
@@ -841,13 +968,13 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "radio_button/4 with form" do
-    assert safe_form(&radio_button(&1, :key, :admin)) ==
+    assert conn_form(&radio_button(&1, :key, :admin)) ==
              ~s(<input id="search_key_admin" name="search[key]" type="radio" value="admin">)
 
-    assert safe_form(&radio_button(&1, :key, :value)) ==
+    assert conn_form(&radio_button(&1, :key, :value)) ==
              ~s(<input checked id="search_key_value" name="search[key]" type="radio" value="value">)
 
-    assert safe_form(&radio_button(&1, :key, :value, checked: false)) ==
+    assert conn_form(&radio_button(&1, :key, :value, checked: false)) ==
              ~s(<input id="search_key_value" name="search[key]" type="radio" value="value">)
   end
 
@@ -899,15 +1026,15 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "checkbox/3 with form" do
-    assert safe_form(&checkbox(&1, :key)) ==
+    assert conn_form(&checkbox(&1, :key)) ==
              ~s(<input name="search[key]" type="hidden" value="false">) <>
                ~s(<input id="search_key" name="search[key]" type="checkbox" value="true">)
 
-    assert safe_form(&checkbox(&1, :key, value: true)) ==
+    assert conn_form(&checkbox(&1, :key, value: true)) ==
              ~s(<input name="search[key]" type="hidden" value="false">) <>
                ~s(<input checked id="search_key" name="search[key]" type="checkbox" value="true">)
 
-    assert safe_form(&checkbox(&1, :key, checked_value: :value, unchecked_value: :novalue)) ==
+    assert conn_form(&checkbox(&1, :key, checked_value: :value, unchecked_value: :novalue)) ==
              ~s(<input name="search[key]" type="hidden" value="novalue">) <>
                ~s(<input checked id="search_key" name="search[key]" type="checkbox" value="value">)
   end
@@ -965,17 +1092,17 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "select/4 with form" do
-    assert safe_form(&select(&1, :key, ~w(value novalue), selected: "novalue")) ==
+    assert conn_form(&select(&1, :key, ~w(value novalue), selected: "novalue")) ==
              ~s(<select id="search_key" name="search[key]">) <>
                ~s(<option selected value="value">value</option>) <>
                ~s(<option value="novalue">novalue</option>) <> ~s(</select>)
 
-    assert safe_form(&select(&1, :other, ~w(value novalue), selected: "novalue")) ==
+    assert conn_form(&select(&1, :other, ~w(value novalue), selected: "novalue")) ==
              ~s(<select id="search_other" name="search[other]">) <>
                ~s(<option value="value">value</option>) <>
                ~s(<option selected value="novalue">novalue</option>) <> ~s(</select>)
 
-    assert safe_form(
+    assert conn_form(
              &select(
                &1,
                :key,
@@ -990,7 +1117,7 @@ defmodule Phoenix.HTML.FormTest do
                ~s(<option disabled selected value="value">Value</option>) <>
                ~s(<option value="novalue">No Value</option>) <> ~s(</select>)
 
-    assert safe_form(
+    assert conn_form(
              &select(
                put_in(&1.data[:other], "value"),
                :other,
@@ -1002,14 +1129,14 @@ defmodule Phoenix.HTML.FormTest do
                ~s(<option value="value">value</option>) <>
                ~s(<option selected value="novalue">novalue</option>) <> ~s(</select>)
 
-    assert safe_form(&select(&1, :key, ~w(value novalue), value: "novalue")) ==
+    assert conn_form(&select(&1, :key, ~w(value novalue), value: "novalue")) ==
              ~s(<select id="search_key" name="search[key]">) <>
                ~s(<option value="value">value</option>) <>
                ~s(<option selected value="novalue">novalue</option>) <> ~s(</select>)
   end
 
   test "select/4 with groups" do
-    assert safe_form(
+    assert conn_form(
              &select(&1, :key, [{"foo", ~w(bar baz)}, {"qux", ~w(qux quz)}], value: "qux")
            ) ==
              ~s(<select id="search_key" name="search[key]">) <>
@@ -1021,7 +1148,7 @@ defmodule Phoenix.HTML.FormTest do
                ~s(<option selected value="qux">qux</option>) <>
                ~s(<option value="quz">quz</option>) <> ~s(</optgroup>) <> ~s(</select>)
 
-    assert safe_form(
+    assert conn_form(
              &select(
                &1,
                :key,
@@ -1038,7 +1165,7 @@ defmodule Phoenix.HTML.FormTest do
                ~s(<option selected value="qux">qux</option>) <>
                ~s(<option value="quz">quz</option>) <> ~s(</optgroup>) <> ~s(</select>)
 
-    assert safe_form(
+    assert conn_form(
              &select(
                &1,
                :key,
@@ -1055,7 +1182,7 @@ defmodule Phoenix.HTML.FormTest do
                ~s(<option selected value="qux">qux</option>) <>
                ~s(<option value="quz">quz</option>) <> ~s(</optgroup>) <> ~s(</select>)
 
-    assert safe_form(
+    assert conn_form(
              &select(
                &1,
                :key,
@@ -1110,29 +1237,29 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "multiple_select/4 with form" do
-    assert safe_form(
+    assert conn_form(
              &multiple_select(&1, :key, [{"foo", 1}, {"bar", 2}], value: [1], selected: [2])
            ) ==
              ~s(<select id="search_key" multiple="" name="search[key][]">) <>
                ~s(<option selected value="1">foo</option>) <>
                ~s(<option value="2">bar</option>) <> ~s(</select>)
 
-    assert safe_form(&multiple_select(&1, :other, [{"foo", 1}, {"bar", 2}], selected: [2])) ==
+    assert conn_form(&multiple_select(&1, :other, [{"foo", 1}, {"bar", 2}], selected: [2])) ==
              ~s(<select id="search_other" multiple="" name="search[other][]">) <>
                ~s(<option value="1">foo</option>) <>
                ~s(<option selected value="2">bar</option>) <> ~s(</select>)
 
-    assert safe_form(&multiple_select(&1, :key, [{"foo", 1}, {"bar", 2}], value: [2])) ==
+    assert conn_form(&multiple_select(&1, :key, [{"foo", 1}, {"bar", 2}], value: [2])) ==
              ~s(<select id="search_key" multiple="" name="search[key][]">) <>
                ~s(<option value="1">foo</option>) <>
                ~s(<option selected value="2">bar</option>) <> ~s(</select>)
 
-    assert safe_form(&multiple_select(&1, :key, ~w(value novalue), value: ["novalue"])) ==
+    assert conn_form(&multiple_select(&1, :key, ~w(value novalue), value: ["novalue"])) ==
              ~s(<select id="search_key" multiple="" name="search[key][]">) <>
                ~s(<option value="value">value</option>) <>
                ~s(<option selected value="novalue">novalue</option>) <> ~s(</select>)
 
-    assert safe_form(
+    assert conn_form(
              &multiple_select(
                put_in(&1.params["key"], ["3"]),
                :key,
@@ -1147,7 +1274,7 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "multiple_select/4 with unnamed form" do
-    assert safe_form(
+    assert conn_form(
              &multiple_select(&1, :key, [{"foo", 1}, {"bar", 2}], value: [1], selected: [2]),
              []
            ) ==
@@ -1155,22 +1282,22 @@ defmodule Phoenix.HTML.FormTest do
                ~s(<option selected value="1">foo</option>) <>
                ~s(<option value="2">bar</option>) <> ~s(</select>)
 
-    assert safe_form(&multiple_select(&1, :other, [{"foo", 1}, {"bar", 2}], selected: [2]), []) ==
+    assert conn_form(&multiple_select(&1, :other, [{"foo", 1}, {"bar", 2}], selected: [2]), []) ==
              ~s(<select id="other" multiple="" name="other[]">) <>
                ~s(<option value="1">foo</option>) <>
                ~s(<option selected value="2">bar</option>) <> ~s(</select>)
 
-    assert safe_form(&multiple_select(&1, :key, [{"foo", 1}, {"bar", 2}], value: [2]), []) ==
+    assert conn_form(&multiple_select(&1, :key, [{"foo", 1}, {"bar", 2}], value: [2]), []) ==
              ~s(<select id="key" multiple="" name="key[]">) <>
                ~s(<option value="1">foo</option>) <>
                ~s(<option selected value="2">bar</option>) <> ~s(</select>)
 
-    assert safe_form(&multiple_select(&1, :key, ~w(value novalue), value: ["novalue"]), []) ==
+    assert conn_form(&multiple_select(&1, :key, ~w(value novalue), value: ["novalue"]), []) ==
              ~s(<select id="key" multiple="" name="key[]">) <>
                ~s(<option value="value">value</option>) <>
                ~s(<option selected value="novalue">novalue</option>) <> ~s(</select>)
 
-    assert safe_form(
+    assert conn_form(
              &multiple_select(
                put_in(&1.params["key"], ["3"]),
                :key,
@@ -1291,7 +1418,7 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "date_select/4 with form" do
-    content = safe_form(&date_select(&1, :datetime, default: {2020, 10, 13}))
+    content = conn_form(&date_select(&1, :datetime, default: {2020, 10, 13}))
     assert content =~ ~s(<select id="search_datetime_year" name="search[datetime][year]">)
     assert content =~ ~s(<select id="search_datetime_month" name="search[datetime][month]">)
     assert content =~ ~s(<select id="search_datetime_day" name="search[datetime][day]">)
@@ -1300,17 +1427,17 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option selected value="17">17</option>)
     assert content =~ ~s(<option value="1">January</option><option value="2">February</option>)
 
-    content = safe_form(&date_select(&1, :unknown, default: {2020, 9, 9}))
+    content = conn_form(&date_select(&1, :unknown, default: {2020, 9, 9}))
     assert content =~ ~s(<option selected value="2020">2020</option>)
     assert content =~ ~s(<option selected value="9">September</option>)
     assert content =~ ~s(<option selected value="9">09</option>)
 
-    content = safe_form(&date_select(&1, :unknown, default: {2020, 10, 13}))
+    content = conn_form(&date_select(&1, :unknown, default: {2020, 10, 13}))
     assert content =~ ~s(<option selected value="2020">2020</option>)
     assert content =~ ~s(<option selected value="10">October</option>)
     assert content =~ ~s(<option selected value="13">13</option>)
 
-    content = safe_form(&date_select(&1, :datetime, value: {2020, 10, 13}))
+    content = conn_form(&date_select(&1, :datetime, value: {2020, 10, 13}))
     assert content =~ ~s(<option selected value="2020">2020</option>)
     assert content =~ ~s(<option selected value="10">October</option>)
     assert content =~ ~s(<option selected value="13">13</option>)
@@ -1378,7 +1505,7 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "time_select/4 with form" do
-    content = safe_form(&time_select(&1, :datetime, default: {1, 2, 3}, second: []))
+    content = conn_form(&time_select(&1, :datetime, default: {1, 2, 3}, second: []))
     assert content =~ ~s(<select id="search_datetime_hour" name="search[datetime][hour]">)
     assert content =~ ~s(<select id="search_datetime_minute" name="search[datetime][minute]">)
     assert content =~ ~s(<select id="search_datetime_second" name="search[datetime][second]">)
@@ -1387,12 +1514,12 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option selected value="13">13</option>)
     assert content =~ ~s(<option value="1">01</option><option value="2">02</option>)
 
-    content = safe_form(&time_select(&1, :unknown, default: {1, 2, 3}, second: []))
+    content = conn_form(&time_select(&1, :unknown, default: {1, 2, 3}, second: []))
     assert content =~ ~s(<option selected value="1">01</option>)
     assert content =~ ~s(<option selected value="2">02</option>)
     assert content =~ ~s(<option selected value="3">03</option>)
 
-    content = safe_form(&time_select(&1, :datetime, value: {1, 2, 3}, second: []))
+    content = conn_form(&time_select(&1, :datetime, value: {1, 2, 3}, second: []))
     assert content =~ ~s(<option selected value="1">01</option>)
     assert content =~ ~s(<option selected value="2">02</option>)
     assert content =~ ~s(<option selected value="3">03</option>)
@@ -1444,7 +1571,7 @@ defmodule Phoenix.HTML.FormTest do
 
   test "datetime_select/4 with form" do
     content =
-      safe_form(&datetime_select(&1, :datetime, default: {{2020, 10, 13}, {1, 2, 3}}, second: []))
+      conn_form(&datetime_select(&1, :datetime, default: {{2020, 10, 13}, {1, 2, 3}}, second: []))
 
     assert content =~ ~s(<select id="search_datetime_year" name="search[datetime][year]">)
     assert content =~ ~s(<select id="search_datetime_month" name="search[datetime][month]">)
@@ -1461,7 +1588,7 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option selected value="13">13</option>)
 
     content =
-      safe_form(&datetime_select(&1, :unknown, default: {{2020, 10, 9}, {1, 2, 3}}, second: []))
+      conn_form(&datetime_select(&1, :unknown, default: {{2020, 10, 9}, {1, 2, 3}}, second: []))
 
     assert content =~ ~s(<option selected value="2020">2020</option>)
     assert content =~ ~s(<option selected value="10">October</option>)
@@ -1471,7 +1598,7 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option selected value="3">03</option>)
 
     content =
-      safe_form(&datetime_select(&1, :unknown, default: {{2020, 10, 13}, {1, 2, 3}}, second: []))
+      conn_form(&datetime_select(&1, :unknown, default: {{2020, 10, 13}, {1, 2, 3}}, second: []))
 
     assert content =~ ~s(<option selected value="2020">2020</option>)
     assert content =~ ~s(<option selected value="10">October</option>)
@@ -1481,7 +1608,7 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option selected value="3">03</option>)
 
     content =
-      safe_form(&datetime_select(&1, :datetime, value: {{2020, 10, 13}, {1, 2, 3}}, second: []))
+      conn_form(&datetime_select(&1, :datetime, value: {{2020, 10, 13}, {1, 2, 3}}, second: []))
 
     assert content =~ ~s(<option selected value="2020">2020</option>)
     assert content =~ ~s(<option selected value="10">October</option>)
@@ -1564,12 +1691,12 @@ defmodule Phoenix.HTML.FormTest do
       assert safe_to_string(label(:search, :key, "Search", for: "test_key")) ==
                ~s(<label for="test_key">Search</label>)
 
-      assert safe_form(&label(&1, :key, "Search")) == ~s(<label for="search_key">Search</label>)
+      assert conn_form(&label(&1, :key, "Search")) == ~s(<label for="search_key">Search</label>)
 
-      assert safe_form(&label(&1, :key, "Search", for: "test_key")) ==
+      assert conn_form(&label(&1, :key, "Search", for: "test_key")) ==
                ~s(<label for="test_key">Search</label>)
 
-      assert safe_form(&label(&1, :key, "Search", for: "test_key", class: "foo")) ==
+      assert conn_form(&label(&1, :key, "Search", for: "test_key", class: "foo")) ==
                ~s(<label class="foo" for="test_key">Search</label>)
     end
 
@@ -1579,85 +1706,18 @@ defmodule Phoenix.HTML.FormTest do
     end
 
     test "with field and block content" do
-      assert safe_form(&label(&1, :key, do: "Hello")) == ~s(<label for="search_key">Hello</label>)
+      assert conn_form(&label(&1, :key, do: "Hello")) == ~s(<label for="search_key">Hello</label>)
 
-      assert safe_form(&label(&1, :key, [class: "test-label"], do: "Hello")) ==
+      assert conn_form(&label(&1, :key, [class: "test-label"], do: "Hello")) ==
                ~s(<label class="test-label" for="search_key">Hello</label>)
     end
 
     test "with atom or binary field" do
-      assert safe_form(&label(&1, :key, do: "Hello")) ==
+      assert conn_form(&label(&1, :key, do: "Hello")) ==
                ~s(<label for="search_key">Hello</label>)
 
-      assert safe_form(&label(&1, "key", do: "Hello")) ==
+      assert conn_form(&label(&1, "key", do: "Hello")) ==
                ~s(<label for="search_key">Hello</label>)
     end
-  end
-
-  ## input_value/2
-
-  test "input_value/2 without form" do
-    assert input_value(:search, :key) == nil
-    assert input_value(:search, 1) == nil
-    assert input_value(:search, "key") == nil
-  end
-
-  test "input_value/2 with form" do
-    assert safe_form(&input_value(&1, :key)) == "value"
-    assert safe_form(&input_value(&1, "key")) == "value"
-  end
-
-  test "input_value/2 with form and data" do
-    assert safe_form(&input_value(put_in(&1.data[:key], "original"), :key)) == "value"
-    assert safe_form(&input_value(put_in(&1.data[:no_key], "original"), :no_key)) == "original"
-
-    assert safe_form(&input_value(put_in(&1.data["key"], "original"), "key")) == "value"
-    assert safe_form(&input_value(put_in(&1.data["no_key"], "original"), "no_key")) == "original"
-  end
-
-  ## input_id/2
-
-  test "input_id/2 without form" do
-    assert input_id(:search, :key) == "search_key"
-    assert input_id(:search, "key") == "search_key"
-  end
-
-  test "input_id/2 with form" do
-    assert safe_form(&input_id(&1, :key)) == "search_key"
-    assert safe_form(&input_id(&1, "key")) == "search_key"
-  end
-
-  test "input_id/2 with form with no name" do
-    assert safe_form(&input_id(&1, :key), []) == "key"
-  end
-
-  ## input_id/3
-
-  test "input_id/3" do
-    assert input_id(:search, :key, "") == "search_key_"
-    assert input_id(:search, :key, "foo") == "search_key_foo"
-    assert input_id(:search, :key, "foo bar") == "search_key_foo_bar"
-    assert input_id(:search, :key, "Foo baR") == "search_key_Foo_baR"
-    assert input_id(:search, :key, "F✓o]o%b+a'R") == "search_key_F_o_o_b_a__39_R"
-    assert input_id(:search, :key, nil) == "search_key_"
-    assert input_id(:search, :key, 37) == "search_key_37"
-    assert input_id(:search, :key, 0) == "search_key_0"
-    assert input_id(:search, :key, -1) == "search_key__1"
-  end
-
-  test "input_id/3 with form with no name" do
-    assert safe_form(&input_id(&1, :key, :value), []) == "key_value"
-  end
-
-  ## input_name/2
-
-  test "input_name/2 without form" do
-    assert input_name(:search, :key) == "search[key]"
-    assert input_name(:search, "key") == "search[key]"
-  end
-
-  test "input_name/2 with form" do
-    assert safe_form(&input_name(&1, :key)) == "search[key]"
-    assert safe_form(&input_name(&1, "key")) == "search[key]"
   end
 end
