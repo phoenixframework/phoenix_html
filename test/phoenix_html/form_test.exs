@@ -209,6 +209,19 @@ defmodule Phoenix.HTML.FormTest do
       assert safe_to_string(normalize_value("textarea", 1234)) == "\n1234"
       assert safe_to_string(normalize_value("textarea", nil)) == "\n"
     end
+
+    test "for anything else" do
+      assert normalize_value("foo", "<other>") == "<other>"
+    end
+  end
+
+  test "input_changed?" do
+    form = form(%{})
+    refute input_changed?(form, form, :foo)
+    assert input_changed?(form, %{form | errors: [foo: "bar"]}, :foo)
+    assert input_changed?(form, %{form | name: "another"}, :foo)
+    assert input_changed?(form, %{form | id: "another"}, :foo)
+    assert input_changed?(form, form(%{"foo" => "bar"}), :foo)
   end
 
   describe "access" do

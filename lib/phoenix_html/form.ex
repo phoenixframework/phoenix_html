@@ -64,6 +64,7 @@ defmodule Phoenix.HTML.Form do
   automatically show up as selected in the form.
 
   ### A note on `:errors`
+
   Even if `changeset.errors` is non-empty, errors will not be displayed in a
   form if [the changeset
   `:action`](https://hexdocs.pm/ecto/Ecto.Changeset.html#module-changeset-actions)
@@ -278,13 +279,13 @@ defmodule Phoenix.HTML.Form do
     field_as_string = Atom.to_string(field)
 
     {:ok,
-    %Phoenix.HTML.FormField{
-      errors: Keyword.get_values(errors, field),
-      form: form,
-      id: input_id(form, field_as_string),
-      name: input_name(form, field_as_string),
-      value: input_value(form, field_as_string)
-    }}
+     %Phoenix.HTML.FormField{
+       errors: Keyword.get_values(errors, field),
+       form: form,
+       id: input_id(form, field_as_string),
+       name: input_name(form, field_as_string),
+       value: input_value(form, field_as_string)
+     }}
   end
 
   def get(%Form{}, field) do
@@ -378,15 +379,16 @@ defmodule Phoenix.HTML.Form do
   """
   @spec input_changed?(t, t, atom) :: boolean()
   def input_changed?(
-        %Form{impl: impl1, errors: errors1, source: source1} = form1,
-        %Form{impl: impl2, errors: errors2, source: source2} = form2,
+        %Form{impl: impl1, id: id1, name: name1, errors: errors1, source: source1} = form1,
+        %Form{impl: impl2, id: id2, name: name2, errors: errors2, source: source2} = form2,
         field
       )
       when is_atom(field) do
     as_string = Atom.to_string(field)
 
-    impl1 == impl2 and Keyword.get_values(errors1, field) == Keyword.get_values(errors2, field) and
-      impl1.input_value(source1, form1, as_string) == impl2.input_value(source2, form2, as_string)
+    impl1 != impl2 or id1 != id2 or name1 != name2 or
+      Keyword.get_values(errors1, field) != Keyword.get_values(errors2, field) or
+      impl1.input_value(source1, form1, as_string) != impl2.input_value(source2, form2, as_string)
   end
 
   @doc """
