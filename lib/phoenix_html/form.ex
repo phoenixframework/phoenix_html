@@ -284,7 +284,7 @@ defmodule Phoenix.HTML.Form do
        form: form,
        id: input_id(form, field_as_string),
        name: input_name(form, field_as_string),
-       value: input_value(form, field_as_string)
+       value: input_value(form, field)
      }}
   end
 
@@ -384,11 +384,9 @@ defmodule Phoenix.HTML.Form do
         field
       )
       when is_atom(field) do
-    as_string = Atom.to_string(field)
-
     impl1 != impl2 or id1 != id2 or name1 != name2 or
       Keyword.get_values(errors1, field) != Keyword.get_values(errors2, field) or
-      impl1.input_value(source1, form1, as_string) != impl2.input_value(source2, form2, as_string)
+      impl1.input_value(source1, form1, field) != impl2.input_value(source2, form2, field)
   end
 
   @doc """
