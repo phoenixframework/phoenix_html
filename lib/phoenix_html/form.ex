@@ -284,7 +284,7 @@ defmodule Phoenix.HTML.Form do
        form: form,
        id: input_id(form, field_as_string),
        name: input_name(form, field_as_string),
-       value: input_value(form, field_as_string)
+       value: input_value(form, field)
      }}
   end
 
