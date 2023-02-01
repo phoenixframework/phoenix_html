@@ -15,8 +15,8 @@ jobs:
         include:
           - elixir: 1.9
             otp: 20.3
-          - elixir: 1.11
-            otp: 23.3
+          - elixir: 1.14.3
+            otp: 25.1
             lint: lint
 
     runs-on: ubuntu-20.04
