@@ -11,6 +11,7 @@ defmodule PhoenixHTML.Mixfile do
       version: @version,
       elixir: "~> 1.7",
       deps: deps(),
+      aliases: aliases(),
       name: "Phoenix.HTML",
       description: "Phoenix view functions for working with HTML templates",
       package: package(),
@@ -34,7 +35,8 @@ defmodule PhoenixHTML.Mixfile do
   defp deps do
     [
       {:plug, "~> 1.5", optional: true},
-      {:ex_doc, ">= 0.0.0", only: :docs}
+      {:ex_doc, ">= 0.0.0", only: :docs},
+      {:esbuild, "~> 0.2", only: :dev}
     ]
   end
 
@@ -47,6 +49,13 @@ defmodule PhoenixHTML.Mixfile do
         Changelog: "https://hexdocs.pm/phoenix_html/changelog.html",
         GitHub: @source_url
       }
+    ]
+  end
+
+   defp aliases do
+    [
+      "assets.build": ["esbuild module", "esbuild cdn", "esbuild cdn_min", "esbuild main"],
+      "assets.watch": ["esbuild module --watch"]
     ]
   end
 end
