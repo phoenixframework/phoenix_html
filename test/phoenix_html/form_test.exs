@@ -229,6 +229,7 @@ defmodule Phoenix.HTML.FormTest do
       form = form(%{"key" => "value"})
 
       assert form[:key] == %Phoenix.HTML.FormField{
+               field: :key,
                id: "key",
                form: form,
                value: "value",
@@ -241,6 +242,7 @@ defmodule Phoenix.HTML.FormTest do
       form = form(%{"key" => "value"}, as: :search)
 
       assert form[:key] == %Phoenix.HTML.FormField{
+               field: :key,
                id: "search_key",
                form: form,
                value: "value",

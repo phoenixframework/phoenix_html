@@ -281,6 +281,7 @@ defmodule Phoenix.HTML.Form do
     {:ok,
      %Phoenix.HTML.FormField{
        errors: Keyword.get_values(errors, field),
+       field: field,
        form: form,
        id: input_id(form, field_as_string),
        name: input_name(form, field_as_string),
