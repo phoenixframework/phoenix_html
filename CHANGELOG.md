@@ -1,12 +1,6 @@
 # Changelog
 
-# v3.3.0-dev
-
-With the addition of the HEEx template engine to Phoenix applications,
-some functions from the `Phoenix.HTML.{Format, Link, Tag}` modules lost
-relevance. Those modules are no longer imported in new apps and they
-will be moved to a separate project in the future. This means code using
-those modules shall continue working in the future by adding one dependency.
+# v3.3.0 (2023-02-10)
 
 * Enhancements
   * Support deeply nested class lists
