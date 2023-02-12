@@ -10,7 +10,7 @@
 * Bug fix
   * Generate unique IDs for checkboxes based on the value
   * Use artificial button click instead of `form.submit` in JavaScript to trigger all relevant events
-  * Fix a bug where false/true attributes in `aria`/`data`/`phx` would emit literal `"true"` and `"false"` values
+  * Fix a bug where nil/false/true attributes in `aria`/`data`/`phx` would emit empty or literal values, such as `"true"` and `"false"`. This release aligns them with all other attributes so both `nil` and `false` emit nothing. `true` emits the attribute with no value.
 
 * Deprecations
   * `Phoenix.HTML.Tag.attributes_escape/1` is deprecated in favor of `Phoenix.HTML.attributes_escape/1`
