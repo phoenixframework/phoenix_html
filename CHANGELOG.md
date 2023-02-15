@@ -1,6 +1,6 @@
 # Changelog
 
-# v3.3.0 (2023-02-10)
+## v3.3.0 (2023-02-10)
 
 * Enhancements
   * Support deeply nested class lists
@@ -15,14 +15,14 @@
 * Deprecations
   * `Phoenix.HTML.Tag.attributes_escape/1` is deprecated in favor of `Phoenix.HTML.attributes_escape/1`
 
-# v3.2.0 (2021-12-18)
+## v3.2.0 (2021-12-18)
 
 * Enhancements
   * Raise if the `id` attribute is set to a number. This is actually an invalid value according to the HTML spec and it can lead to problematic client behaviour, especially in LiveView and other client frameworks.
   * Allow `phx` attributes to be nested, similar to `aria` and `data` attributes
   * Allow hidden fields in forms to be a list of values
 
-# v3.1.0 (2021-10-23)
+## v3.1.0 (2021-10-23)
 
 * Bug fix
   * Do not submit data-method links if default has been prevented
@@ -30,27 +30,27 @@
   * Deprecate `~E` and `Phoenix.HTML.Tag.attributes_escape/1`
   * Remove deprecated `Phoenix.HTML.Link.link/1`
 
-# v3.0.4 (2021-09-23)
+## v3.0.4 (2021-09-23)
 
 * Bug fix
   * Ensure `class={@class}` in HEEx templates and `:class` attribute in `content_tag` are properly escaped against XSS
 
-# v3.0.3 (2021-09-04)
+## v3.0.3 (2021-09-04)
 
 * Bug fix
   * Fix sorting of attributes in `tag`/`content_tag`
 
-# v3.0.2 (2021-08-19)
+## v3.0.2 (2021-08-19)
 
 * Enhancements
   * Support maps on `Phoenix.HTML.Tag.attributes_escape/1`
 
-# v3.0.1 (2021-08-14)
+## v3.0.1 (2021-08-14)
 
 * Enhancements
   * Add `Phoenix.HTML.Tag.csrf_input_tag/2`
 
-# v3.0.0 (2021-08-06)
+## v3.0.0 (2021-08-06)
 
 * Enhancements
   * Allow extra html attributes on the `:prompt` option in `select`
