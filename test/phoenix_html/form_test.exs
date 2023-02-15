@@ -225,7 +225,7 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   describe "access" do
-    test "without name" do
+    test "atom key without name" do
       form = form(%{"key" => "value"})
 
       assert form[:key] == %Phoenix.HTML.FormField{
@@ -238,7 +238,33 @@ defmodule Phoenix.HTML.FormTest do
              }
     end
 
-    test "with name" do
+    test "atom key with name" do
+      form = form(%{"key" => "value"}, as: :search)
+
+      assert form[:key] == %Phoenix.HTML.FormField{
+               field: :key,
+               id: "search_key",
+               form: form,
+               value: "value",
+               name: "search[key]",
+               errors: []
+             }
+    end
+
+    test "string key without name" do
+      form = form(%{"key" => "value"})
+
+      assert form[:key] == %Phoenix.HTML.FormField{
+               field: :key,
+               id: "key",
+               form: form,
+               value: "value",
+               name: "key",
+               errors: []
+             }
+    end
+
+    test "string key with name" do
       form = form(%{"key" => "value"}, as: :search)
 
       assert form[:key] == %Phoenix.HTML.FormField{

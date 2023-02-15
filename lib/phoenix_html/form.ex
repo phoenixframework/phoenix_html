@@ -276,12 +276,13 @@ defmodule Phoenix.HTML.Form do
 
   @doc false
   def fetch(%Form{errors: errors} = form, field) when is_atom(field) do
-    field_as_string = Atom.to_string(field)
+    field_as_string = field_to_string(field)
+    field_as_atom = field_to_atom(field)
 
     {:ok,
      %Phoenix.HTML.FormField{
-       errors: Keyword.get_values(errors, field),
-       field: field,
+       errors: Keyword.get_values(errors, field_as_atom),
+       field: field_as_atom,
        form: form,
        id: input_id(form, field_as_string),
        name: input_name(form, field_as_string),
@@ -1865,4 +1866,7 @@ defmodule Phoenix.HTML.Form do
   # Normalize field name to string version
   defp field_to_string(field) when is_atom(field), do: Atom.to_string(field)
   defp field_to_string(field) when is_binary(field), do: field
+
+  defp field_to_atom(field) when is_atom(field), do: field
+  defp field_to_atom(field) when is_binary(field), do: String.to_existing_atom(field)
 end
