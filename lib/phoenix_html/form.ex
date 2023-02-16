@@ -289,7 +289,7 @@ defmodule Phoenix.HTML.Form do
      }}
   end
 
-  def get(%Form{}, field) do
+  def fetch(%Form{}, field) do
     raise ArgumentError,
           "accessing a form with form[field] requires the field to be atom, got: #{inspect(field)}"
   end
