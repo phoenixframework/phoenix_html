@@ -225,8 +225,11 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   describe "access" do
-    test "without name" do
-      form = form(%{"key" => "value"})
+    test "without name and atom keys" do
+      form =
+        form(%{"key" => "value"})
+        |> Map.replace!(:errors, atom: "oops")
+        |> Map.replace!(:data, %{atom: "data"})
 
       assert form[:key] == %Phoenix.HTML.FormField{
                field: :key,
@@ -236,10 +239,22 @@ defmodule Phoenix.HTML.FormTest do
                name: "key",
                errors: []
              }
+
+      assert form[:atom] == %Phoenix.HTML.FormField{
+               field: :atom,
+               id: "atom",
+               form: form,
+               value: "data",
+               name: "atom",
+               errors: ["oops"]
+             }
     end
 
-    test "with name" do
-      form = form(%{"key" => "value"}, as: :search)
+    test "with name and atom keys" do
+      form =
+        form(%{"key" => "value"}, as: :search)
+        |> Map.replace!(:errors, atom: "oops")
+        |> Map.replace!(:data, %{atom: "data"})
 
       assert form[:key] == %Phoenix.HTML.FormField{
                field: :key,
@@ -248,6 +263,65 @@ defmodule Phoenix.HTML.FormTest do
                value: "value",
                name: "search[key]",
                errors: []
+             }
+
+      assert form[:atom] == %Phoenix.HTML.FormField{
+               field: :atom,
+               id: "search_atom",
+               form: form,
+               value: "data",
+               name: "search[atom]",
+               errors: ["oops"]
+             }
+    end
+
+    test "without name and string keys" do
+      form =
+        form(%{"key" => "value"})
+        |> Map.replace!(:errors, [{"string", "oops"}])
+        |> Map.replace!(:data, %{"string" => "data"})
+
+      assert form["key"] == %Phoenix.HTML.FormField{
+               field: "key",
+               id: "key",
+               form: form,
+               value: "value",
+               name: "key",
+               errors: []
+             }
+
+      assert form["string"] == %Phoenix.HTML.FormField{
+               field: "string",
+               id: "string",
+               form: form,
+               value: "data",
+               name: "string",
+               errors: ["oops"]
+             }
+    end
+
+    test "with name and string keys" do
+      form =
+        form(%{"key" => "value"}, as: :search)
+        |> Map.replace!(:errors, [{"string", "oops"}])
+        |> Map.replace!(:data, %{"string" => "data"})
+
+      assert form["key"] == %Phoenix.HTML.FormField{
+               field: "key",
+               id: "search_key",
+               form: form,
+               value: "value",
+               name: "search[key]",
+               errors: []
+             }
+
+      assert form["string"] == %Phoenix.HTML.FormField{
+               field: "string",
+               id: "search_string",
+               form: form,
+               value: "data",
+               name: "search[string]",
+               errors: ["oops"]
              }
     end
   end

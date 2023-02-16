@@ -3,213 +3,18 @@ defmodule Phoenix.HTML.Form do
   # TODO: Keep only map implementation for form data
 
   @moduledoc ~S"""
-  Helpers related to producing HTML forms.
-
-  The functions in this module can be used in three
-  distinct scenarios:
-
-    * with changeset data - when information to populate
-      the form comes from a changeset. The changeset holds
-      rich information, which helps provide conveniences
-
-    * with map data - a simple map of parameters (such as
-      `Plug.Conn.params` can be given as data to the form)
-
-    * outside of a form  - when the functions are used directly,
-      outside of `form_for`
-
-  We will explore all three scenarios below.
-
-  ## With changeset data
-
-  The entry point for defining forms in Phoenix is with
-  the `form_for/4` function. For this example, we will
-  use `Ecto.Changeset`, which integrates nicely with Phoenix
-  forms via the `phoenix_ecto` package.
-
-  Imagine you have the following action in your controller:
-
-      def new(conn, _params) do
-        changeset = User.changeset(%User{})
-        render conn, "new.html", changeset: changeset
-      end
-
-  where `User.changeset/2` is defined as follows:
-
-      def changeset(user, params \\ %{}) do
-        Ecto.Changeset.cast(user, params, [:name, :age])
-      end
-
-  Now a `@changeset` assign is available in views which we
-  can pass to the form:
-
-      <%= form_for @changeset, Routes.user_path(@conn, :create), fn f -> %>
-        <label>
-          Name: <%= text_input f, :name %>
-        </label>
-
-        <label>
-          Age: <%= select f, :age, 18..100 %>
-        </label>
-
-        <%= submit "Submit" %>
-      <% end %>
-
-  `form_for/4` receives the `Ecto.Changeset` and converts it
-  to a form, which is passed to the function as the argument
-  `f`. All the remaining functions in this module receive
-  the form and automatically generate the input fields, often
-  by extracting information from the given changeset. For example,
-  if the user had a default value for age set, it will
-  automatically show up as selected in the form.
-
-  ### A note on `:errors`
-
-  Even if `changeset.errors` is non-empty, errors will not be displayed in a
-  form if [the changeset
-  `:action`](https://hexdocs.pm/ecto/Ecto.Changeset.html#module-changeset-actions)
-  is `nil` or `:ignore`.
-
-  This is useful for things like validation hints on form fields, e.g. an empty
-  changeset for a new form. That changeset isn't valid, but we don't want to
-  show errors until an actual user action has been performed.
-
-  For example, if the user submits and a `Repo.insert/1` is called and fails on
-  changeset validation, the action will be set to `:insert` to show that an
-  insert was attempted, and the presence of that action will cause errors to be
-  displayed. The same is true for Repo.update/delete.
-
-  If you want to show errors manually you can also set the action yourself,
-  either directly on the `Ecto.Changeset` struct field or by using
-  `Ecto.Changeset.apply_action/2`. Since the action can be arbitrary, you can
-  set it to `:validate` or anything else to avoid giving the impression that a
-  database operation has actually been attempted.
-
-  ## With map data
-
-  `form_for/4` expects as first argument any data structure that
-  implements the `Phoenix.HTML.FormData` protocol. By default,
-  Phoenix.HTML implements this protocol for `Map`.
-
-  This is useful when you are creating forms that are not backed
-  by any kind of data layer. Let's assume that we're submitting a
-  form to the `:new` action in the `FooController`:
-
-      <%= form_for @conn.params, Routes.foo_path(@conn, :new), fn f -> %>
-        <%= text_input f, :contents %>
-        <%= submit "Search" %>
-      <% end %>
-
-  Once the form is submitted, the form contents will be set directly
-  as the parameters root, such as `conn.params["contents"]`. If you
-  prefer, you can pass the `:as` option to configure them to be nested:
-
-      <%= form_for @conn.params["search"] || %{}, Routes.foo_path(@conn, :new), [as: :search], fn f -> %>
-        <%= text_input f, :contents %>
-        <%= submit "Search" %>
-      <% end %>
-
-  In the example above, all form contents is now set inside `conn.params["search"]`
-  thanks to the `[as: :search]` option.
-
-  ## Without form data
-
-  Sometimes we may want to generate a `text_input/3` or any other
-  tag outside of a form. The functions in this module also support
-  such usage by simply passing an atom as first argument instead
-  of the form.
-
-      <%= text_input :user, :name, value: "This is a prepopulated value" %>
-
-  ## Nested inputs
-
-  If your data layer supports embedding or nested associations,
-  you can use `inputs_for` to attach nested data to the form.
-
-  Imagine the following Ecto schemas:
-
-      defmodule User do
-        use Ecto.Schema
-
-        schema "users" do
-          field :name
-          embeds_one :permalink, Permalink
-        end
-
-        def changeset(user \\ %User{}, params) do
-          user
-          |> Ecto.Changeset.cast(params)
-          |> Ecto.Changeset.cast_assoc(:permalink)
-        end
-      end
-
-      defmodule Permalink do
-        use Ecto.Schema
-
-        embedded_schema do
-          field :url
-        end
-      end
-
-  In the form, you now can:
-
-      <%= form_for @changeset, Routes.user_path(@conn, :create), fn f -> %>
-        <%= text_input f, :name %>
-
-        <%= inputs_for f, :permalink, fn fp -> %>
-          <%= text_input fp, :url %>
-        <% end %>
-      <% end %>
-
-  The default option can be given to populate the fields if none
-  is given:
-
-      <%= inputs_for f, :permalink, [default: %Permalink{title: "default"}], fn fp -> %>
-        <%= text_input fp, :url %>
-      <% end %>
-
-  `inputs_for/4` can be used to work with single entities or
-  collections. When working with collections, `:prepend` and
-  `:append` can be used to add entries to the collection
-  stored in the changeset.
-
-  ## CSRF protection
-
-  CSRF protection is a mechanism to ensure that the user who rendered
-  the form is the one actually submitting it. This module generates a
-  CSRF token by default. Your application should check this token on
-  the server to avoid attackers from making requests on your server on
-  behalf of other users. Phoenix by default checks this token.
-
-  When posting a form with a host in its address, such as "//host.com/path"
-  instead of only "/path", Phoenix will include the host signature in the
-  token and validate the token only if the accessed host is the same as
-  the host in the token. This is to avoid tokens from leaking to third
-  party applications. If this behaviour is problematic, you can generate
-  a non-host specific token with `Plug.CSRFProtection.get_csrf_token/0` and
-  pass it to the form generator via the `:csrf_token` option.
-
-  ## Phoenix.LiveView integration
-
-  Phoenix.LiveView builds on top of this function to [provide a function
-  component named `form`](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#form/1).
-  Inside your HEEx templates, instead of doing this:
-
-      <%= form_for @changeset, url, opts, fn f -> %>
-        <%= text_input f, :name %>
-      <% end %>
-
-  you should import `Phoenix.LiveView.Helpers` and then write:
-
-      <.form let={f} for={@changeset}>
-        <%= text_input f, :name %>
-      </.form>
+  Define a `Phoenix.HTML.Form` struct and functions to interact with it.
 
   ## Access behaviour
 
   The `Phoenix.HTML.Form` struct implements the `Access` behaviour.
   When you do `form[field]`, it returns a `Phoenix.HTML.FormField`
-  struct with the id, name, value, and errors prefilled.
+  struct with the `id`, `name`, `value`, and `errors` prefilled.
+
+  The field name can be either an atom or a string. If it is an atom,
+  it assumes the form keeps both data and errors as atoms. If it is a
+  string, it considers data and errors are stored as strings for said
+  field.
   """
 
   alias Phoenix.HTML.Form
@@ -275,12 +80,23 @@ defmodule Phoenix.HTML.Form do
   @type field :: atom | String.t()
 
   @doc false
-  def fetch(%Form{errors: errors} = form, field) when is_atom(field) do
-    field_as_string = Atom.to_string(field)
+  def fetch(%Form{} = form, field) when is_atom(field) do
+    fetch(form, field, Atom.to_string(field))
+  end
 
+  def fetch(%Form{} = form, field) when is_binary(field) do
+    fetch(form, field, field)
+  end
+
+  def fetch(%Form{}, field) do
+    raise ArgumentError,
+          "accessing a form with form[field] requires the field to be atom, got: #{inspect(field)}"
+  end
+
+  defp fetch(%{errors: errors} = form, field, field_as_string) do
     {:ok,
      %Phoenix.HTML.FormField{
-       errors: Keyword.get_values(errors, field),
+       errors: for({^field, value} <- errors, do: value),
        field: field,
        form: form,
        id: input_id(form, field_as_string),
@@ -289,16 +105,13 @@ defmodule Phoenix.HTML.Form do
      }}
   end
 
-  def fetch(%Form{}, field) do
-    raise ArgumentError,
-          "accessing a form with form[field] requires the field to be atom, got: #{inspect(field)}"
-  end
-
   @doc """
   Returns a value of a corresponding form field.
 
-  The `form` should either be a `Phoenix.HTML.Form` emitted
-  by `form_for` or an atom.
+  The `form` should either be a `Phoenix.HTML.Form` or an atom.
+  The field is either a string or an atom. If the field is given
+  as an atom, it will attempt to look data with atom keys. If
+  a string, it will look data with string keys.
 
   When a form is given, it will lookup for changes and then
   fallback to parameters and finally fallback to the default
@@ -308,9 +121,8 @@ defmodule Phoenix.HTML.Form do
   no guarantee that the value will have a certain type. For
   example, a boolean field will be sent as "false" as a
   parameter, and this function will return it as is. If you
-  need to normalize the result of `input_value`, the best
-  option is to call `html_escape` on it and compare the
-  resulting string.
+  need to normalize the result of `input_value`, see
+  `normalize_value/2`.
   """
   @spec input_value(t | atom, field) :: term
   def input_value(%{source: source, impl: impl} = form, field)
@@ -352,8 +164,7 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Returns a name of a corresponding form field.
 
-  The first argument should either be a `Phoenix.HTML.Form` emitted
-  by `form_for` or an atom.
+  The first argument should either be a `Phoenix.HTML.Form` or an atom.
 
   ## Examples
 
@@ -524,22 +335,7 @@ defmodule Phoenix.HTML.Form do
     end
   end
 
-  @doc """
-  Generates a form tag with a form builder **without** an anonymous function.
-
-  This functionality exists mostly for integration with `Phoenix.LiveView`
-  that replaces the anonymous function for explicit closing of the `<form>`
-  tag:
-
-      <%= f = form_for @changeset, Routes.user_path(@conn, :create), opts %>
-        Name: <%= text_input f, :name %>
-      </form>
-
-  See the [Phoenix.LiveView integration](#module-phoenix-liveview-integration)
-  section in module documentation for examples of using this function.
-
-  See `form_for/4` for the available options.
-  """
+  @doc false
   @spec form_for(Phoenix.HTML.FormData.t(), String.t(), Keyword.t()) :: Phoenix.HTML.Form.t()
   def form_for(form_data, action, options) when is_list(options) do
     IO.warn(
@@ -588,7 +384,176 @@ defmodule Phoenix.HTML.Form do
         Name: <%= text_input f, :name %>
       <% end %>
 
-  See the module documentation for examples of using this function.
+  Forms may be used in two distinct scenarios:
+
+    * with changeset data - when information to populate
+      the form comes from a changeset. The changeset holds
+      rich information, which helps provide conveniences
+
+    * with map data - a simple map of parameters (such as
+      `Plug.Conn.params` can be given as data to the form)
+
+  We will explore all them below.
+
+  ## With changeset data
+
+  The entry point for defining forms in Phoenix is with
+  the `form_for/4` function. For this example, we will
+  use `Ecto.Changeset`, which integrates nicely with Phoenix
+  forms via the `phoenix_ecto` package.
+
+  Imagine you have the following action in your controller:
+
+      def new(conn, _params) do
+        changeset = User.changeset(%User{})
+        render conn, "new.html", changeset: changeset
+      end
+
+  where `User.changeset/2` is defined as follows:
+
+      def changeset(user, params \\ %{}) do
+        Ecto.Changeset.cast(user, params, [:name, :age])
+      end
+
+  Now a `@changeset` assign is available in views which we
+  can pass to the form:
+
+      <%= form_for @changeset, Routes.user_path(@conn, :create), fn f -> %>
+        <label>
+          Name: <%= text_input f, :name %>
+        </label>
+
+        <label>
+          Age: <%= select f, :age, 18..100 %>
+        </label>
+
+        <%= submit "Submit" %>
+      <% end %>
+
+  `form_for/4` receives the `Ecto.Changeset` and converts it
+  to a form, which is passed to the function as the argument
+  `f`. All the remaining functions in this module receive
+  the form and automatically generate the input fields, often
+  by extracting information from the given changeset. For example,
+  if the user had a default value for age set, it will
+  automatically show up as selected in the form.
+
+  ### A note on `:errors`
+
+  Even if `changeset.errors` is non-empty, errors will not be displayed in a
+  form if [the changeset
+  `:action`](https://hexdocs.pm/ecto/Ecto.Changeset.html#module-changeset-actions)
+  is `nil` or `:ignore`.
+
+  This is useful for things like validation hints on form fields, e.g. an empty
+  changeset for a new form. That changeset isn't valid, but we don't want to
+  show errors until an actual user action has been performed.
+
+  For example, if the user submits and a `Repo.insert/1` is called and fails on
+  changeset validation, the action will be set to `:insert` to show that an
+  insert was attempted, and the presence of that action will cause errors to be
+  displayed. The same is true for Repo.update/delete.
+
+  If you want to show errors manually you can also set the action yourself,
+  either directly on the `Ecto.Changeset` struct field or by using
+  `Ecto.Changeset.apply_action/2`. Since the action can be arbitrary, you can
+  set it to `:validate` or anything else to avoid giving the impression that a
+  database operation has actually been attempted.
+
+  ## With map data
+
+  `form_for/4` expects as first argument any data structure that
+  implements the `Phoenix.HTML.FormData` protocol. By default,
+  Phoenix.HTML implements this protocol for `Map`.
+
+  This is useful when you are creating forms that are not backed
+  by any kind of data layer. Let's assume that we're submitting a
+  form to the `:new` action in the `FooController`:
+
+      <%= form_for @conn.params, Routes.foo_path(@conn, :new), fn f -> %>
+        <%= text_input f, :contents %>
+        <%= submit "Search" %>
+      <% end %>
+
+  Once the form is submitted, the form contents will be set directly
+  as the parameters root, such as `conn.params["contents"]`. If you
+  prefer, you can pass the `:as` option to configure them to be nested:
+
+      <%= form_for @conn.params["search"] || %{}, Routes.foo_path(@conn, :new), [as: :search], fn f -> %>
+        <%= text_input f, :contents %>
+        <%= submit "Search" %>
+      <% end %>
+
+  In the example above, all form contents is now set inside `conn.params["search"]`
+  thanks to the `[as: :search]` option.
+
+  ## Nested inputs
+
+  If your data layer supports embedding or nested associations,
+  you can use `inputs_for` to attach nested data to the form.
+
+  Imagine the following Ecto schemas:
+
+      defmodule User do
+        use Ecto.Schema
+
+        schema "users" do
+          field :name
+          embeds_one :permalink, Permalink
+        end
+
+        def changeset(user \\ %User{}, params) do
+          user
+          |> Ecto.Changeset.cast(params)
+          |> Ecto.Changeset.cast_assoc(:permalink)
+        end
+      end
+
+      defmodule Permalink do
+        use Ecto.Schema
+
+        embedded_schema do
+          field :url
+        end
+      end
+
+  In the form, you now can:
+
+      <%= form_for @changeset, Routes.user_path(@conn, :create), fn f -> %>
+        <%= text_input f, :name %>
+
+        <%= inputs_for f, :permalink, fn fp -> %>
+          <%= text_input fp, :url %>
+        <% end %>
+      <% end %>
+
+  The default option can be given to populate the fields if none
+  is given:
+
+      <%= inputs_for f, :permalink, [default: %Permalink{title: "default"}], fn fp -> %>
+        <%= text_input fp, :url %>
+      <% end %>
+
+  `inputs_for/4` can be used to work with single entities or
+  collections. When working with collections, `:prepend` and
+  `:append` can be used to add entries to the collection
+  stored in the changeset.
+
+  ## CSRF protection
+
+  CSRF protection is a mechanism to ensure that the user who rendered
+  the form is the one actually submitting it. This module generates a
+  CSRF token by default. Your application should check this token on
+  the server to avoid attackers from making requests on your server on
+  behalf of other users. Phoenix by default checks this token.
+
+  When posting a form with a host in its address, such as "//host.com/path"
+  instead of only "/path", Phoenix will include the host signature in the
+  token and validate the token only if the accessed host is the same as
+  the host in the token. This is to avoid tokens from leaking to third
+  party applications. If this behaviour is problematic, you can generate
+  a non-host specific token with `Plug.CSRFProtection.get_csrf_token/0` and
+  pass it to the form generator via the `:csrf_token` option.
 
   ## Options
 
