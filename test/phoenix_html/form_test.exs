@@ -5,111 +5,8 @@ defmodule Phoenix.HTML.FormTest do
   import Phoenix.HTML.Form
   doctest Phoenix.HTML.Form
 
-  defp search_params do
-    %{
-      "key" => "value",
-      "time" => ~T[01:02:03.004005],
-      "datetime" => %{
-        "year" => "2020",
-        "month" => "4",
-        "day" => "17",
-        "hour" => "2",
-        "minute" => "11",
-        "second" => "13"
-      },
-      "naive_datetime" => ~N[2000-01-01 10:00:42]
-    }
-  end
-
   defp form(map \\ %{}, opts \\ []) do
     Phoenix.HTML.FormData.to_form(map, opts)
-  end
-
-  describe "form_for/4 with map" do
-    test "with :as" do
-      search_params = search_params()
-
-      form =
-        safe_to_string(
-          form_for(search_params, "/", [as: :search], fn f ->
-            assert f.impl == Phoenix.HTML.FormData.Map
-            assert f.name == "search"
-            assert f.source == search_params
-            assert f.params["key"] == "value"
-            ""
-          end)
-        )
-
-      assert form =~ ~s(<form action="/" method="post">)
-    end
-
-    test "without :as" do
-      form =
-        safe_to_string(
-          form_for(search_params(), "/", fn f ->
-            text_input(f, :key)
-          end)
-        )
-
-      assert form =~ ~s(<input id="key" name="key" type="text" value="value">)
-    end
-
-    test "with custom options" do
-      form =
-        safe_to_string(
-          form_for(search_params(), "/", [as: :search, method: :put, multipart: true], fn f ->
-            refute f.options[:name]
-            assert f.options[:multipart] == true
-            assert f.options[:method] == :put
-            ""
-          end)
-        )
-
-      assert form =~
-               ~s(<form action="/" enctype="multipart/form-data" method="post">)
-
-      assert form =~ ~s(<input name="_method" type="hidden" hidden value="put">)
-    end
-
-    test "is html safe" do
-      form = safe_to_string(form_for(search_params(), "/", [as: :search], fn _ -> "<>" end))
-      assert form =~ ~s(&lt;&gt;</form>)
-    end
-
-    test "with type and validations" do
-      form =
-        safe_to_string(
-          form_for(search_params(), "/", [as: :search], fn f ->
-            assert input_type(f, :hello) == :text_input
-            assert input_type(f, :email) == :email_input
-            assert input_type(f, :search) == :search_input
-            assert input_type(f, :password) == :password_input
-            assert input_type(f, :special_url) == :url_input
-            assert input_type(f, :number, %{"number" => :number_input}) == :number_input
-            assert input_validations(f, :hello) == []
-            ""
-          end)
-        )
-
-      assert form =~ "<form"
-    end
-
-    test "with errors through options" do
-      errors = [field: {"error message!", []}]
-
-      form =
-        safe_to_string(
-          form_for(search_params(), "/", [errors: errors], fn f ->
-            for {field, {message, _}} <- f.errors do
-              Phoenix.HTML.Tag.content_tag(:span, humanize(field) <> " " <> message,
-                class: "errors"
-              )
-            end
-          end)
-        )
-
-      assert form =~ ~s(<span class="errors">Field error message!</span>)
-    end
   end
 
   test "warns on string keys" do
@@ -333,6 +230,109 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   ## TODO: Move on v4.0
+
+  defp search_params do
+    %{
+      "key" => "value",
+      "time" => ~T[01:02:03.004005],
+      "datetime" => %{
+        "year" => "2020",
+        "month" => "4",
+        "day" => "17",
+        "hour" => "2",
+        "minute" => "11",
+        "second" => "13"
+      },
+      "naive_datetime" => ~N[2000-01-01 10:00:42]
+    }
+  end
+
+  describe "form_for/4 with map" do
+    test "with :as" do
+      search_params = search_params()
+
+      form =
+        safe_to_string(
+          form_for(search_params, "/", [as: :search], fn f ->
+            assert f.impl == Phoenix.HTML.FormData.Map
+            assert f.name == "search"
+            assert f.source == search_params
+            assert f.params["key"] == "value"
+            ""
+          end)
+        )
+
+      assert form =~ ~s(<form action="/" method="post">)
+    end
+
+    test "without :as" do
+      form =
+        safe_to_string(
+          form_for(search_params(), "/", fn f ->
+            text_input(f, :key)
+          end)
+        )
+
+      assert form =~ ~s(<input id="key" name="key" type="text" value="value">)
+    end
+
+    test "with custom options" do
+      form =
+        safe_to_string(
+          form_for(search_params(), "/", [as: :search, method: :put, multipart: true], fn f ->
+            refute f.options[:name]
+            assert f.options[:multipart] == true
+            assert f.options[:method] == :put
+            ""
+          end)
+        )
+
+      assert form =~
+               ~s(<form action="/" enctype="multipart/form-data" method="post">)
+
+      assert form =~ ~s(<input name="_method" type="hidden" hidden value="put">)
+    end
+
+    test "is html safe" do
+      form = safe_to_string(form_for(search_params(), "/", [as: :search], fn _ -> "<>" end))
+      assert form =~ ~s(&lt;&gt;</form>)
+    end
+
+    test "with type and validations" do
+      form =
+        safe_to_string(
+          form_for(search_params(), "/", [as: :search], fn f ->
+            assert input_type(f, :hello) == :text_input
+            assert input_type(f, :email) == :email_input
+            assert input_type(f, :search) == :search_input
+            assert input_type(f, :password) == :password_input
+            assert input_type(f, :special_url) == :url_input
+            assert input_type(f, :number, %{"number" => :number_input}) == :number_input
+            assert input_validations(f, :hello) == []
+            ""
+          end)
+        )
+
+      assert form =~ "<form"
+    end
+
+    test "with errors through options" do
+      errors = [field: {"error message!", []}]
+
+      form =
+        safe_to_string(
+          form_for(search_params(), "/", [errors: errors], fn f ->
+            for {field, {message, _}} <- f.errors do
+              Phoenix.HTML.Tag.content_tag(:span, humanize(field) <> " " <> message,
+                class: "errors"
+              )
+            end
+          end)
+        )
+
+      assert form =~ ~s(<span class="errors">Field error message!</span>)
+    end
+  end
 
   defp conn do
     Plug.Test.conn(:get, "/foo", %{"search" => search_params()})
