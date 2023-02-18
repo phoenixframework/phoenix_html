@@ -112,6 +112,12 @@ defmodule Phoenix.HTML.FormTest do
     end
   end
 
+  test "warns on string keys" do
+    assert ExUnit.CaptureIO.capture_io(:stderr, fn -> form(%{foo: 123}) end) =~
+             "a map with atom keys was given to a form. Maps are always considered parameters and " <>
+               "therefore must have string keys, got: %{foo: 123}"
+  end
+
   describe "input_value/2" do
     test "without form" do
       assert input_value(:search, :key) == nil

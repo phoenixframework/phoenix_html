@@ -79,6 +79,13 @@ defimpl Phoenix.HTML.FormData, for: [Plug.Conn, Atom, Map] do
 
     Map ->
       defp name_params_and_opts(map, opts) do
+        with {key, _, _} when is_atom(key) <- :maps.next(:maps.iterator(map)) do
+          IO.warn(
+            "a map with atom keys was given to a form. Maps are always considered " <>
+              "parameters and therefore must have string keys, got: #{inspect(map)}"
+          )
+        end
+
         case Keyword.pop(opts, :as) do
           {nil, opts} -> {nil, map, opts}
           {name, opts} -> {to_string(name), map, opts}
