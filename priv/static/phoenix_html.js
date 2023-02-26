@@ -34,7 +34,7 @@
 
     form.method = (element.getAttribute("data-method") === "get") ? "get" : "post";
     form.action = to;
-    form.style.display = "hidden";
+    form.style.display = "none";
 
     if (target) form.target = target;
     else if (targetModifierKey) form.target = "_blank";
