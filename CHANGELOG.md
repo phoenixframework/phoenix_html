@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.3.1 (2023-02-27)
+
+* Bug fix
+  * Set display to none on generated forms
+  * Warn for maps with atom keys
+
 ## v3.3.0 (2023-02-10)
 
 * Enhancements
