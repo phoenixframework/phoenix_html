@@ -221,8 +221,8 @@ defmodule Phoenix.HTML.Form do
     * For "datetime-local" types, it converts `DateTime` and
       `NaiveDateTime` to strings without the second precision
 
-    * For "checkboxes" types, it returns a boolean depending if
-      the input is "true" or not
+    * For "checkbox" types, it returns a boolean depending on
+      whether the input is "true" or not
 
     * For "textarea", it prefixes a newline to ensure newlines
       won't be ignored on submission. This requires however
