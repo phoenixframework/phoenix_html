@@ -6,10 +6,18 @@ defprotocol Phoenix.HTML.FormData do
   @doc """
   Converts a data structure into a [`Phoenix.HTML.Form`](`t:Phoenix.HTML.Form.t/0`) struct.
 
-  The options are the same options given to `form_for/4`. It
-  can be used by implementations to configure their behaviour
-  and it must be stored in the underlying struct, with any
-  custom field removed.
+  The options have their meaning defined by the underlying
+  implementation but all shared options below are expected to
+  be implemented. All remaining options must be stored in the
+  returned struct.
+
+  ## Shared options
+
+    * `:as` - the value to be used as the form name
+
+    * `:id` - the ID of the form attribute. All form inputs will
+      be prefixed by the given ID
+
   """
   @spec to_form(t, Keyword.t()) :: Phoenix.HTML.Form.t()
   def to_form(data, options)
@@ -18,10 +26,29 @@ defprotocol Phoenix.HTML.FormData do
   Converts the field in the given form based on the data structure
   into a list of [`Phoenix.HTML.Form`](`t:Phoenix.HTML.Form.t/0`) structs.
 
-  The options are the same options given to `inputs_for/4`. It
-  can be used by implementations to configure their behaviour
-  and it must be stored in the underlying struct, with any
-  custom field removed.
+  The options have their meaning defined by the underlying
+  implementation but all shared options below are expected to
+  be implemented. All remaining options must be stored in the
+  returned struct.
+
+  ## Shared Options
+
+    * `:id` - the id to be used in the form, defaults to the
+      concatenation of the given `field` to the parent form id
+
+    * `:as` - the name to be used in the form, defaults to the
+      concatenation of the given `field` to the parent form name
+
+    * `:default` - the value to use if none is available
+
+    * `:prepend` - the values to prepend when rendering. This only
+      applies if the field value is a list and no parameters were
+      sent through the form.
+
+    * `:append` - the values to append when rendering. This only
+      applies if the field value is a list and no parameters were
+      sent through the form.
+
   """
   @spec to_form(t, Phoenix.HTML.Form.t(), Phoenix.HTML.Form.field(), Keyword.t()) ::
           [Phoenix.HTML.Form.t()]
