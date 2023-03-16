@@ -14,7 +14,7 @@ defmodule Phoenix.HTML.Form do
   The field name can be either an atom or a string. If it is an atom,
   it assumes the form keeps both data and errors as atoms. If it is a
   string, it considers data and errors are stored as strings for said
-  field.
+  field. Forms backed by an `Ecto.Changeset` only support atom field names.
   """
 
   alias Phoenix.HTML.Form
