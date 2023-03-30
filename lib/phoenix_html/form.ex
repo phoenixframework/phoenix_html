@@ -508,8 +508,8 @@ defmodule Phoenix.HTML.Form do
 
         def changeset(user \\ %User{}, params) do
           user
-          |> Ecto.Changeset.cast(params)
-          |> Ecto.Changeset.cast_assoc(:permalink)
+          |> Ecto.Changeset.cast(params, [:name])
+          |> Ecto.Changeset.cast_embed(:permalink)
         end
       end
 
