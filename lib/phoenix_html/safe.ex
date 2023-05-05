@@ -73,13 +73,17 @@ defimpl Phoenix.HTML.Safe, for: List do
     Phoenix.HTML.Engine.html_escape(h)
   end
 
+  def to_iodata(h) when is_atom(h) do
+    Phoenix.HTML.Engine.html_escape(Atom.to_string(h))
+  end
+
   def to_iodata({:safe, data}) do
     data
   end
 
   def to_iodata(other) do
     raise ArgumentError,
-          "lists in Phoenix.HTML and templates may only contain integers representing bytes, binaries or other lists, " <>
+          "lists in Phoenix.HTML and templates may only contain integers representing atoms, bytes, binaries or other lists, " <>
             "got invalid entry: #{inspect(other)}"
   end
 end

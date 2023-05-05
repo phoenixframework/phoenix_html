@@ -39,6 +39,11 @@ defmodule Phoenix.HTML.SafeTest do
     assert Safe.to_iodata(date) == "2000-01-01"
   end
 
+  test "impl for List of atom" do
+    list = [:foo, :bar]
+    assert Safe.to_iodata(list) == ["foo", "bar"]
+  end
+
   test "impl for NaiveDateTime" do
     {:ok, datetime} = NaiveDateTime.new(2000, 1, 1, 12, 13, 14)
     assert Safe.to_iodata(datetime) == "2000-01-01T12:13:14"
