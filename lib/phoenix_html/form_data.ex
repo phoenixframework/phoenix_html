@@ -4,10 +4,10 @@ defprotocol Phoenix.HTML.FormData do
   
   ## Ecto integration
   
-  Phoenix provides integration of forms with ecto structures using the [phoenix_ecto](https://hex.pm/packages/phoenix_ecto)
-  library. If a project was generated without ecto support that dependency will need to be manually added.
- 
-  
+  Phoenix provides integration of forms with Ecto changesets and data
+  structures via the [phoenix_ecto](https://hex.pm/packages/phoenix_ecto) package.
+  If a project was generated without Ecto support that dependency will need to be
+  manually added.
   """
 
   @doc """
