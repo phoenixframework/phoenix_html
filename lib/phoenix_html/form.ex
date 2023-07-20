@@ -13,7 +13,7 @@ defmodule Phoenix.HTML.Form do
 
   The field name can be either an atom or a string. If it is an atom,
   it assumes the form keeps both data and errors as atoms. If it is a
-  string, it considers data and errors are stored as strings for said
+  string, it considers that data and errors are stored as strings for said
   field. Forms backed by an `Ecto.Changeset` only support atom field names.
 
   It is possible to "access" fields which do not exist in the source data
@@ -44,15 +44,15 @@ defmodule Phoenix.HTML.Form do
 
     * `:data` - the field used to store lookup data
 
-    * `:params` - the parameters associated to this form
+    * `:params` - the parameters associated with this form
 
-    * `:hidden` - a keyword list of fields that are required for
-      submitting the form behind the scenes as hidden inputs
+    * `:hidden` - a keyword list of fields that are required to
+      submit the form behind the scenes as hidden inputs
 
     * `:options` - a copy of the options given when creating the
       form via `form_for/4` without any form data specific key
 
-    * `:errors` - a keyword list of errors that associated with
+    * `:errors` - a keyword list of errors that are associated with
       the form
   """
   defstruct source: nil,
@@ -117,8 +117,8 @@ defmodule Phoenix.HTML.Form do
   as an atom, it will attempt to look data with atom keys. If
   a string, it will look data with string keys.
 
-  When a form is given, it will lookup for changes and then
-  fallback to parameters and finally fallback to the default
+  When a form is given, it will look for changes, then
+  fallback to parameters, and finally fallback to the default
   struct/map value.
 
   Since the function looks up parameter values too, there is
@@ -218,8 +218,8 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Normalizes an input `value` according to its input `type`.
 
-  Certain HTML inputs values must be cast or have idiosyncracies
-  when rendering them. The goal of this function is to encapsulate
+  Certain HTML input values must be cast, or they will have idiosyncracies
+  when they are rendered. The goal of this function is to encapsulate
   this logic. In particular:
 
     * For "datetime-local" types, it converts `DateTime` and
@@ -488,7 +488,7 @@ defmodule Phoenix.HTML.Form do
         <%= submit "Search" %>
       <% end %>
 
-  In the example above, all form contents is now set inside `conn.params["search"]`
+  In the example above, all form contents are now set inside `conn.params["search"]`
   thanks to the `[as: :search]` option.
 
   ## Nested inputs
@@ -521,7 +521,7 @@ defmodule Phoenix.HTML.Form do
         end
       end
 
-  In the form, you now can:
+  In the form, you can now do this:
 
       <%= form_for @changeset, Routes.user_path(@conn, :create), fn f -> %>
         <%= text_input f, :name %>
@@ -548,15 +548,15 @@ defmodule Phoenix.HTML.Form do
   CSRF protection is a mechanism to ensure that the user who rendered
   the form is the one actually submitting it. This module generates a
   CSRF token by default. Your application should check this token on
-  the server to avoid attackers from making requests on your server on
-  behalf of other users. Phoenix by default checks this token.
+  the server to prevent attackers from making requests on your server on
+  behalf of other users. Phoenix checks this token by default.
 
   When posting a form with a host in its address, such as "//host.com/path"
   instead of only "/path", Phoenix will include the host signature in the
-  token and validate the token only if the accessed host is the same as
-  the host in the token. This is to avoid tokens from leaking to third
-  party applications. If this behaviour is problematic, you can generate
-  a non-host specific token with `Plug.CSRFProtection.get_csrf_token/0` and
+  token, and will only validate the token if the accessed host is the same as
+  the host in the token. This is to avoid tokens from leaking to third-party
+  applications. If this behaviour is problematic, you can generate a
+  non-host-specific token with `Plug.CSRFProtection.get_csrf_token/0` and
   pass it to the form generator via the `:csrf_token` option.
 
   ## Options
@@ -571,21 +571,21 @@ defmodule Phoenix.HTML.Form do
       Defaults to "post".
 
     * `:multipart` - when true, sets enctype to "multipart/form-data".
-      Required when uploading files
+      Required when uploading files.
 
     * `:csrf_token` - for "post" requests, the form tag will automatically
       include an input tag with name `_csrf_token`. When set to false, this
-      is disabled
+      is disabled.
 
     * `:errors` - use this to manually pass a keyword list of errors to the form
       (for example from `conn.assigns[:errors]`). This option is only used when a
       connection is used as the form source and it will make the errors available
-      under `f.errors`
+      under `f.errors`.
 
     * `:id` - the ID of the form attribute. If an ID is given, all form inputs
-      will also be prefixed by the given ID
+      will also be prefixed by the given ID.
 
-  All other options will be passed as html attributes, such as `class: "foo"`.
+  All other options will be passed as HTML attributes, such as `class: "foo"`.
   """
   @spec form_for(Phoenix.HTML.FormData.t(), String.t(), (t -> Phoenix.HTML.unsafe())) ::
           Phoenix.HTML.safe()
@@ -604,7 +604,7 @@ defmodule Phoenix.HTML.Form do
     do: inputs_for(form, field, [])
 
   @doc """
-  Generate a new form builder for the given parameter in form **without** an
+  Generate a new form builder for the given parameter in a form **without** an
   anonymous function.
 
   This functionality exists mostly for integration with `Phoenix.LiveView`
@@ -612,7 +612,7 @@ defmodule Phoenix.HTML.Form do
   instead.
 
   Keep in mind that this function does not generate hidden inputs automatically
-  like `inputs_for/4`. To generate them you need to explicit do it by yourself.
+  like `inputs_for/4`. To generate them, you need to explicitly do it yourself.
 
       <.form for={@changeset} action={Routes.user_path(@conn, :create)}>
         Name: <%= text_input f, :name %>
@@ -968,10 +968,10 @@ defmodule Phoenix.HTML.Form do
 
   Notice the generated textarea includes a new line after
   the opening tag. This is because the HTML spec says new
-  lines after tags must be ignored and all major browser
+  lines after tags must be ignored, and all major browser
   implementations do that.
 
-  So in order to avoid new lines provided by the user
+  Therefore, in order to avoid new lines provided by the user
   from being ignored when the form is resubmitted, we
   automatically add a new line before the text area
   value.
@@ -1168,7 +1168,7 @@ defmodule Phoenix.HTML.Form do
     {hidden_input, opts} = Keyword.pop(opts, :hidden_input, true)
 
     # We html escape all values to be sure we are comparing
-    # apples to apples. After all we may have true in the data
+    # apples to apples. After all, we may have true in the data
     # but "true" in the params and both need to match.
     checked_value = html_escape(checked_value)
     unchecked_value = html_escape(unchecked_value)
@@ -1207,7 +1207,7 @@ defmodule Phoenix.HTML.Form do
 
     * keyword lists - each keyword list is expected to have the keys
       `:key` and `:value`. Additional keys such as `:disabled` may
-      be given to customize the option
+      be given to customize the option.
 
     * two-item tuples - where the first element is an atom, string or
       integer to be used as the option label and the second element is
@@ -1255,7 +1255,7 @@ defmodule Phoenix.HTML.Form do
       #=>   <option value="user">User</option>
       #=> </select>
 
-  And customize the prompt as any other entry:
+  And customize the prompt like any other entry:
 
       select(form, :role, ["Admin": "admin", "User": "user"], prompt: [key: "Choose your role", disabled: true])
       #=> <select id="user_role" name="user[role]">
@@ -1355,7 +1355,7 @@ defmodule Phoenix.HTML.Form do
       #=>   <option value="2">Power User</option>
       #=> </select>
 
-  When working with structs, associations and embeds, you will need to tell
+  When working with structs, associations, and embeds, you will need to tell
   Phoenix how to extract the value out of the collection. For example,
   imagine `user.roles` is a list of `%Role{}` structs. You must call it as:
 
@@ -1415,7 +1415,7 @@ defmodule Phoenix.HTML.Form do
   @doc ~S'''
   Generates select tags for datetime.
 
-  Warning: this functionality is best provided by browsers nowadays.
+  Warning: This functionality is best provided by browsers nowadays.
   Consider using `datetime_local_input/3` instead.
 
   ## Examples
@@ -1489,7 +1489,7 @@ defmodule Phoenix.HTML.Form do
   ## Options
 
     * `:value` - the value used to select a given option.
-      The default value is extracted from the form data if available
+      The default value is extracted from the form data if available.
 
     * `:default` - the default value to use when none was given in
       `:value` and none is available in the form data
@@ -1571,7 +1571,7 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Generates select tags for date.
 
-  Warning: this functionality is best provided by browsers nowadays.
+  Warning: This functionality is best provided by browsers nowadays.
   Consider using `date_input/3` instead.
 
   Check `datetime_select/3` for more information on options and supported values.
@@ -1608,7 +1608,7 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Generates select tags for time.
 
-  Warning: this functionality is best provided by browsers nowadays.
+  Warning: This functionality is best provided by browsers nowadays.
   Consider using `time_input/3` instead.
 
   Check `datetime_select/3` for more information on options and supported values.
