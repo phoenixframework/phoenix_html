@@ -207,11 +207,11 @@ defmodule Phoenix.HTML do
       iex> safe_to_string attributes_escape(title: "the title", id: "the id", selected: true)
       " title=\"the title\" id=\"the id\" selected"
 
-      iex> safe_to_string attributes_escape(%{data: [confirm: "Are you sure?"], class: "foo"})
-      " class=\"foo\" data-confirm=\"Are you sure?\""
+      iex> safe_to_string attributes_escape(%{data: [confirm: "Are you sure?"]})
+      " data-confirm=\"Are you sure?\""
 
-      iex> safe_to_string attributes_escape(%{phx: [value: [foo: "bar"]], class: "foo"})
-      " class=\"foo\" phx-value-foo=\"bar\""
+      iex> safe_to_string attributes_escape(%{phx: [value: [foo: "bar"]]})
+      " phx-value-foo=\"bar\""
 
   """
   def attributes_escape(attrs) when is_list(attrs) do

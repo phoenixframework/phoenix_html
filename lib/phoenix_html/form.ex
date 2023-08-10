@@ -373,7 +373,7 @@ defmodule Phoenix.HTML.Form do
         bin
       end
 
-    bin |> String.replace("_", " ") |> String.capitalize()
+    bin |> String.replace("_", " ") |> :string.titlecase()
   end
 
   @doc false
@@ -596,39 +596,18 @@ defmodule Phoenix.HTML.Form do
     html_escape([form_tag(action, form.options), fun.(form), raw("</form>")])
   end
 
-  @doc """
-  Same as `inputs_for(form, field, [])`.
-  """
-  @spec inputs_for(t, field) :: list(Phoenix.HTML.Form.t())
+  @doc false
   def inputs_for(form, field) when is_atom(field) or is_binary(field),
     do: inputs_for(form, field, [])
 
-  @doc """
-  Generate a new form builder for the given parameter in a form **without** an
-  anonymous function.
-
-  This functionality exists mostly for integration with `Phoenix.LiveView`
-  that replaces the anonymous function for returning the generated forms
-  instead.
-
-  Keep in mind that this function does not generate hidden inputs automatically
-  like `inputs_for/4`. To generate them, you need to explicitly do it yourself.
-
-      <.form for={@changeset} action={Routes.user_path(@conn, :create)}>
-        Name: <%= text_input f, :name %>
-
-        <%= for friend_form <- inputs_for(f, :friends) do %>
-          <%!-- Generating hidden inputs --!%>
-          <%= hidden_inputs_for(friend_form) %>
-          <%= text_input friend_form, :name %>
-        <% end %>
-      </.form>
-
-  See `inputs_for/4` for the available options.
-  """
-  @spec inputs_for(t, field, Keyword.t()) :: list(Phoenix.HTML.Form.t())
+  @doc false
   def inputs_for(%{impl: impl} = form, field, options)
       when (is_atom(field) or is_binary(field)) and is_list(options) do
+    IO.warn(
+      "inputs_for/3 without an anonymous function is deprecated. " <>
+        "If you are using Phoenix.LiveView, use the new Phoenix.Component.inputs_for/1 component"
+    )
+
     options =
       form.options
       |> Keyword.take([:multipart])
@@ -640,7 +619,7 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Generate a new form builder for the given parameter in form.
 
-  See the module documentation for examples of using this function.
+  See `form_for/4` for examples of using this function.
 
   ## Options
 

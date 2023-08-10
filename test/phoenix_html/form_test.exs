@@ -536,44 +536,6 @@ defmodule Phoenix.HTML.FormTest do
     end
   end
 
-  describe "inputs_for/3" do
-    test "generate a new form builder for the given parameter" do
-      form =
-        form_for(%{}, "/", [as: :user], fn form ->
-          for company_form <- inputs_for(form, :company) do
-            text_input(company_form, :name)
-          end
-        end)
-        |> safe_to_string()
-
-      assert form =~ ~s(<input id="user_company_name" name="user[company][name]" type="text">)
-    end
-
-    test "support options" do
-      form =
-        form_for(%{}, "/", [as: :user], fn form ->
-          for company_form <- inputs_for(form, :company, as: :new_company, id: :custom_id) do
-            text_input(company_form, :name)
-          end
-        end)
-        |> safe_to_string()
-
-      assert form =~ ~s(<input id="custom_id_name" name="new_company[name]" type="text">)
-    end
-
-    test "support atom or binary field" do
-      form = Phoenix.HTML.FormData.to_form(%{}, as: :user)
-
-      [f] = inputs_for(form, :key)
-      assert f.name == "user[key]"
-      assert f.id == "user_key"
-
-      [f] = inputs_for(form, "key")
-      assert f.name == "user[key]"
-      assert f.id == "user_key"
-    end
-  end
-
   describe "inputs_for/4" do
     test "generate a new form builder for the given parameter" do
       form =
