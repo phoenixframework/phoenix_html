@@ -1,5 +1,13 @@
 # Changelog
 
+## v3.3.2 (2023-08-10)
+
+* Enhancements
+  * Address deprecations in Elixir v1.16+
+
+* Deprecations
+  * Deprecate `inputs_for/2` and `inputs_for/3` (without anonymous functions)
+
 ## v3.3.1 (2023-02-27)
 
 * Bug fix
