@@ -118,13 +118,22 @@ defmodule Phoenix.HTML.FormTest do
     end
   end
 
-  test "input_changed?" do
+  test "input_changed? with atom fields" do
     form = form(%{})
     refute input_changed?(form, form, :foo)
     assert input_changed?(form, %{form | errors: [foo: "bar"]}, :foo)
     assert input_changed?(form, %{form | name: "another"}, :foo)
     assert input_changed?(form, %{form | id: "another"}, :foo)
     assert input_changed?(form, form(%{"foo" => "bar"}), :foo)
+  end
+
+  test "input_changed? with string fields" do
+    form = form(%{})
+    refute input_changed?(form, form, "foo")
+    assert input_changed?(form, %{form | errors: [{"foo", "bar"}]}, "foo")
+    assert input_changed?(form, %{form | name: "another"}, "foo")
+    assert input_changed?(form, %{form | id: "another"}, "foo")
+    assert input_changed?(form, form(%{"foo" => "bar"}), "foo")
   end
 
   describe "access" do

@@ -100,7 +100,7 @@ defmodule Phoenix.HTML.Form do
   defp fetch(%{errors: errors} = form, field, field_as_string) do
     {:ok,
      %Phoenix.HTML.FormField{
-       errors: for({^field, value} <- errors, do: value),
+       errors: field_errors(errors, field),
        field: field,
        form: form,
        id: input_id(form, field_as_string),
@@ -193,15 +193,15 @@ defmodule Phoenix.HTML.Form do
   changed. This is mostly used for optimization engines as an extension
   of the `Access` behaviour.
   """
-  @spec input_changed?(t, t, atom) :: boolean()
+  @spec input_changed?(t, t, field()) :: boolean()
   def input_changed?(
         %Form{impl: impl1, id: id1, name: name1, errors: errors1, source: source1} = form1,
         %Form{impl: impl2, id: id2, name: name2, errors: errors2, source: source2} = form2,
         field
       )
-      when is_atom(field) do
+      when is_atom(field) or is_binary(field) do
     impl1 != impl2 or id1 != id2 or name1 != name2 or
-      Keyword.get_values(errors1, field) != Keyword.get_values(errors2, field) or
+      field_errors(errors1, field) != field_errors(errors2, field) or
       impl1.input_value(source1, form1, field) != impl2.input_value(source2, form2, field)
   end
 
@@ -1813,4 +1813,10 @@ defmodule Phoenix.HTML.Form do
   # Normalize field name to string version
   defp field_to_string(field) when is_atom(field), do: Atom.to_string(field)
   defp field_to_string(field) when is_binary(field), do: field
+
+  # Helper for getting field errors, handling string fields
+  defp field_errors(errors, field)
+       when is_list(errors) and (is_atom(field) or is_binary(field)) do
+    for {^field, error} <- errors, do: error
+  end
 end
