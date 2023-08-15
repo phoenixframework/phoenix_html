@@ -74,7 +74,7 @@ defmodule Phoenix.HTML.Form do
           params: %{binary => term},
           hidden: Keyword.t(),
           options: Keyword.t(),
-          errors: Keyword.t(),
+          errors: [{field, term}],
           impl: module,
           id: String.t(),
           index: nil | non_neg_integer,
