@@ -330,8 +330,9 @@ defmodule Phoenix.HTML.Form do
   defimpl Phoenix.HTML.Safe do
     def to_iodata(%{action: action, options: options}) do
       IO.warn(
-        "form_for/3 without an anonymous function is deprecated. " <>
-          "If you are using Phoenix.LiveView, use the new Phoenix.Component.form/1 component"
+        "rendering a Phoenix.HTML.Form as part of HTML is deprecated, " <>
+          "please extract the component you want to render instead. " <>
+          "If you want to build a form, use form_for/3 or <.form> in LiveView"
       )
 
       {:safe, contents} = form_tag(action, options)
