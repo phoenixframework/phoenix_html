@@ -345,7 +345,7 @@ defmodule Phoenix.HTML.Form do
   def form_for(form_data, action, options) when is_list(options) do
     IO.warn(
       "form_for/3 without an anonymous function is deprecated. " <>
-        "If you are using Phoenix.LiveView, use the new Phoenix.Component.form/1 component"
+        "If you are using HEEx templates, use the new Phoenix.Component.form/1 component"
     )
 
     %{Phoenix.HTML.FormData.to_form(form_data, options) | action: action}
@@ -400,8 +400,8 @@ defmodule Phoenix.HTML.Form do
 
   We will explore all them below.
 
-  Note that if you are using Phoenix LiveView, `form_for/4` is no longer the
-  preferred way to generate a form tag, and you should use
+  Note that if you are using HEEx templates, `form_for/4` is no longer
+  the preferred way to generate a form tag, and you should use
   [`Phoenix.Component.form/1`](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#form/1)
   instead.
 
@@ -611,7 +611,7 @@ defmodule Phoenix.HTML.Form do
       when (is_atom(field) or is_binary(field)) and is_list(options) do
     IO.warn(
       "inputs_for/3 without an anonymous function is deprecated. " <>
-        "If you are using Phoenix.LiveView, use the new Phoenix.Component.inputs_for/1 component"
+        "If you are using HEEx templates, use the new Phoenix.Component.inputs_for/1 component"
     )
 
     options =
