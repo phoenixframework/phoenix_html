@@ -400,6 +400,11 @@ defmodule Phoenix.HTML.Form do
 
   We will explore all them below.
 
+  Note that if you are using Phoenix LiveView, `form_for/4` is no longer the
+  preferred way to generate a form tag, and you should use
+  [`Phoenix.Component.form/1`](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#form/1)
+  instead.
+
   ## With changeset data
 
   The entry point for defining forms in Phoenix is with
