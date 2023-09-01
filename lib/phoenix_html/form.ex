@@ -402,7 +402,7 @@ defmodule Phoenix.HTML.Form do
 
   Note that if you are using Phoenix LiveView, `form_for/4` is no longer the
   preferred way to generate a form tag, and you should use
-  [Phoenix.Component.form/1](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#form/1)
+  [`Phoenix.Component.form/1`](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#form/1)
   instead.
 
   ## With changeset data
