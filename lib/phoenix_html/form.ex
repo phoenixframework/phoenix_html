@@ -261,8 +261,16 @@ defmodule Phoenix.HTML.Form do
   ## Examples
 
       options_for_select(["Admin": "admin", "User": "user"], "admin")
-      #=> <option value="admin" selected="selected">Admin</option>
+      #=> <option value="admin" selected>Admin</option>
       #=> <option value="user">User</option>
+
+  Multiple selected values:
+
+      options_for_select(["Admin": "admin", "User": "user", "Moderator": "moderator"],
+        ["admin", "moderator"])
+      #=> <option value="admin" selected>Admin</option>
+      #=> <option value="user" >User</option>
+      #=> <option value="moderator" selected>Moderator</option>
 
   Groups are also supported:
 
