@@ -269,7 +269,7 @@ defmodule Phoenix.HTML.Form do
       options_for_select(["Admin": "admin", "User": "user", "Moderator": "moderator"],
         ["admin", "moderator"])
       #=> <option value="admin" selected>Admin</option>
-      #=> <option value="user" >User</option>
+      #=> <option value="user">User</option>
       #=> <option value="moderator" selected>Moderator</option>
 
   Groups are also supported:
