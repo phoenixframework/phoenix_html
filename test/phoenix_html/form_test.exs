@@ -102,8 +102,10 @@ defmodule Phoenix.HTML.FormTest do
       assert normalize_value("datetime-local", ~N[2017-09-21 20:21:53]) ==
                {:safe, ["2017-09-21", ?T, "20:21"]}
 
-      assert normalize_value("datetime-local", "2017-09-21 20:21:53") == "2017-09-21 20:21:53"
-      assert normalize_value("datetime-local", "other") == "other"
+      assert normalize_value("datetime-local", "2017-09-21 20:21:53") ==
+               {:safe, "2017-09-21 20:21:53"}
+
+      assert normalize_value("datetime-local", "other") == {:safe, "other"}
     end
 
     test "for textarea" do
