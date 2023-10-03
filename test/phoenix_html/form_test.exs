@@ -114,7 +114,8 @@ defmodule Phoenix.HTML.FormTest do
     end
 
     test "for anything else" do
-      assert normalize_value("foo", "<other>") == "<other>"
+      assert normalize_value("foo", nil) == nil
+      assert normalize_value("foo", "<other>") == {:safe, [[[] | "&lt;"], "other" | "&gt;"]}
     end
   end
 

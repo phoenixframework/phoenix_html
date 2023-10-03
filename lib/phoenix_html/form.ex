@@ -248,9 +248,10 @@ defmodule Phoenix.HTML.Form do
     html_escape(value) == {:safe, "true"}
   end
 
-  def normalize_value(_type, value) do
-    value
-  end
+  def normalize_value(_type, nil), do: nil
+  def normalize_value(_type, true), do: true
+  def normalize_value(_type, false), do: false
+  def normalize_value(_type, value), do: html_escape(value)
 
   @doc """
   Returns options to be used inside a select.
