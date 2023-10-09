@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.3.3 (2023-10-09)
+
+* Enhancements
+  * Allow string fields on `input_changed?`
+
 ## v3.3.2 (2023-08-10)
 
 * Enhancements

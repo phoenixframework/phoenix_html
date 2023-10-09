@@ -3,7 +3,7 @@ defmodule PhoenixHTML.Mixfile do
 
   # Also change package.json version
   @source_url "https://github.com/phoenixframework/phoenix_html"
-  @version "3.3.2"
+  @version "3.3.3"
 
   def project do
     [
