@@ -232,8 +232,6 @@ defmodule Phoenix.HTML.Form do
       won't be ignored on submission. This requires however
       that the textarea is rendered with no spaces after its
       content
-
-  All other values are HTML escaped.
   """
   def normalize_value("datetime-local", %struct{} = value)
       when struct in [NaiveDateTime, DateTime] do
@@ -250,10 +248,9 @@ defmodule Phoenix.HTML.Form do
     html_escape(value) == {:safe, "true"}
   end
 
-  def normalize_value(_type, nil), do: nil
-  def normalize_value(_type, true), do: true
-  def normalize_value(_type, false), do: false
-  def normalize_value(_type, value), do: html_escape(value)
+  def normalize_value(_type, value) do
+    value
+  end
 
   @doc """
   Returns options to be used inside a select.
