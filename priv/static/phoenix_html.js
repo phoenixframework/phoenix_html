@@ -19,7 +19,7 @@
   function buildHiddenInput(name, value) {
     var input = document.createElement("input");
     input.type = "hidden";
-    input.name = name;
+    input.setAttribute("name", name);
     input.value = value;
     return input;
   }
