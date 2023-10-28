@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/phoenixframework/phoenix_html/workflows/Tests/badge.svg)](https://github.com/phoenixframework/phoenix_html/actions?query=workflow%3ATests)
 
-The default building blocks for working with HTML safely in Phoenix.
+Building blocks for working with HTML in Phoenix.
 
 This library provides three main functionalities:
 

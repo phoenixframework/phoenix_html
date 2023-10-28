@@ -1,7 +1,6 @@
 defmodule Phoenix.HTML do
   @moduledoc """
-  The default building blocks for working with HTML safely
-  in Phoenix.
+  Building blocks for working with HTML in Phoenix.
 
   This library provides three main functionalities:
 
