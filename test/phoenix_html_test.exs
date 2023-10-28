@@ -1,14 +1,8 @@
 defmodule Phoenix.HTMLTest do
   use ExUnit.Case, async: true
 
-  use Phoenix.HTML
+  import Phoenix.HTML
   doctest Phoenix.HTML
-
-  test "~E sigil" do
-    assert ~E"""
-           <%= "foo" %>
-           """ == {:safe, ["foo", "\n"]}
-  end
 
   test "javascript_escape/1" do
     assert javascript_escape("") == ""

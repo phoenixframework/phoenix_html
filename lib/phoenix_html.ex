@@ -6,7 +6,7 @@ defmodule Phoenix.HTML do
   This library provides three main functionalities:
 
     * HTML safety
-    * Form handling (with CSRF protection)
+    * Form abstractions
     * A tiny JavaScript library to enhance applications
 
   ## HTML safety
@@ -74,15 +74,19 @@ defmodule Phoenix.HTML do
   """
 
   @doc false
-  # TODO: Deprecate me
   defmacro __using__(_) do
-    quote do
-      import Phoenix.HTML
-      import Phoenix.HTML.Form
-      import Phoenix.HTML.Link
-      import Phoenix.HTML.Tag, except: [attributes_escape: 1]
-      import Phoenix.HTML.Format
-    end
+    raise """
+    use Phoenix.HTML is no longer supported in v4.0.
+
+    To keep compatibility with previous versions, \
+    add {:phoenix_html_helpers, "~> 1.0"} to your mix.exs deps
+    and then, instead of "use Phoenix.HTML", you might:
+
+        import Phoenix.HTML
+        import Phoenix.HTML.Form
+        use PhoenixHTMLHelpers
+
+    """
   end
 
   @typedoc "Guaranteed to be safe"
@@ -90,36 +94,6 @@ defmodule Phoenix.HTML do
 
   @typedoc "May be safe or unsafe (i.e. it needs to be converted)"
   @type unsafe :: Phoenix.HTML.Safe.t()
-
-  @doc false
-  @deprecated "use the ~H sigil instead"
-  defmacro sigil_e(expr, opts) do
-    handle_sigil(expr, opts, __CALLER__)
-  end
-
-  @doc false
-  @deprecated "use the ~H sigil instead"
-  defmacro sigil_E(expr, opts) do
-    handle_sigil(expr, opts, __CALLER__)
-  end
-
-  defp handle_sigil({:<<>>, meta, [expr]}, [], caller) do
-    options = [
-      engine: Phoenix.HTML.Engine,
-      file: caller.file,
-      line: caller.line + 1,
-      indentation: meta[:indentation] || 0
-    ]
-
-    EEx.compile_string(expr, options)
-  end
-
-  defp handle_sigil(_, _, _) do
-    raise ArgumentError,
-          "interpolation not allowed in ~e sigil. " <>
-            "Remove the interpolation, use <%= %> to insert values, " <>
-            "or use ~E to show the interpolation literally"
-  end
 
   @doc """
   Marks the given content as raw.
