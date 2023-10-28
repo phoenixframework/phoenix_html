@@ -5,6 +5,9 @@ defmodule Phoenix.HTML.Form do
   @moduledoc ~S"""
   Define a `Phoenix.HTML.Form` struct and functions to interact with it.
 
+  For building actual forms in your Phoenix application, see
+  [the `Phoenix.Component.form/1` component](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html#form/1).
+
   ## Access behaviour
 
   The `Phoenix.HTML.Form` struct implements the `Access` behaviour.
@@ -19,6 +22,11 @@ defmodule Phoenix.HTML.Form do
   It is possible to "access" fields which do not exist in the source data
   structure. A `Phoenix.HTML.FormField` struct will be dynamically created
   with some attributes such as `name` and `id` populated.
+
+  ## Custom implementations
+
+  There is a protocol named `Phoenix.HTML.FormData` which can be implemented
+  by any data structure that wants to be cast to the `Phoenix.HTML.Form` struct.
   """
 
   alias Phoenix.HTML.Form

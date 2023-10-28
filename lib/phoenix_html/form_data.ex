@@ -1,6 +1,6 @@
 defprotocol Phoenix.HTML.FormData do
   @moduledoc """
-  Converts a data structure into a [`Phoenix.HTML.Form`](`t:Phoenix.HTML.Form.t/0`) struct.
+  Converts a data structure into a `Phoenix.HTML.Form` struct.
 
   ## Ecto integration
 
