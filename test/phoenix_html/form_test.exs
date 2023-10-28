@@ -288,4 +288,194 @@ defmodule Phoenix.HTML.FormTest do
                  ~s(<option value="quz">quz</option>) <> ~s(</optgroup>)
     end
   end
+
+  describe "to_form/4" do
+    defp nested_form(field, opts \\ []) do
+      map = %{
+        "date" => %{"year" => "2020", "month" => "4", "day" => "17"},
+        "dates" => %{
+          "0" => %{"year" => "2010", "month" => "4", "day" => "17"},
+          "1" => %{"year" => "2020", "month" => "4", "day" => "17"}
+        }
+      }
+
+      form = Phoenix.HTML.FormData.to_form(map, as: "search")
+      Phoenix.HTML.FormData.to_form(map, form, field, opts)
+    end
+
+    ## Cardinality one
+
+    test "one: without default and field is not present" do
+      [f] = nested_form(:unknown)
+      assert f.index == nil
+      assert f.impl == Phoenix.HTML.FormData.Map
+
+      assert %Phoenix.HTML.FormField{
+               id: "search_unknown_year",
+               name: "search[unknown][year]",
+               field: :year,
+               value: nil
+             } = f[:year]
+    end
+
+    test "one: without default and field is present" do
+      [f] = nested_form(:date)
+
+      assert %Phoenix.HTML.FormField{
+               id: "search_date_year",
+               name: "search[date][year]",
+               field: :year,
+               value: "2020"
+             } = f[:year]
+    end
+
+    test "one: with default and field is not present" do
+      [f] = nested_form(:unknown, default: %{year: 2015})
+
+      assert %Phoenix.HTML.FormField{
+               id: "search_unknown_year",
+               name: "search[unknown][year]",
+               field: :year,
+               value: 2015
+             } = f[:year]
+    end
+
+    test "one: with default and field is present" do
+      [f] = nested_form(:date, default: %{year: 2015})
+
+      assert %Phoenix.HTML.FormField{
+               id: "search_date_year",
+               name: "search[date][year]",
+               field: :year,
+               value: "2020"
+             } = f[:year]
+    end
+
+    test "one: with custom name and id" do
+      [f] = nested_form(:date, as: :foo, id: :bar)
+
+      assert %Phoenix.HTML.FormField{
+               id: "bar_year",
+               name: "foo[year]",
+               field: :year,
+               value: "2020"
+             } = f[:year]
+    end
+
+    # ## Cardinality many
+
+    test "many: with defaults" do
+      [f1, f2] = nested_form(:unknown, default: [%{}, %{}])
+
+      assert f1.index == 0
+
+      assert %Phoenix.HTML.FormField{
+               id: "search_unknown_0_year",
+               name: "search[unknown][0][year]",
+               field: :year,
+               value: nil
+             } = f1[:year]
+
+      assert f2.index == 1
+
+      assert %Phoenix.HTML.FormField{
+               id: "search_unknown_1_year",
+               name: "search[unknown][1][year]",
+               field: :year,
+               value: nil
+             } = f2[:year]
+    end
+
+    test "many: with default and field is present" do
+      [f1, f2] = nested_form(:dates, default: [%{year: 1000}, %{year: 1001}])
+
+      assert %Phoenix.HTML.FormField{
+               id: "search_dates_0_year",
+               name: "search[dates][0][year]",
+               field: :year,
+               value: "2010"
+             } = f1[:year]
+
+      assert %Phoenix.HTML.FormField{
+               id: "search_dates_1_year",
+               name: "search[dates][1][year]",
+               field: :year,
+               value: "2020"
+             } = f2[:year]
+    end
+
+    test "many: with name and id" do
+      [f1, f2] = nested_form(:dates, default: [%{year: 1000}, %{year: 1001}], as: :foo, id: :bar)
+
+      assert %Phoenix.HTML.FormField{
+               id: "bar_0_year",
+               name: "foo[0][year]",
+               field: :year,
+               value: "2010"
+             } = f1[:year]
+
+      assert %Phoenix.HTML.FormField{
+               id: "bar_1_year",
+               name: "foo[1][year]",
+               field: :year,
+               value: "2020"
+             } = f2[:year]
+    end
+
+    @prepend_append [
+      prepend: [%{year: 2008}],
+      append: [%{year: 2022}],
+      default: [%{year: 2012}, %{year: 2018}]
+    ]
+
+    test "many: inputs_for/4 with prepend/append and field is not present" do
+      [f0, f1, f2, f3] = nested_form(:unknown, @prepend_append)
+
+      assert %Phoenix.HTML.FormField{
+               id: "search_unknown_0_year",
+               name: "search[unknown][0][year]",
+               field: :year,
+               value: 2008
+             } = f0[:year]
+
+      assert %Phoenix.HTML.FormField{
+               id: "search_unknown_1_year",
+               name: "search[unknown][1][year]",
+               field: :year,
+               value: 2012
+             } = f1[:year]
+
+      assert %Phoenix.HTML.FormField{
+               id: "search_unknown_2_year",
+               name: "search[unknown][2][year]",
+               field: :year,
+               value: 2018
+             } = f2[:year]
+
+      assert %Phoenix.HTML.FormField{
+               id: "search_unknown_3_year",
+               name: "search[unknown][3][year]",
+               field: :year,
+               value: 2022
+             } = f3[:year]
+    end
+
+    test "many: with prepend/append and field is present" do
+      [f1, f2] = nested_form(:dates, @prepend_append)
+
+      assert %Phoenix.HTML.FormField{
+               id: "search_dates_0_year",
+               name: "search[dates][0][year]",
+               field: :year,
+               value: "2010"
+             } = f1[:year]
+
+      assert %Phoenix.HTML.FormField{
+               id: "search_dates_1_year",
+               name: "search[dates][1][year]",
+               field: :year,
+               value: "2020"
+             } = f2[:year]
+    end
+  end
 end
