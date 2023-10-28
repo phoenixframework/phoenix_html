@@ -239,4 +239,53 @@ defmodule Phoenix.HTML.FormTest do
              }
     end
   end
+
+  describe "options_for_select/2" do
+    test "simple" do
+      assert options_for_select(~w(value novalue), "novalue") |> safe_to_string() ==
+               ~s(<option value="value">value</option>) <>
+                 ~s(<option selected value="novalue">novalue</option>)
+
+      assert options_for_select(~w(value novalue), "novalue") |> safe_to_string() ==
+               ~s(<option value="value">value</option>) <>
+                 ~s(<option selected value="novalue">novalue</option>)
+
+      assert options_for_select(
+               [
+                 [value: "value", key: "Value", disabled: true],
+                 [value: "novalue", key: "No Value"]
+               ],
+               "novalue"
+             )
+             |> safe_to_string() ==
+               ~s(<option disabled value="value">Value</option>) <>
+                 ~s(<option selected value="novalue">No Value</option>)
+
+      assert options_for_select(~w(value novalue), ["value", "novalue"]) |> safe_to_string() ==
+               ~s(<option selected value="value">value</option>) <>
+                 ~s(<option selected value="novalue">novalue</option>)
+    end
+
+    test "with groups" do
+      assert options_for_select([{"foo", ~w(bar baz)}, {"qux", ~w(qux quz)}], "qux")
+             |> safe_to_string() ==
+               ~s(<optgroup label="foo">) <>
+                 ~s(<option value="bar">bar</option>) <>
+                 ~s(<option value="baz">baz</option>) <>
+                 ~s(</optgroup>) <>
+                 ~s(<optgroup label="qux">) <>
+                 ~s(<option selected value="qux">qux</option>) <>
+                 ~s(<option value="quz">quz</option>) <> ~s(</optgroup>)
+
+      assert options_for_select([{"foo", ~w(bar baz)}, {"qux", ~w(qux quz)}], ["baz", "qux"])
+             |> safe_to_string() ==
+               ~s(<optgroup label="foo">) <>
+                 ~s(<option value="bar">bar</option>) <>
+                 ~s(<option selected value="baz">baz</option>) <>
+                 ~s(</optgroup>) <>
+                 ~s(<optgroup label="qux">) <>
+                 ~s(<option selected value="qux">qux</option>) <>
+                 ~s(<option value="quz">quz</option>) <> ~s(</optgroup>)
+    end
+  end
 end
