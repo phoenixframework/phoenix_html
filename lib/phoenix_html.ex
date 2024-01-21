@@ -295,7 +295,7 @@ defmodule Phoenix.HTML do
   defp attr_escape(other), do: Phoenix.HTML.Safe.to_iodata(other)
 
   @doc """
-  Escapes HTML content to be inserted a JavaScript string.
+  Escapes HTML content to be inserted into a JavaScript string.
 
   This function is useful in JavaScript responses when there is a need
   to escape HTML rendered from other templates, like in the following:
