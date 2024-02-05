@@ -60,6 +60,7 @@ defmodule Phoenix.HTML.Form do
             id: nil,
             name: nil,
             data: nil,
+            action: nil,
             hidden: [],
             params: %{},
             errors: [],
@@ -71,6 +72,7 @@ defmodule Phoenix.HTML.Form do
           source: Phoenix.HTML.FormData.t(),
           name: String.t(),
           data: %{field => term},
+          action: atom(),
           params: %{binary => term},
           hidden: Keyword.t(),
           options: Keyword.t(),
@@ -189,18 +191,32 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Receives two forms structs and checks if the given field changed.
 
-  The field will have changed if either its associated value or errors
-  changed. This is mostly used for optimization engines as an extension
-  of the `Access` behaviour.
+  The field will have changed if either its associated value, errors,
+  action, or implementation changed. This is mostly used for optimization
+  engines as an extension of the `Access` behaviour.
   """
   @spec input_changed?(t, t, field()) :: boolean()
   def input_changed?(
-        %Form{impl: impl1, id: id1, name: name1, errors: errors1, source: source1} = form1,
-        %Form{impl: impl2, id: id2, name: name2, errors: errors2, source: source2} = form2,
+        %Form{
+          impl: impl1,
+          id: id1,
+          name: name1,
+          errors: errors1,
+          source: source1,
+          action: action1
+        } = form1,
+        %Form{
+          impl: impl2,
+          id: id2,
+          name: name2,
+          errors: errors2,
+          source: source2,
+          action: action2
+        } = form2,
         field
       )
       when is_atom(field) or is_binary(field) do
-    impl1 != impl2 or id1 != id2 or name1 != name2 or
+    impl1 != impl2 or id1 != id2 or name1 != name2 or action1 != action2 or
       field_errors(errors1, field) != field_errors(errors2, field) or
       impl1.input_value(source1, form1, field) != impl2.input_value(source2, form2, field)
   end
