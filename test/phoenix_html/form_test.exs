@@ -138,6 +138,13 @@ defmodule Phoenix.HTML.FormTest do
     assert input_changed?(form, form(%{"foo" => "bar"}), "foo")
   end
 
+  test "input_changed? with changed action or method" do
+    form = form(%{}, action: :validate, method: "post")
+    refute input_changed?(form, %{form | action: :validate, method: "post"}, :foo)
+    assert input_changed?(form, %{form | action: :save}, :foo)
+    assert input_changed?(form, %{form | method: "put"}, :foo)
+  end
+
   describe "access" do
     test "without name and atom keys" do
       form =

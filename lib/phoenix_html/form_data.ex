@@ -56,6 +56,10 @@ defprotocol Phoenix.HTML.FormData do
       applies if the field value is a list and no parameters were
       sent through the form.
 
+    * `:action` - The form action, such as the HTML `action` attribute
+      or LiveView action.
+
+    * `:method` - The form method, such as the HTML `method` attribute.
   """
   @spec to_form(t, Phoenix.HTML.Form.t(), Phoenix.HTML.Form.field(), Keyword.t()) ::
           [Phoenix.HTML.Form.t()]
@@ -79,6 +83,8 @@ defimpl Phoenix.HTML.FormData, for: Map do
   def to_form(conn_or_atom_or_map, opts) do
     {name, params, opts} = name_params_and_opts(conn_or_atom_or_map, opts)
     {errors, opts} = Keyword.pop(opts, :errors, [])
+    {action, opts} = Keyword.pop(opts, :action, nil)
+    {method, opts} = Keyword.pop(opts, :method, nil)
     id = Keyword.get(opts, :id) || name
 
     unless is_binary(id) or is_nil(id) do
@@ -93,6 +99,8 @@ defimpl Phoenix.HTML.FormData, for: Map do
       params: params,
       data: %{},
       errors: errors,
+      action: action,
+      method: method,
       options: opts
     }
   end
@@ -118,6 +126,8 @@ defimpl Phoenix.HTML.FormData, for: Map do
     {name, opts} = Keyword.pop(opts, :as)
     {id, opts} = Keyword.pop(opts, :id)
     {hidden, opts} = Keyword.pop(opts, :hidden, [])
+    {action, opts} = Keyword.pop(opts, :action)
+    {method, opts} = Keyword.pop(opts, :method)
 
     id = to_string(id || form.id <> "_#{field}")
     name = to_string(name || form.name <> "[#{field}]")
@@ -133,6 +143,8 @@ defimpl Phoenix.HTML.FormData, for: Map do
             id: id,
             name: name,
             data: default,
+            action: action,
+            method: method,
             params: params || %{},
             hidden: hidden,
             options: opts
@@ -157,6 +169,8 @@ defimpl Phoenix.HTML.FormData, for: Map do
             source: conn_or_atom_or_map,
             impl: __MODULE__,
             index: index,
+            action: action,
+            method: method,
             id: id <> "_" <> index_string,
             name: name <> "[" <> index_string <> "]",
             data: data,
