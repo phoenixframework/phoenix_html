@@ -65,7 +65,6 @@ defmodule Phoenix.HTML.Form do
             name: nil,
             data: nil,
             action: nil,
-            method: nil,
             hidden: [],
             params: %{},
             errors: [],
@@ -77,7 +76,6 @@ defmodule Phoenix.HTML.Form do
           name: String.t(),
           data: %{field => term},
           action: nil | atom() | String.t(),
-          method: nil | atom() | String.t(),
           params: %{binary => term},
           hidden: Keyword.t(),
           options: Keyword.t(),
@@ -196,7 +194,7 @@ defmodule Phoenix.HTML.Form do
   Receives two forms structs and checks if the given field changed.
 
   The field will have changed if either its associated value, errors,
-  action, method, or implementation changed. This is mostly used for optimization
+  action, or implementation changed. This is mostly used for optimization
   engines as an extension of the `Access` behaviour.
   """
   @spec input_changed?(t, t, field()) :: boolean()
@@ -207,7 +205,6 @@ defmodule Phoenix.HTML.Form do
       )
       when is_atom(field) or is_binary(field) do
     impl1 != impl2 or id1 != id2 or name1 != name2 or form1.action != form2.action or
-      form1.method != form2.method or
       field_errors(errors1, field) != field_errors(errors2, field) or
       impl1.input_value(source1, form1, field) != impl2.input_value(source2, form2, field)
   end
