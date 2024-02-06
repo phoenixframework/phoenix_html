@@ -199,12 +199,26 @@ defmodule Phoenix.HTML.Form do
   """
   @spec input_changed?(t, t, field()) :: boolean()
   def input_changed?(
-        %Form{impl: impl1, id: id1, name: name1, errors: errors1, source: source1} = form1,
-        %Form{impl: impl2, id: id2, name: name2, errors: errors2, source: source2} = form2,
+        %Form{
+          impl: impl1,
+          id: id1,
+          name: name1,
+          errors: errors1,
+          source: source1,
+          action: action1
+        } = form1,
+        %Form{
+          impl: impl2,
+          id: id2,
+          name: name2,
+          errors: errors2,
+          source: source2,
+          action: action2
+        } = form2,
         field
       )
       when is_atom(field) or is_binary(field) do
-    impl1 != impl2 or id1 != id2 or name1 != name2 or form1.action != form2.action or
+    impl1 != impl2 or id1 != id2 or name1 != name2 or action1 != action2 or
       field_errors(errors1, field) != field_errors(errors2, field) or
       impl1.input_value(source1, form1, field) != impl2.input_value(source2, form2, field)
   end
