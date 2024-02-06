@@ -75,7 +75,7 @@ defmodule Phoenix.HTML.Form do
           source: Phoenix.HTML.FormData.t(),
           name: String.t(),
           data: %{field => term},
-          action: nil | atom() | String.t(),
+          action: atom(),
           params: %{binary => term},
           hidden: Keyword.t(),
           options: Keyword.t(),
