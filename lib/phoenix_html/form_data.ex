@@ -56,8 +56,8 @@ defprotocol Phoenix.HTML.FormData do
       applies if the field value is a list and no parameters were
       sent through the form.
 
-    * `:action` - The form action, such as the HTML `action` attribute
-      or LiveView action.
+    * `:action` - The user defined action being taken by the form, such
+      as `:validate`, `:save`, etc.
   """
   @spec to_form(t, Phoenix.HTML.Form.t(), Phoenix.HTML.Form.field(), Keyword.t()) ::
           [Phoenix.HTML.Form.t()]
