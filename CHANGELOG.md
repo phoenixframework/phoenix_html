@@ -1,5 +1,8 @@
 # Changelog
 
+## v4.1.1 (2024-03-01)
+  * Fix dependency resolution error
+
 ## v4.1.0 (2024-02-29)
 
 * Enhancements
