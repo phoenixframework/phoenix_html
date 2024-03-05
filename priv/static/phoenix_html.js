@@ -1,6 +1,8 @@
 "use strict";
 
-(function() {
+(function(loaded) {
+  if (loaded) { return }
+
   var PolyfillEvent = eventConstructor();
 
   function eventConstructor() {
@@ -81,4 +83,6 @@
       e.preventDefault();
     }
   }, false);
-})();
+
+  window._phx_loaded = true;
+})(window._phx_loaded);
