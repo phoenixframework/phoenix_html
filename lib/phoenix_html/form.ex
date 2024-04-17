@@ -34,8 +34,7 @@ defmodule Phoenix.HTML.Form do
 
   Its fields are:
 
-    * `:source` - the data structure given to `form_for/4` that
-      implements the form data protocol
+    * `:source` - the data structure that implements the form data protocol
 
     * `:impl` - the module with the form data protocol implementation.
       This is used to avoid multiple protocol dispatches.
@@ -54,7 +53,7 @@ defmodule Phoenix.HTML.Form do
       submit the form behind the scenes as hidden inputs
 
     * `:options` - a copy of the options given when creating the
-      form via `form_for/4` without any form data specific key
+      form without any form data specific key
 
     * `:errors` - a keyword list of errors that are associated with
       the form
@@ -143,8 +142,7 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Returns an id of a corresponding form field.
 
-  The form should either be a `Phoenix.HTML.Form` emitted
-  by `form_for` or an atom.
+  The form should either be a `Phoenix.HTML.Form` or an atom.
   """
   @spec input_id(t | atom, field) :: String.t()
   def input_id(%{id: nil}, field), do: "#{field}"
