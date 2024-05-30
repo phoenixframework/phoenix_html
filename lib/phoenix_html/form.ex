@@ -65,22 +65,20 @@ defmodule Phoenix.HTML.Form do
             params: %{},
             errors: [],
             options: [],
-            index: nil,
-            action: nil
+            index: nil
 
   @type t :: %Form{
           source: Phoenix.HTML.FormData.t(),
           name: String.t(),
           data: %{field => term},
-          action: atom(),
+          action: nil | String.t() | atom(),
           params: %{binary => term},
           hidden: Keyword.t(),
           options: Keyword.t(),
           errors: [{field, term}],
           impl: module,
           id: String.t(),
-          index: nil | non_neg_integer,
-          action: nil | String.t()
+          index: nil | non_neg_integer
         }
 
   @type field :: atom | String.t()
