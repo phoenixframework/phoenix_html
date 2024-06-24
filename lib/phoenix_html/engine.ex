@@ -16,6 +16,7 @@ defmodule Phoenix.HTML.Engine do
   """
   def encode_to_iodata!({:safe, body}), do: body
   def encode_to_iodata!(nil), do: ""
+  def encode_to_iodata!(""), do: ""
   def encode_to_iodata!(bin) when is_binary(bin), do: html_escape(bin)
   def encode_to_iodata!(list) when is_list(list), do: Phoenix.HTML.Safe.List.to_iodata(list)
   def encode_to_iodata!(other), do: Phoenix.HTML.Safe.to_iodata(other)

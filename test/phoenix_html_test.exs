@@ -36,6 +36,12 @@ defmodule Phoenix.HTMLTest do
         html_escape(~c"foo🐥")
       end
     end
+
+    test "equivalences" do
+      # Since some HTML code may compare html_escape("") with html_escape(nil),
+      # we make sure they have equivalent representations.
+      assert html_escape("") == html_escape(nil)
+    end
   end
 
   describe "attributes_escape" do
