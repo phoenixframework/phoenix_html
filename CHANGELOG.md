@@ -10,7 +10,7 @@
 
 ## v4.0.0 (2023-12-19)
 
-This version removes deprecated functionality and moved all HTML helpers to a separate library. HTML Helpers are no longer used in new apps from Phoenix v1.7. Older applications who wish to maintain compatibility, add `{:phoenix_html_helpers, "~> 1.0"}` to your `mix.exs` and then replace `use Phoenix.HTML` in your applications by:
+This version removes deprecated functionality and moved all HTML helpers to a separate library. HTML Helpers are no longer used in new apps from Phoenix v1.7, instead it relies on function components from `Phoenix.LiveView`. Older applications who wish to maintain compatibility, add `{:phoenix_html_helpers, "~> 1.0"}` to your `mix.exs` and then replace `use Phoenix.HTML` in your applications by:
 
 ```elixir
 import Phoenix.HTML
