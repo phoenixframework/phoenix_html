@@ -297,6 +297,21 @@ defmodule Phoenix.HTML.Form do
       #=>   <option>France</option>
       #=> </optgroup>
 
+  Horizontal seperators can be added:
+
+      options_for_select(["Admin", "User", :hr, "New"], nil)
+      #=> <option>Admin</option>
+      #=> <option>User</option>
+      #=> <hr/>
+      #=> <option>New</option>
+
+      options_for_select(["Admin": "admin", "User": "user", hr: nil, "New": "new"], nil)
+      #=> <option value="admin" selected>Admin</option>
+      #=> <option value="user">User</option>
+      #=> <hr/>
+      #=> <option value="new">New</option>
+
+
   """
   def options_for_select(options, selected_values) do
     {:safe,
@@ -308,6 +323,9 @@ defmodule Phoenix.HTML.Form do
 
   defp escaped_options_for_select(options, selected_values) do
     Enum.reduce(options, [], fn
+      {:hr, nil}, acc ->
+        [acc | hr_tag()]
+
       {option_key, option_value}, acc ->
         [acc | option(option_key, option_value, [], selected_values)]
 
@@ -325,6 +343,9 @@ defmodule Phoenix.HTML.Form do
                 "expected :value key when building <option> from keyword list: #{inspect(options)}"
 
         [acc | option(option_key, option_value, options, selected_values)]
+
+      :hr, acc ->
+        [acc | hr_tag()]
 
       option, acc ->
         [acc | option(option, option, [], selected_values)]
@@ -347,6 +368,10 @@ defmodule Phoenix.HTML.Form do
   defp option_tag(name, attrs, {:safe, body}) when is_binary(name) and is_list(attrs) do
     {:safe, attrs} = Phoenix.HTML.attributes_escape(attrs)
     [?<, name, attrs, ?>, body, ?<, ?/, name, ?>]
+  end
+
+  defp hr_tag() do
+    [?<, "hr", ?/, ?>]
   end
 
   # Helper for getting field errors, handling string fields
