@@ -253,9 +253,9 @@ defmodule Phoenix.HTML.FormTest do
                  ~s(<option selected value="novalue">novalue</option>)
 
       assert options_for_select(["value", :hr, "novalue"], "novalue") |> safe_to_string() ==
-                  ~s(<option value="value">value</option>) <>
-                    ~s(<hr/>) <>
-                    ~s(<option selected value="novalue">novalue</option>)
+               ~s(<option value="value">value</option>) <>
+                 ~s(<hr/>) <>
+                 ~s(<option selected value="novalue">novalue</option>)
 
       assert options_for_select(
                [
@@ -274,10 +274,10 @@ defmodule Phoenix.HTML.FormTest do
                ~s(<option selected value="value">value</option>) <>
                  ~s(<option selected value="novalue">novalue</option>)
 
-      assert options_for_select(["Label": "value", hr: nil, "New": "new"], nil) |> safe_to_string() ==
-                  ~s(<option value="value">Label</option>) <>
-                    ~s(<hr/>) <>
-                    ~s(<option value="new">New</option>)
+      assert options_for_select([Label: "value", hr: nil, New: "new"], nil) |> safe_to_string() ==
+               ~s(<option value="value">Label</option>) <>
+                 ~s(<hr/>) <>
+                 ~s(<option value="new">New</option>)
     end
 
     test "with groups" do
