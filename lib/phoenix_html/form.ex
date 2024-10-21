@@ -297,7 +297,7 @@ defmodule Phoenix.HTML.Form do
       #=>   <option>France</option>
       #=> </optgroup>
 
-  Horizontal seperators can be added:
+  Horizontal separators can be added:
 
       options_for_select(["Admin", "User", :hr, "New"], nil)
       #=> <option>Admin</option>
