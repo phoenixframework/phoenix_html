@@ -252,31 +252,40 @@ defmodule Phoenix.HTML.FormTest do
                ~s(<option value="value">value</option>) <>
                  ~s(<option selected value="novalue">novalue</option>)
 
-      assert options_for_select(~w(value novalue), "novalue") |> safe_to_string() ==
+      assert options_for_select(["value", :hr, "novalue"], "novalue") |> safe_to_string() ==
                ~s(<option value="value">value</option>) <>
+                 ~s(<hr/>) <>
                  ~s(<option selected value="novalue">novalue</option>)
 
       assert options_for_select(
                [
                  [value: "value", key: "Value", disabled: true],
+                 :hr,
                  [value: "novalue", key: "No Value"]
                ],
                "novalue"
              )
              |> safe_to_string() ==
                ~s(<option disabled value="value">Value</option>) <>
+                 ~s(<hr/>) <>
                  ~s(<option selected value="novalue">No Value</option>)
 
       assert options_for_select(~w(value novalue), ["value", "novalue"]) |> safe_to_string() ==
                ~s(<option selected value="value">value</option>) <>
                  ~s(<option selected value="novalue">novalue</option>)
+
+      assert options_for_select([Label: "value", hr: nil, New: "new"], nil) |> safe_to_string() ==
+               ~s(<option value="value">Label</option>) <>
+                 ~s(<hr/>) <>
+                 ~s(<option value="new">New</option>)
     end
 
     test "with groups" do
-      assert options_for_select([{"foo", ~w(bar baz)}, {"qux", ~w(qux quz)}], "qux")
+      assert options_for_select([{"foo", ["bar", :hr, "baz"]}, {"qux", ~w(qux quz)}], "qux")
              |> safe_to_string() ==
                ~s(<optgroup label="foo">) <>
                  ~s(<option value="bar">bar</option>) <>
+                 ~s(<hr/>) <>
                  ~s(<option value="baz">baz</option>) <>
                  ~s(</optgroup>) <>
                  ~s(<optgroup label="qux">) <>
