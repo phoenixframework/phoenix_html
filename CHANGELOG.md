@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.2.0
+
+* Enhancements
+  * Add `Phoenix.HTML.css_escape/1` to escape strings for use inside CSS selectors
+  * Add the ability to pass `:hr` to `options_for_select/2` to render a horizontal rule
+
 ## v4.1.1 (2024-03-01)
   * Fix dependency resolution error
 
