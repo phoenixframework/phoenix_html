@@ -36,6 +36,10 @@ defmodule Phoenix.HTML.Form do
 
     * `:source` - the data structure that implements the form data protocol
 
+    * `:action` - The action that was taken against the form. This value can be
+      used to distinguish between different operations such as the user typing
+      into a form for validation, or submitting a form for a database insert.
+
     * `:impl` - the module with the form data protocol implementation.
       This is used to avoid multiple protocol dispatches.
 

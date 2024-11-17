@@ -314,7 +314,7 @@ defmodule Phoenix.HTML.FormTest do
         }
       }
 
-      form = Phoenix.HTML.FormData.to_form(map, as: "search")
+      form = Phoenix.HTML.FormData.to_form(map, as: "search", action: :validate)
       Phoenix.HTML.FormData.to_form(map, form, field, opts)
     end
 
@@ -329,6 +329,7 @@ defmodule Phoenix.HTML.FormTest do
                id: "search_unknown_year",
                name: "search[unknown][year]",
                field: :year,
+               form: %{action: :validate},
                value: nil
              } = f[:year]
     end
@@ -340,6 +341,7 @@ defmodule Phoenix.HTML.FormTest do
                id: "search_date_year",
                name: "search[date][year]",
                field: :year,
+               form: %{action: :validate},
                value: "2020"
              } = f[:year]
     end
@@ -351,6 +353,7 @@ defmodule Phoenix.HTML.FormTest do
                id: "search_unknown_year",
                name: "search[unknown][year]",
                field: :year,
+               form: %{action: :validate},
                value: 2015
              } = f[:year]
     end
@@ -362,17 +365,19 @@ defmodule Phoenix.HTML.FormTest do
                id: "search_date_year",
                name: "search[date][year]",
                field: :year,
+               form: %{action: :validate},
                value: "2020"
              } = f[:year]
     end
 
-    test "one: with custom name and id" do
-      [f] = nested_form(:date, as: :foo, id: :bar)
+    test "one: with custom name, id, and action" do
+      [f] = nested_form(:date, as: :foo, id: :bar, action: :another)
 
       assert %Phoenix.HTML.FormField{
                id: "bar_year",
                name: "foo[year]",
                field: :year,
+               form: %{action: :another},
                value: "2020"
              } = f[:year]
     end
