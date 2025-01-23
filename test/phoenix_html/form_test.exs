@@ -248,9 +248,10 @@ defmodule Phoenix.HTML.FormTest do
 
   describe "options_for_select/2" do
     test "simple" do
-      assert options_for_select(~w(value novalue), "novalue") |> safe_to_string() ==
+      assert options_for_select(["value", "novalue", nil], "novalue") |> safe_to_string() ==
                ~s(<option value="value">value</option>) <>
-                 ~s(<option selected value="novalue">novalue</option>)
+                 ~s(<option selected value="novalue">novalue</option>) <>
+                 ~s(<option value=""></option>)
 
       assert options_for_select(["value", :hr, "novalue"], "novalue") |> safe_to_string() ==
                ~s(<option value="value">value</option>) <>
@@ -261,14 +262,16 @@ defmodule Phoenix.HTML.FormTest do
                [
                  [value: "value", key: "Value", disabled: true],
                  :hr,
-                 [value: "novalue", key: "No Value"]
+                 [value: "novalue", key: "No Value"],
+                 [value: nil, key: nil]
                ],
                "novalue"
              )
              |> safe_to_string() ==
                ~s(<option disabled value="value">Value</option>) <>
                  ~s(<hr/>) <>
-                 ~s(<option selected value="novalue">No Value</option>)
+                 ~s(<option selected value="novalue">No Value</option>) <>
+                 ~s(<option value=""></option>)
 
       assert options_for_select(~w(value novalue), ["value", "novalue"]) |> safe_to_string() ==
                ~s(<option selected value="value">value</option>) <>
