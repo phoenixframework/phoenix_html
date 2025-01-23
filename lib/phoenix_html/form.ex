@@ -334,18 +334,25 @@ defmodule Phoenix.HTML.Form do
         [acc | option(option_key, option_value, [], selected_values)]
 
       options, acc when is_list(options) ->
-        if not Keyword.has_key?(options, :key) do
-          raise ArgumentError,
-                "expected :key key when building <option> from keyword list: #{inspect(options)}"
-        end
+        {option_key, options} =
+          case List.keytake(options, :key, 0) do
+            nil ->
+              raise ArgumentError,
+                    "expected :key key when building <option> from keyword list: #{inspect(options)}"
 
-        if not Keyword.has_key?(options, :value) do
-          raise ArgumentError,
-                "expected :value key when building <option> from keyword list: #{inspect(options)}"
-        end
+            {{:key, key}, options} ->
+              {key, options}
+          end
 
-        {option_key, options} = Keyword.pop(options, :key)
-        {option_value, options} = Keyword.pop(options, :value)
+        {option_value, options} =
+          case List.keytake(options, :value, 0) do
+            nil ->
+              raise ArgumentError,
+                    "expected :value key when building <option> from keyword list: #{inspect(options)}"
+
+            {{:value, value}, options} ->
+              {value, options}
+          end
 
         [acc | option(option_key, option_value, options, selected_values)]
 
