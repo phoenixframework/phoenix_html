@@ -17,17 +17,23 @@ defmodule Phoenix.HTML do
   By default, data output in templates is not considered
   safe:
 
-      <%= "<hello>" %>
+  ```heex
+  <%= "<hello>" %>
+  ```
 
   will be shown as:
 
-      &lt;hello&gt;
+  ```html
+  &lt;hello&gt;
+  ```
 
   User data or data coming from the database is almost never
   considered safe. However, in some cases, you may want to tag
   it as safe and show its "raw" contents:
 
-      <%= raw "<hello>" %>
+  ```heex
+  <%= raw "<hello>" %>
+  ```
 
   ## Form handling
 

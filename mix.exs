@@ -34,7 +34,7 @@ defmodule PhoenixHTML.Mixfile do
     [
       {:ex_doc, ">= 0.0.0", only: :docs},
       {:makeup_eex, ">= 0.1.1", only: :docs},
-      {:makeup_diff, "~> 0.1", only: :docs}
+      {:makeup_syntect, "~> 0.1.0", only: :docs}
     ]
   end
 
