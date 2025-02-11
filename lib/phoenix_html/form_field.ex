@@ -12,6 +12,15 @@ defmodule Phoenix.HTML.FormField do
     * `:value` - the value for the input
 
   """
+  @type t :: %__MODULE__{
+          id: String.t(),
+          name: String.t(),
+          errors: [term],
+          field: Phoenix.HTML.Form.field(),
+          form: Phoenix.HTML.Form.t(),
+          value: term
+        }
+
   @enforce_keys [:id, :name, :errors, :field, :form, :value]
   defstruct [:id, :name, :errors, :field, :form, :value]
 end
