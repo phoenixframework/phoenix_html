@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.2.1 (2025-02-21)
+
+* Enhancements
+  * Add type to `Phoenix.HTML.FormField`
+  * Allow keyword lists in options to use nil as key/value
+
 ## 4.2.0 (2024-12-28)
 
 * Enhancements
