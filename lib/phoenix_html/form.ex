@@ -273,10 +273,25 @@ defmodule Phoenix.HTML.Form do
   end
 
   @doc """
-  Returns options to be used inside a select.
+  Returns options to be used inside a select element.
 
-  This is useful when building the select by hand.
-  It expects all options and one or more select values.
+  `options` is expected to be an enumerable which will be used to
+  generate each `option` element. The function supports different data
+  for the individual elements:
+    * keyword lists - each keyword list is expected to have the keys
+      `:key` and `:value`. Additional keys such as `:disabled` may
+      be given to customize the option.
+    * two-item tuples - where the first element is an atom, string or
+      integer to be used as the option label and the second element is
+      an atom, string or integer to be used as the option value
+    * simple atom, string or integer - which will be used as both label and value
+      for the generated select
+    
+  ## Option groups
+  If `options` is map or keyword list where the first element is a string,
+  atom or integer and the second element is a list or a map, it is assumed
+  the key will be wrapped in an `<optgroup>` and the value will be used to
+  generate `<options>` nested under the group.
 
   ## Examples
 
@@ -292,7 +307,7 @@ defmodule Phoenix.HTML.Form do
       #=> <option value="user">User</option>
       #=> <option value="moderator" selected>Moderator</option>
 
-  Groups are also supported:
+  Groups:
 
       options_for_select(["Europe": ["UK", "Sweden", "France"], ...], nil)
       #=> <optgroup label="Europe">
