@@ -278,6 +278,7 @@ defmodule Phoenix.HTML.Form do
   `options` is expected to be an enumerable which will be used to
   generate each `option` element. The function supports different data
   for the individual elements:
+
     * keyword lists - each keyword list is expected to have the keys
       `:key` and `:value`. Additional keys such as `:disabled` may
       be given to customize the option.
@@ -288,6 +289,7 @@ defmodule Phoenix.HTML.Form do
       for the generated select
     
   ## Option groups
+
   If `options` is map or keyword list where the first element is a string,
   atom or integer and the second element is a list or a map, it is assumed
   the key will be wrapped in an `<optgroup>` and the value will be used to
