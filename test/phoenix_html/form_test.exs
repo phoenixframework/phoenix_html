@@ -168,6 +168,9 @@ defmodule Phoenix.HTML.FormTest do
                name: "atom",
                errors: ["oops"]
              }
+
+      assert form[:key][:id] == "key"
+      assert form[:atom][:value] == "data"
     end
 
     test "with name and atom keys" do
@@ -193,6 +196,9 @@ defmodule Phoenix.HTML.FormTest do
                name: "search[atom]",
                errors: ["oops"]
              }
+
+      assert form[:key][:id] == "search_key"
+      assert form[:atom][:value] == "data"
     end
 
     test "without name and string keys" do
@@ -218,6 +224,9 @@ defmodule Phoenix.HTML.FormTest do
                name: "string",
                errors: ["oops"]
              }
+
+      assert form["key"][:id] == "key"
+      assert form["string"][:value] == "data"
     end
 
     test "with name and string keys" do
@@ -243,6 +252,9 @@ defmodule Phoenix.HTML.FormTest do
                name: "search[string]",
                errors: ["oops"]
              }
+
+      assert form["key"][:id] == "search_key"
+      assert form["string"][:value] == "data"
     end
   end
 
