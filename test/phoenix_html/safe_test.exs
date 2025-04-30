@@ -62,9 +62,11 @@ defmodule Phoenix.HTML.SafeTest do
     assert Safe.to_iodata(datetime) == "2000-01-01T12:13:14+00:30"
   end
 
-  test "impl for Duration" do
-    duration = Duration.new!(month: 1)
-    assert Safe.to_iodata(duration) == "P1M"
+  if Code.ensure_loaded?(Duration) do
+    test "impl for Duration" do
+      duration = Duration.new!(month: 1)
+      assert Safe.to_iodata(duration) == "P1M"
+    end
   end
 
   test "impl for URI" do
