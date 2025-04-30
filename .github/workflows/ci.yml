@@ -13,13 +13,13 @@ jobs:
     strategy:
       matrix:
         include:
-          - elixir: 1.7
-            otp: 21.3
-          - elixir: 1.14
-            otp: 25.3
+          - elixir: 1.12
+            otp: 24.3
+          - elixir: 1.18
+            otp: 27.2
             lint: lint
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout
