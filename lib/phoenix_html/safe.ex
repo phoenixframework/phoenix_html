@@ -44,6 +44,10 @@ defimpl Phoenix.HTML.Safe, for: DateTime do
   end
 end
 
+defimpl Phoenix.HTML.Safe, for: Duration do
+  defdelegate to_iodata(data), to: Duration, as: :to_iso8601
+end
+
 defimpl Phoenix.HTML.Safe, for: List do
   def to_iodata(list), do: recur(list)
 
