@@ -268,6 +268,10 @@ defmodule Phoenix.HTML.Form do
     html_escape(value) == {:safe, "true"}
   end
 
+  def normalize_value("file", _value) do
+    ""
+  end
+
   def normalize_value(_type, value) do
     value
   end
