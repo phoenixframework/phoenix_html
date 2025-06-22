@@ -252,6 +252,9 @@ defmodule Phoenix.HTML.Form do
       won't be ignored on submission. This requires however
       that the textarea is rendered with no spaces after its
       content
+
+    * For "file", it returns an empty string because file path
+      can't be set programmatically.
   """
   def normalize_value("datetime-local", %struct{} = value)
       when struct in [NaiveDateTime, DateTime] do
