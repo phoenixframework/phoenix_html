@@ -253,6 +253,8 @@ defmodule Phoenix.HTML.Form do
       that the textarea is rendered with no spaces after its
       content
   """
+  def normalize_value(type, value)
+
   def normalize_value("datetime-local", %struct{} = value)
       when struct in [NaiveDateTime, DateTime] do
     <<date::10-binary, ?\s, hour_minute::5-binary, _rest::binary>> = struct.to_string(value)
