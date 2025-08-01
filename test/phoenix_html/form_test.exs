@@ -295,6 +295,47 @@ defmodule Phoenix.HTML.FormTest do
                  ~s(<option value="new">New</option>)
     end
 
+    test "with custom option tag" do
+      assert options_for_select(["value", "novalue", nil], "novalue", tag: "el-option")
+             |> safe_to_string() ==
+               ~s(<el-option value="value">value</el-option>) <>
+                 ~s(<el-option selected value="novalue">novalue</el-option>) <>
+                 ~s(<el-option value=""></el-option>)
+
+      assert options_for_select(["value", :hr, "novalue"], "novalue", tag: "el-option")
+             |> safe_to_string() ==
+               ~s(<el-option value="value">value</el-option>) <>
+                 ~s(<hr/>) <>
+                 ~s(<el-option selected value="novalue">novalue</el-option>)
+
+      assert options_for_select(
+               [
+                 [value: "value", key: "Value", disabled: true],
+                 :hr,
+                 [value: "novalue", key: "No Value"],
+                 [value: nil, key: nil]
+               ],
+               "novalue",
+               tag: "el-option"
+             )
+             |> safe_to_string() ==
+               ~s(<el-option disabled value="value">Value</el-option>) <>
+                 ~s(<hr/>) <>
+                 ~s(<el-option selected value="novalue">No Value</el-option>) <>
+                 ~s(<el-option value=""></el-option>)
+
+      assert options_for_select(~w(value novalue), ["value", "novalue"], tag: "el-option")
+             |> safe_to_string() ==
+               ~s(<el-option selected value="value">value</el-option>) <>
+                 ~s(<el-option selected value="novalue">novalue</el-option>)
+
+      assert options_for_select([Label: "value", hr: nil, New: "new"], nil, tag: "el-option")
+             |> safe_to_string() ==
+               ~s(<el-option value="value">Label</el-option>) <>
+                 ~s(<hr/>) <>
+                 ~s(<el-option value="new">New</el-option>)
+    end
+
     test "with groups" do
       assert options_for_select([{"foo", ["bar", :hr, "baz"]}, {"qux", ~w(qux quz)}], "qux")
              |> safe_to_string() ==
