@@ -293,6 +293,19 @@ defmodule Phoenix.HTML.FormTest do
                ~s(<option value="value">Label</option>) <>
                  ~s(<hr/>) <>
                  ~s(<option value="new">New</option>)
+
+      assert options_for_select(
+               [
+                 {"Open", ~U[2025-01-01 06:30:00.000000Z]},
+                 {"Close", ~U[2025-01-01 18:30:00.000000Z]}
+               ],
+               [
+                 ~U[2025-01-01 06:30:00.000000Z]
+               ]
+             )
+             |> safe_to_string() ==
+               ~s(<option selected value="2025-01-01T06:30:00.000000Z">Open</option>) <>
+                 ~s(<option value="2025-01-01T18:30:00.000000Z">Close</option>)
     end
 
     test "with custom option tag" do
