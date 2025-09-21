@@ -391,7 +391,8 @@ defmodule Phoenix.HTML.Form do
   end
 
   defp option(group_label, group_values, extra, value)
-       when is_list(group_values) or is_map(group_values) do
+       when is_list(group_values) or
+              (is_map(group_values) and not is_map_key(group_values, :__struct__)) do
     section_options = escaped_options_for_select(group_values, value, extra)
     option_tag("optgroup", [label: group_label], {:safe, section_options})
   end
