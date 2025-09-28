@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.3.0 (2025-09-28)
+
+* Enhancements
+  * Implement `Phoenix.HTML.Safe` for Duration
+  * Add function head for argument names of `normalize_value/2` to improve documentation
+  * Allow custom tags in options_for_select
+  * Allow datetime as form option values
+
+* Bug fixes
+  * Avoid false positive warnings on Elixir v1.19
+
 ## 4.2.1 (2025-02-21)
 
 * Enhancements
