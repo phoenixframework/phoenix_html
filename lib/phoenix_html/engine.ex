@@ -146,8 +146,9 @@ defmodule Phoenix.HTML.Engine do
   # We need to check at runtime and we do so by optimizing common cases.
   defp to_safe(expr, line) do
     # Keep stacktraces for protocol dispatch and coverage
+    # bin_return uses generated: true to make Elixir's type system on v1.19 happy
     safe_return = quote line: line, do: data
-    bin_return = quote line: line, do: Phoenix.HTML.Engine.html_escape(bin)
+    bin_return = quote line: line, generated: true, do: Phoenix.HTML.Engine.html_escape(bin)
     other_return = quote line: line, do: Phoenix.HTML.Safe.to_iodata(other)
 
     # However ignore them for the generated clauses to avoid warnings
