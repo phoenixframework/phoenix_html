@@ -37,7 +37,8 @@ defmodule Phoenix.HTML do
 
   ## Form handling
 
-  See `Phoenix.HTML.Form`.
+  This libraries also provides an abstraction and a protocol
+  to build forms. See `Phoenix.HTML.Form`.
 
   ## JavaScript library
 
