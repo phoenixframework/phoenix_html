@@ -380,7 +380,11 @@ defmodule Phoenix.HTML.Form do
               {value, options}
           end
 
-        [acc | option(option_key, option_value, extra ++ options, selected_values)]
+        if option_key == :hr do
+          [acc | hr_tag()]
+        else
+          [acc | option(option_key, option_value, extra ++ options, selected_values)]
+        end
 
       :hr, acc ->
         [acc | hr_tag()]

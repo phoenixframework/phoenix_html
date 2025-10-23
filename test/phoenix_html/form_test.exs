@@ -296,6 +296,19 @@ defmodule Phoenix.HTML.FormTest do
 
       assert options_for_select(
                [
+                 [key: "First", value: "first"],
+                 [key: :hr, value: nil],
+                 [key: "Last", value: "last"]
+               ],
+               nil
+             )
+             |> safe_to_string() ==
+               ~s(<option value="first">First</option>) <>
+                 ~s(<hr/>) <>
+                 ~s(<option value="last">Last</option>)
+
+      assert options_for_select(
+               [
                  {"Open", ~U[2025-01-01 06:30:00.000000Z]},
                  {"Close", ~U[2025-01-01 18:30:00.000000Z]}
                ],
