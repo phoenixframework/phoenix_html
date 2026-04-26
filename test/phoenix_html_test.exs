@@ -133,6 +133,21 @@ defmodule Phoenix.HTMLTest do
       end
     end
 
+    test "raises on invalid binary attribute name" do
+      for invalid <- ["", "foo\"bar", "foo'bar", "foo>bar", "foo/bar", "foo=bar",
+                      "foo\tbar", "foo\nbar", "foo\0bar", "foo\x7Fbar"] do
+        assert_raise ArgumentError, ~r/expected attribute name/, fn ->
+          attributes_escape([{invalid, "value"}])
+        end
+      end
+    end
+
+    test "raises on invalid binary nested attribute name" do
+      assert_raise ArgumentError, ~r/expected attribute name/, fn ->
+        attributes_escape([{"data", [{"a=b", "1"}]}])
+      end
+    end
+
     test "suppress attribute when value is falsy" do
       assert attributes_escape([{"title", nil}]) |> safe_to_string() == ~s()
       assert attributes_escape([{"title", false}]) |> safe_to_string() == ~s()

@@ -293,7 +293,27 @@ defmodule Phoenix.HTML do
   end
 
   defp key_escape(value) when is_atom(value), do: String.replace(Atom.to_string(value), "_", "-")
+  defp key_escape(value) when is_binary(value), do: validate_attr_name!(value)
   defp key_escape(value), do: attr_escape(value)
+
+  @invalid_attr_chars ~c"\"'>/="
+
+  defp validate_attr_name!(name) do
+    if name != "" and valid_attr_name?(name) do
+      name
+    else
+      raise ArgumentError,
+            "expected attribute name to be a non-empty string not containing any of " <>
+              "#{inspect(List.to_string(@invalid_attr_chars))}, control characters, or DEL, " <>
+              "got: #{inspect(name)}"
+    end
+  end
+
+  defp valid_attr_name?(<<c, rest::binary>>),
+    do: c > 0x1F and c != 0x7F and c not in @invalid_attr_chars and valid_attr_name?(rest)
+
+  defp valid_attr_name?(<<>>),
+    do: true
 
   defp attr_escape({:safe, data}), do: data
   defp attr_escape(nil), do: []
