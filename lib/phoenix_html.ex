@@ -329,6 +329,12 @@ defmodule Phoenix.HTML do
       $("#container").append("<%= javascript_escape(render("post.html", post: @post)) %>");
 
   It escapes quotes (double and single), double backslashes and others.
+
+  > #### Do not inject into template literals {: .error}
+  >
+  > Do not inject the result of `javascript_escape` into JavaScript
+  > template literals (defined with backticks), given template functions
+  > can change the meaning of the string in unsafe ways.
   """
   @spec javascript_escape(binary) :: binary
   @spec javascript_escape(safe) :: safe
@@ -353,7 +359,7 @@ defmodule Phoenix.HTML do
   defp javascript_escape(<<"\r\n", t::binary>>, acc),
     do: javascript_escape(t, <<acc::binary, ?\\, ?n>>)
 
-  defp javascript_escape(<<h, t::binary>>, acc) when h in [?", ?', ?\\, ?`],
+  defp javascript_escape(<<h, t::binary>>, acc) when h in [?", ?', ?\\, ?`, ?$],
     do: javascript_escape(t, <<acc::binary, ?\\, h>>)
 
   defp javascript_escape(<<h, t::binary>>, acc) when h in [?\r, ?\n],

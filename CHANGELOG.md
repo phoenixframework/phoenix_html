@@ -190,7 +190,7 @@ use PhoenixHTMLHelpers
 
 * Enhancements
   * Allow safe content to be given to label
-  * Also escale template literals in `javascript_escape/1`
+  * Also escape template literals in `javascript_escape/1`
 
 * Bug fixes
   * Fix deprecation warnings to point to the correct alternative

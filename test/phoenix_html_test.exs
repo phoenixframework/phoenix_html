@@ -9,7 +9,7 @@ defmodule Phoenix.HTMLTest do
     assert javascript_escape("\\Double backslash") == "\\\\Double backslash"
     assert javascript_escape("\"Double quote\"") == "\\\"Double quote\\\""
     assert javascript_escape("'Single quote'") == "\\'Single quote\\'"
-    assert javascript_escape("`Backtick`") == "\\`Backtick\\`"
+    assert javascript_escape("`Bac${kt}ick`") == "\\`Bac\\${kt}ick\\`"
     assert javascript_escape("New line\r") == "New line\\n"
     assert javascript_escape("New line\n") == "New line\\n"
     assert javascript_escape("New line\r\n") == "New line\\n"
@@ -134,8 +134,18 @@ defmodule Phoenix.HTMLTest do
     end
 
     test "raises on invalid binary attribute name" do
-      for invalid <- ["", "foo\"bar", "foo'bar", "foo>bar", "foo/bar", "foo=bar",
-                      "foo\tbar", "foo\nbar", "foo\0bar", "foo\x7Fbar"] do
+      for invalid <- [
+            "",
+            "foo\"bar",
+            "foo'bar",
+            "foo>bar",
+            "foo/bar",
+            "foo=bar",
+            "foo\tbar",
+            "foo\nbar",
+            "foo\0bar",
+            "foo\x7Fbar"
+          ] do
         assert_raise ArgumentError, ~r/expected attribute name/, fn ->
           attributes_escape([{invalid, "value"}])
         end
