@@ -167,9 +167,23 @@ defmodule Phoenix.HTML.Form do
   @spec input_id(t | atom, field, Phoenix.HTML.Safe.t()) :: String.t()
   def input_id(name, field, value) do
     {:safe, value} = html_escape(value)
-    value_id = value |> IO.iodata_to_binary() |> String.replace(~r/\W/u, "_")
+    # Avoid String.replace/3 + Regex for AtomVM (no Elixir.String module).
+    # Approximate ~r/\W/u by replacing non [A-Za-z0-9_] codepoints with "_".
+    value_id = value |> IO.iodata_to_binary() |> non_word_to_underscore()
     input_id(name, field) <> "_" <> value_id
   end
+
+  defp non_word_to_underscore(bin) when is_binary(bin) do
+    for <<c::utf8 <- bin>>, into: <<>> do
+      if word_char?(c), do: <<c::utf8>>, else: <<?_>>
+    end
+  end
+
+  defp word_char?(c) when c in ?0..?9, do: true
+  defp word_char?(c) when c in ?A..?Z, do: true
+  defp word_char?(c) when c in ?a..?z, do: true
+  defp word_char?(?_), do: true
+  defp word_char?(_), do: false
 
   @doc """
   Returns a name of a corresponding form field.
