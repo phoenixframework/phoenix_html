@@ -24,23 +24,32 @@ defimpl Phoenix.HTML.Safe, for: BitString do
   defdelegate to_iodata(data), to: Phoenix.HTML.Engine, as: :html_escape
 end
 
-defimpl Phoenix.HTML.Safe, for: Time do
-  defdelegate to_iodata(data), to: Time, as: :to_iso8601
+# Guard calendar/URI impls: AtomVM may not ship these modules.
+if Code.ensure_loaded?(Time) do
+  defimpl Phoenix.HTML.Safe, for: Time do
+    defdelegate to_iodata(data), to: Time, as: :to_iso8601
+  end
 end
 
-defimpl Phoenix.HTML.Safe, for: Date do
-  defdelegate to_iodata(data), to: Date, as: :to_iso8601
+if Code.ensure_loaded?(Date) do
+  defimpl Phoenix.HTML.Safe, for: Date do
+    defdelegate to_iodata(data), to: Date, as: :to_iso8601
+  end
 end
 
-defimpl Phoenix.HTML.Safe, for: NaiveDateTime do
-  defdelegate to_iodata(data), to: NaiveDateTime, as: :to_iso8601
+if Code.ensure_loaded?(NaiveDateTime) do
+  defimpl Phoenix.HTML.Safe, for: NaiveDateTime do
+    defdelegate to_iodata(data), to: NaiveDateTime, as: :to_iso8601
+  end
 end
 
-defimpl Phoenix.HTML.Safe, for: DateTime do
-  def to_iodata(data) do
-    # Call escape in case someone can inject reserved
-    # characters in the timezone or its abbreviation
-    Phoenix.HTML.Engine.html_escape(DateTime.to_iso8601(data))
+if Code.ensure_loaded?(DateTime) do
+  defimpl Phoenix.HTML.Safe, for: DateTime do
+    def to_iodata(data) do
+      # Call escape in case someone can inject reserved
+      # characters in the timezone or its abbreviation
+      Phoenix.HTML.Engine.html_escape(DateTime.to_iso8601(data))
+    end
   end
 end
 
@@ -100,6 +109,8 @@ defimpl Phoenix.HTML.Safe, for: Tuple do
   def to_iodata(value), do: raise(Protocol.UndefinedError, protocol: @protocol, value: value)
 end
 
-defimpl Phoenix.HTML.Safe, for: URI do
-  def to_iodata(data), do: Phoenix.HTML.Engine.html_escape(URI.to_string(data))
+if Code.ensure_loaded?(URI) do
+  defimpl Phoenix.HTML.Safe, for: URI do
+    def to_iodata(data), do: Phoenix.HTML.Engine.html_escape(URI.to_string(data))
+  end
 end

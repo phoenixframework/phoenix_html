@@ -292,9 +292,16 @@ defmodule Phoenix.HTML do
     |> Enum.join(" ")
   end
 
-  defp key_escape(value) when is_atom(value), do: String.replace(Atom.to_string(value), "_", "-")
+  # AtomVM has no Elixir.String; avoid String.replace/3 for attribute key mapping.
+  defp key_escape(value) when is_atom(value), do: underscore_to_dash(Atom.to_string(value))
   defp key_escape(value) when is_binary(value), do: validate_attr_name!(value)
   defp key_escape(value), do: attr_escape(value)
+
+  defp underscore_to_dash(bin) when is_binary(bin) do
+    for <<c <- bin>>, into: <<>> do
+      if c == ?_, do: <<?->>, else: <<c>>
+    end
+  end
 
   @invalid_attr_chars ~c"\"'>/="
 
@@ -387,10 +394,15 @@ defmodule Phoenix.HTML do
     # This is a direct translation of
     # https://github.com/mathiasbynens/CSS.escape/blob/master/css.escape.js
     # into Elixir.
+    # Avoid String.to_charlist/1 for AtomVM (no Elixir.String module).
     value
-    |> String.to_charlist()
+    |> utf8_charlist()
     |> escape_css_chars()
     |> IO.iodata_to_binary()
+  end
+
+  defp utf8_charlist(bin) when is_binary(bin) do
+    for <<c::utf8 <- bin>>, do: c
   end
 
   defp escape_css_chars(chars) do
