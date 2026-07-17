@@ -90,21 +90,41 @@ defmodule Phoenix.HTML.Form do
 
   @type field :: atom | String.t()
 
+  def fetch_field(%Form{} = form, field) when is_atom(field) or is_binary(field) do
+    {:ok, field_struct} = fetch(form, field)
+    field_struct
+  end
+
+  @behaviour Access
+
   @doc false
+  @impl Access
   def fetch(%Form{} = form, field) when is_atom(field) do
-    fetch(form, field, Atom.to_string(field))
+    build_form_field(form, field, Atom.to_string(field))
   end
 
+  @impl Access
   def fetch(%Form{} = form, field) when is_binary(field) do
-    fetch(form, field, field)
+    build_form_field(form, field, field)
   end
 
+  @impl Access
   def fetch(%Form{}, field) do
     raise ArgumentError,
           "accessing a form with form[field] requires the field to be an atom or a string, got: #{inspect(field)}"
   end
 
-  defp fetch(%{errors: errors} = form, field, field_as_string) do
+  @impl Access
+  def get_and_update(_form, _key, _fun) do
+    raise ArgumentError, "cannot get_and_update keys from a Phoenix.HTML.Form"
+  end
+
+  @impl Access
+  def pop(_form, _key) do
+    raise ArgumentError, "cannot pop keys from a Phoenix.HTML.Form"
+  end
+
+  defp build_form_field(%{errors: errors} = form, field, field_as_string) do
     {:ok,
      %Phoenix.HTML.FormField{
        errors: field_errors(errors, field),
@@ -428,9 +448,13 @@ defmodule Phoenix.HTML.Form do
     [?<, "hr", ?/, ?>]
   end
 
-  # Helper for getting field errors, handling string fields
+  # Helper for getting field errors, handling string fields.
+  # AtomVM: avoid `for` comprehensions (elixir_erl_pass).
   defp field_errors(errors, field)
        when is_list(errors) and (is_atom(field) or is_binary(field)) do
-    for {^field, error} <- errors, do: error
+    Enum.flat_map(errors, fn
+      {^field, error} -> [error]
+      _ -> []
+    end)
   end
 end
