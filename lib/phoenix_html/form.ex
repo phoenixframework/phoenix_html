@@ -238,7 +238,7 @@ defmodule Phoenix.HTML.Form do
   @doc """
   Normalizes an input `value` according to its input `type`.
 
-  Certain HTML input values must be cast, or they will have idiosyncracies
+  Certain HTML input values must be cast, or they will have idiosyncrasies
   when they are rendered. The goal of this function is to encapsulate
   this logic. In particular:
 
