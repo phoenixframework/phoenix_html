@@ -115,6 +115,10 @@ defmodule Phoenix.HTML.FormTest do
       assert safe_to_string(normalize_value("textarea", nil)) == "\n"
     end
 
+    test "for file" do
+      assert normalize_value("file", "<any>") == ""
+    end
+
     test "for anything else" do
       assert normalize_value("foo", "<other>") == "<other>"
     end
