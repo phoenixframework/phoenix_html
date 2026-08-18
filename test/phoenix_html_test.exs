@@ -21,6 +21,18 @@ defmodule Phoenix.HTMLTest do
     assert javascript_escape({:safe, ["'Single quote'"]}) == {:safe, "\\'Single quote\\'"}
   end
 
+  test "json_escape/1" do
+    assert json_escape("") == {:safe, ""}
+
+    assert ~s({"data":"</script><!--&>"})
+           |> json_escape()
+           |> safe_to_string() == ~S({"data":"\u003C/script\u003E\u003C!--\u0026\u003E"})
+
+    assert ~S({"data":"\"quotes\" and \\slashes"})
+           |> json_escape()
+           |> safe_to_string() == ~S({"data":"\"quotes\" and \\slashes"})
+  end
+
   describe "html_escape" do
     test "escapes entities" do
       assert html_escape("foo") == {:safe, "foo"}
