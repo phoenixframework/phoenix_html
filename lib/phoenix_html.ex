@@ -371,6 +371,64 @@ defmodule Phoenix.HTML do
 
   defp javascript_escape(<<>>, acc), do: acc
 
+  @doc ~S"""
+  Escapes encoded JSON for safe insertion into an HTML script tag.
+
+  The given JSON must already be encoded. The characters `<`, `>`, and `&`
+  are encoded as JSON Unicode escape sequences and the result is marked as
+  HTML safe.
+
+      iex> json = ~s({"name":"</script>"})
+      iex> json |> json_escape() |> safe_to_string()
+      "{\"name\":\"\\u003C/script\\u003E\"}"
+
+  """
+  @spec json_escape(binary) :: safe
+  def json_escape(data) when is_binary(data) do
+    {:safe, json_escape(data, 0, data, [])}
+  end
+
+  escapes = [
+    {?<, "\\u003C"},
+    {?>, "\\u003E"},
+    {?&, "\\u0026"}
+  ]
+
+  for {match, insert} <- escapes do
+    defp json_escape(<<unquote(match), rest::bits>>, skip, original, acc) do
+      json_escape(rest, skip + 1, original, [acc | unquote(insert)])
+    end
+  end
+
+  defp json_escape(<<_char, rest::bits>>, skip, original, acc) do
+    json_escape(rest, skip, original, acc, 1)
+  end
+
+  defp json_escape(<<>>, 0, original, _acc) do
+    original
+  end
+
+  defp json_escape(<<>>, _skip, _original, acc) do
+    acc
+  end
+
+  for {match, insert} <- escapes do
+    defp json_escape(<<unquote(match), rest::bits>>, skip, original, acc, len) do
+      part = binary_part(original, skip, len)
+      json_escape(rest, skip + len + 1, original, [acc, part | unquote(insert)], 0)
+    end
+  end
+
+  defp json_escape(<<_char, rest::bits>>, skip, original, acc, len) do
+    json_escape(rest, skip, original, acc, len + 1)
+  end
+
+  defp json_escape(<<>>, 0, original, _acc, _len), do: original
+
+  defp json_escape(<<>>, skip, original, acc, len) do
+    [acc | binary_part(original, skip, len)]
+  end
+
   @doc """
   Escapes a string for use as a CSS identifier.
 
