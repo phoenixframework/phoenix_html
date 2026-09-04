@@ -415,7 +415,7 @@ defmodule Phoenix.HTML do
   for {match, insert} <- escapes do
     defp json_escape(<<unquote(match), rest::bits>>, skip, original, acc, len) do
       part = binary_part(original, skip, len)
-      json_escape(rest, skip + len + 1, original, [acc, part | unquote(insert)], 0)
+      json_escape(rest, skip + len + 1, original, [acc, part | unquote(insert)])
     end
   end
 
