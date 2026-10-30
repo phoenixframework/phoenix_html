@@ -161,30 +161,12 @@ defmodule Phoenix.HTMLTest do
       end
     end
 
-    test "raises on invalid atom attribute name" do
-      for invalid <- [
-            :"",
-            :"foo\"bar",
-            :"foo'bar",
-            :"foo>bar",
-            :"foo/bar",
-            :"foo=bar",
-            :"foo bar"
-          ] do
-        assert_raise ArgumentError, ~r/expected attribute name/, fn ->
-          attributes_escape([{invalid, "value"}])
-        end
-      end
-    end
+    test "handle atom attribute name without validation" do
+      assert attributes_escape([{:"foo bar", "baz"}]) |> safe_to_string() == ~s( foo bar="baz")
+      assert attributes_escape([{:"foo bar", true}]) |> safe_to_string() == ~s( foo bar)
 
-    test "raises on invalid atom nested attribute name" do
-      assert_raise ArgumentError, ~r/expected attribute name/, fn ->
-        attributes_escape([{:data, [{:"a b", "1"}]}])
-      end
-
-      assert_raise ArgumentError, ~r/expected attribute name/, fn ->
-        attributes_escape(aria: [{:"x\"><script>", "y"}])
-      end
+      assert attributes_escape(data: [{:"a b", "1"}]) |> safe_to_string() ==
+               ~s( data-a b="1")
     end
 
     test "raises on invalid attribute name in map" do
@@ -199,21 +181,21 @@ defmodule Phoenix.HTMLTest do
       end
 
       assert_raise ArgumentError, ~r/expected attribute name/, fn ->
-        attributes_escape([{:"x onmouseover=alert(1)", true}])
+        attributes_escape([{"x onmouseover=alert(1)", true}])
       end
 
       assert_raise ArgumentError, ~r/expected attribute name/, fn ->
-        attributes_escape(phx: [{:"x onclick=alert(1)", true}])
+        attributes_escape(phx: [{"x onclick=alert(1)", true}])
       end
     end
 
     test "raises on invalid attribute name in deeply nested attributes" do
       assert_raise ArgumentError, ~r/expected attribute name/, fn ->
-        attributes_escape(data: [{:"a b", [{:c, "d"}]}])
+        attributes_escape(data: [{"a b", [{:c, "d"}]}])
       end
 
       assert_raise ArgumentError, ~r/expected attribute name/, fn ->
-        attributes_escape(data: [{:a, [{:"c d", "e"}]}])
+        attributes_escape(data: [{:a, [{"c d", "e"}]}])
       end
     end
 

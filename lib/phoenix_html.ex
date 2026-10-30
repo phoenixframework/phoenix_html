@@ -184,8 +184,10 @@ defmodule Phoenix.HTML do
 
   The keys and values can be of any shape, as long as they
   implement the `Phoenix.HTML.Safe` protocol. In addition,
-  if the key is an atom, it will be "dasherized". In other
-  words, `:phx_value_id` will be converted to `phx-value-id`.
+  if the key is an atom, it will be "dasherized" and emitted as is
+  without validation. In other words, `:phx_value_id` will be
+  converted to `phx-value-id`. Any `raw/1` values are emitted
+  without validation.
 
   Furthermore, the following attributes provide behaviour:
 
@@ -316,7 +318,7 @@ defmodule Phoenix.HTML do
   defp key_escape({:safe, value}), do: value
 
   defp key_escape(value) when is_atom(value),
-    do: value |> Atom.to_string() |> String.replace("_", "-") |> validate_attr_name!()
+    do: value |> Atom.to_string() |> String.replace("_", "-")
 
   defp key_escape(value) when is_binary(value), do: validate_attr_name!(value)
 
