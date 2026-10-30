@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.4.0 (2026-10-30)
+
+* Security
+  * Validate attribute names to prevent attribute injection for user-supplied attributes ([CVE-2026-117645](https://cna.erlef.org/cves/CVE-2026-117645.html))
+
+* Enhancements
+  * Add `Phoenix.HTML.json_escape/1` to escape encoded JSON for safe insertion into an HTML script tag
+
 ## 4.3.0 (2025-09-28)
 
 * Enhancements
