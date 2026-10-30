@@ -133,6 +133,117 @@ defmodule Phoenix.HTMLTest do
       end
     end
 
+    test "raises on invalid binary attribute name" do
+      for invalid <- [
+            "",
+            "foo\"bar",
+            "foo'bar",
+            "foo>bar",
+            "foo/bar",
+            "foo=bar",
+            "foo bar",
+            "foo\tbar",
+            "foo\nbar",
+            "foo\fbar",
+            "foo\rbar",
+            "foo\0bar",
+            "foo\x7Fbar"
+          ] do
+        assert_raise ArgumentError, ~r/expected attribute name/, fn ->
+          attributes_escape([{invalid, "value"}])
+        end
+      end
+    end
+
+    test "raises on invalid binary nested attribute name" do
+      assert_raise ArgumentError, ~r/expected attribute name/, fn ->
+        attributes_escape([{"data", [{"a=b", "1"}]}])
+      end
+    end
+
+    test "raises on invalid atom attribute name" do
+      for invalid <- [
+            :"",
+            :"foo\"bar",
+            :"foo'bar",
+            :"foo>bar",
+            :"foo/bar",
+            :"foo=bar",
+            :"foo bar"
+          ] do
+        assert_raise ArgumentError, ~r/expected attribute name/, fn ->
+          attributes_escape([{invalid, "value"}])
+        end
+      end
+    end
+
+    test "raises on invalid atom nested attribute name" do
+      assert_raise ArgumentError, ~r/expected attribute name/, fn ->
+        attributes_escape([{:data, [{:"a b", "1"}]}])
+      end
+
+      assert_raise ArgumentError, ~r/expected attribute name/, fn ->
+        attributes_escape(aria: [{:"x\"><script>", "y"}])
+      end
+    end
+
+    test "raises on invalid attribute name in map" do
+      assert_raise ArgumentError, ~r/expected attribute name/, fn ->
+        attributes_escape(%{"x onmouseover" => "alert(1)"})
+      end
+    end
+
+    test "raises on invalid attribute name with true value" do
+      assert_raise ArgumentError, ~r/expected attribute name/, fn ->
+        attributes_escape([{"x onmouseover=alert(1)", true}])
+      end
+
+      assert_raise ArgumentError, ~r/expected attribute name/, fn ->
+        attributes_escape([{:"x onmouseover=alert(1)", true}])
+      end
+
+      assert_raise ArgumentError, ~r/expected attribute name/, fn ->
+        attributes_escape(phx: [{:"x onclick=alert(1)", true}])
+      end
+    end
+
+    test "raises on invalid attribute name in deeply nested attributes" do
+      assert_raise ArgumentError, ~r/expected attribute name/, fn ->
+        attributes_escape(data: [{:"a b", [{:c, "d"}]}])
+      end
+
+      assert_raise ArgumentError, ~r/expected attribute name/, fn ->
+        attributes_escape(data: [{:a, [{:"c d", "e"}]}])
+      end
+    end
+
+    test "handle non-ascii attribute name" do
+      assert attributes_escape(%{"données" => "y"}) |> safe_to_string() == ~s( données="y")
+    end
+
+    test "raises on invalid iodata attribute name" do
+      for invalid <- [[], ~c"foo bar", ["foo bar"], ["foo", " ", "bar"]] do
+        assert_raise ArgumentError, ~r/expected attribute name/, fn ->
+          attributes_escape([{invalid, "value"}])
+        end
+      end
+    end
+
+    test "handle iodata attribute name" do
+      assert attributes_escape([{["foo", "-", "bar"], "v"}]) |> safe_to_string() ==
+               ~s( foo-bar="v")
+
+      assert attributes_escape([{~c"a&b", "v"}]) |> safe_to_string() == ~s( a&amp;b="v")
+    end
+
+    test "handle safe attribute name without validation" do
+      assert attributes_escape([{{:safe, "foo"}, "bar"}]) |> safe_to_string() == ~s( foo="bar")
+      assert attributes_escape([{{:safe, "foo"}, true}]) |> safe_to_string() == ~s( foo)
+
+      assert attributes_escape(data: [{{:safe, "foo"}, "bar"}]) |> safe_to_string() ==
+               ~s( data-foo="bar")
+    end
+
     test "suppress attribute when value is falsy" do
       assert attributes_escape([{"title", nil}]) |> safe_to_string() == ~s()
       assert attributes_escape([{"title", false}]) |> safe_to_string() == ~s()
