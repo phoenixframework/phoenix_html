@@ -21,11 +21,14 @@ defmodule Phoenix.HTML.TagTest do
 
     assert tag(:input, my_attr: "blah") |> safe_to_string() == ~s(<input my-attr="blah">)
 
-    assert tag(:input, [{"my_<_attr", "blah"}]) |> safe_to_string() ==
-             ~s(<input my_&lt;_attr="blah">)
+    assert tag(:input, [{"my_attr", "blah"}]) |> safe_to_string() == ~s(<input my_attr="blah">)
 
-    assert tag(:input, [{{:safe, "my_<_attr"}, "blah"}]) |> safe_to_string() ==
-             ~s(<input my_<_attr="blah">)
+    assert_raise ArgumentError, ~r/expected attribute name/, fn ->
+      tag(:input, [{"my attr", "blah"}])
+    end
+
+    assert tag(:input, [{{:safe, "my attr"}, "blah"}]) |> safe_to_string() ==
+             ~s(<input my attr="blah">)
 
     assert tag(:input, data: [my_attr: "blah"]) |> safe_to_string() ==
              ~s(<input data-my-attr="blah">)

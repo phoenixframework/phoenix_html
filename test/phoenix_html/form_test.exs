@@ -249,11 +249,13 @@ defmodule Phoenix.HTML.FormTest do
   ## TODO: Move on v4.0
 
   defp search_params do
+    year = Date.utc_today().year
+
     %{
       "key" => "value",
       "time" => ~T[01:02:03.004005],
       "datetime" => %{
-        "year" => "2020",
+        "year" => Integer.to_string(year),
         "month" => "4",
         "day" => "17",
         "hour" => "2",
@@ -1438,32 +1440,34 @@ defmodule Phoenix.HTML.FormTest do
   # date_select/4
 
   test "date_select/4" do
+    year = Date.utc_today().year
+
     content = safe_to_string(date_select(:search, :datetime))
     assert content =~ ~s(<select id="search_datetime_year" name="search[datetime][year]">)
     assert content =~ ~s(<select id="search_datetime_month" name="search[datetime][month]">)
     assert content =~ ~s(<select id="search_datetime_day" name="search[datetime][day]">)
 
-    content = safe_to_string(date_select(:search, :datetime, value: {2020, 04, 17}))
-    assert content =~ ~s(<option selected value="2020">2020</option>)
+    content = safe_to_string(date_select(:search, :datetime, value: {year, 04, 17}))
+    assert content =~ ~s(<option selected value="#{year}">#{year}</option>)
     assert content =~ ~s(<option selected value="4">April</option>)
     assert content =~ ~s(<option selected value="17">17</option>)
 
-    content = safe_to_string(date_select(:search, :datetime, value: "2020-04-17"))
-    assert content =~ ~s(<option selected value="2020">2020</option>)
+    content = safe_to_string(date_select(:search, :datetime, value: "#{year}-04-17"))
+    assert content =~ ~s(<option selected value="#{year}">#{year}</option>)
     assert content =~ ~s(<option selected value="4">April</option>)
     assert content =~ ~s(<option selected value="17">17</option>)
 
     content =
-      safe_to_string(date_select(:search, :datetime, value: %{year: 2020, month: 04, day: 07}))
+      safe_to_string(date_select(:search, :datetime, value: %{year: year, month: 04, day: 07}))
 
-    assert content =~ ~s(<option selected value="2020">2020</option>)
+    assert content =~ ~s(<option selected value="#{year}">#{year}</option>)
     assert content =~ ~s(<option selected value="4">April</option>)
     assert content =~ ~s(<option selected value="7">07</option>)
 
     content =
-      safe_to_string(date_select(:search, :datetime, value: %{year: 2020, month: 04, day: 09}))
+      safe_to_string(date_select(:search, :datetime, value: %{year: year, month: 04, day: 09}))
 
-    assert content =~ ~s(<option selected value="2020">2020</option>)
+    assert content =~ ~s(<option selected value="#{year}">#{year}</option>)
     assert content =~ ~s(<option selected value="4">April</option>)
     assert content =~ ~s(<option selected value="9">09</option>)
 
@@ -1492,27 +1496,29 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "date_select/4 with form" do
-    content = conn_form(&date_select(&1, :datetime, default: {2020, 10, 13}))
+    year = Date.utc_today().year
+
+    content = conn_form(&date_select(&1, :datetime, default: {year, 10, 13}))
     assert content =~ ~s(<select id="search_datetime_year" name="search[datetime][year]">)
     assert content =~ ~s(<select id="search_datetime_month" name="search[datetime][month]">)
     assert content =~ ~s(<select id="search_datetime_day" name="search[datetime][day]">)
-    assert content =~ ~s(<option selected value="2020">2020</option>)
+    assert content =~ ~s(<option selected value="#{year}">#{year}</option>)
     assert content =~ ~s(<option selected value="4">April</option>)
     assert content =~ ~s(<option selected value="17">17</option>)
     assert content =~ ~s(<option value="1">January</option><option value="2">February</option>)
 
-    content = conn_form(&date_select(&1, :unknown, default: {2020, 9, 9}))
-    assert content =~ ~s(<option selected value="2020">2020</option>)
+    content = conn_form(&date_select(&1, :unknown, default: {year, 9, 9}))
+    assert content =~ ~s(<option selected value="#{year}">#{year}</option>)
     assert content =~ ~s(<option selected value="9">September</option>)
     assert content =~ ~s(<option selected value="9">09</option>)
 
-    content = conn_form(&date_select(&1, :unknown, default: {2020, 10, 13}))
-    assert content =~ ~s(<option selected value="2020">2020</option>)
+    content = conn_form(&date_select(&1, :unknown, default: {year, 10, 13}))
+    assert content =~ ~s(<option selected value="#{year}">#{year}</option>)
     assert content =~ ~s(<option selected value="10">October</option>)
     assert content =~ ~s(<option selected value="13">13</option>)
 
-    content = conn_form(&date_select(&1, :datetime, value: {2020, 10, 13}))
-    assert content =~ ~s(<option selected value="2020">2020</option>)
+    content = conn_form(&date_select(&1, :datetime, value: {year, 10, 13}))
+    assert content =~ ~s(<option selected value="#{year}">#{year}</option>)
     assert content =~ ~s(<option selected value="10">October</option>)
     assert content =~ ~s(<option selected value="13">13</option>)
   end
@@ -1602,6 +1608,8 @@ defmodule Phoenix.HTML.FormTest do
   # datetime_select/4
 
   test "datetime_select/4" do
+    year = Date.utc_today().year
+
     content = safe_to_string(datetime_select(:search, :datetime))
     assert content =~ ~s(<select id="search_datetime_year" name="search[datetime][year]">)
     assert content =~ ~s(<select id="search_datetime_month" name="search[datetime][month]">)
@@ -1620,10 +1628,10 @@ defmodule Phoenix.HTML.FormTest do
 
     content =
       safe_to_string(
-        datetime_select(:search, :datetime, value: {{2020, 9, 9}, {2, 11, 13}}, second: [])
+        datetime_select(:search, :datetime, value: {{year, 9, 9}, {2, 11, 13}}, second: [])
       )
 
-    assert content =~ ~s(<option selected value="2020">2020</option>)
+    assert content =~ ~s(<option selected value="#{year}">#{year}</option>)
     assert content =~ ~s(<option selected value="9">September</option>)
     assert content =~ ~s(<option selected value="9">09</option>)
     assert content =~ ~s(<option selected value="2">02</option>)
@@ -1632,10 +1640,10 @@ defmodule Phoenix.HTML.FormTest do
 
     content =
       safe_to_string(
-        datetime_select(:search, :datetime, value: {{2020, 04, 17}, {2, 11, 13}}, second: [])
+        datetime_select(:search, :datetime, value: {{year, 04, 17}, {2, 11, 13}}, second: [])
       )
 
-    assert content =~ ~s(<option selected value="2020">2020</option>)
+    assert content =~ ~s(<option selected value="#{year}">#{year}</option>)
     assert content =~ ~s(<option selected value="4">April</option>)
     assert content =~ ~s(<option selected value="17">17</option>)
     assert content =~ ~s(<option selected value="2">02</option>)
@@ -1644,13 +1652,15 @@ defmodule Phoenix.HTML.FormTest do
   end
 
   test "datetime_select/4 with form" do
+    year = Date.utc_today().year
+
     content =
-      conn_form(&datetime_select(&1, :datetime, default: {{2020, 10, 13}, {1, 2, 3}}, second: []))
+      conn_form(&datetime_select(&1, :datetime, default: {{year, 10, 13}, {1, 2, 3}}, second: []))
 
     assert content =~ ~s(<select id="search_datetime_year" name="search[datetime][year]">)
     assert content =~ ~s(<select id="search_datetime_month" name="search[datetime][month]">)
     assert content =~ ~s(<select id="search_datetime_day" name="search[datetime][day]">)
-    assert content =~ ~s(<option selected value="2020">2020</option>)
+    assert content =~ ~s(<option selected value="#{year}">#{year}</option>)
     assert content =~ ~s(<option selected value="4">April</option>)
     assert content =~ ~s(<option selected value="17">17</option>)
 
@@ -1662,9 +1672,9 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option selected value="13">13</option>)
 
     content =
-      conn_form(&datetime_select(&1, :unknown, default: {{2020, 10, 9}, {1, 2, 3}}, second: []))
+      conn_form(&datetime_select(&1, :unknown, default: {{year, 10, 9}, {1, 2, 3}}, second: []))
 
-    assert content =~ ~s(<option selected value="2020">2020</option>)
+    assert content =~ ~s(<option selected value="#{year}">#{year}</option>)
     assert content =~ ~s(<option selected value="10">October</option>)
     assert content =~ ~s(<option selected value="9">09</option>)
     assert content =~ ~s(<option selected value="1">01</option>)
@@ -1672,9 +1682,9 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option selected value="3">03</option>)
 
     content =
-      conn_form(&datetime_select(&1, :unknown, default: {{2020, 10, 13}, {1, 2, 3}}, second: []))
+      conn_form(&datetime_select(&1, :unknown, default: {{year, 10, 13}, {1, 2, 3}}, second: []))
 
-    assert content =~ ~s(<option selected value="2020">2020</option>)
+    assert content =~ ~s(<option selected value="#{year}">#{year}</option>)
     assert content =~ ~s(<option selected value="10">October</option>)
     assert content =~ ~s(<option selected value="13">13</option>)
     assert content =~ ~s(<option selected value="1">01</option>)
@@ -1682,9 +1692,9 @@ defmodule Phoenix.HTML.FormTest do
     assert content =~ ~s(<option selected value="3">03</option>)
 
     content =
-      conn_form(&datetime_select(&1, :datetime, value: {{2020, 10, 13}, {1, 2, 3}}, second: []))
+      conn_form(&datetime_select(&1, :datetime, value: {{year, 10, 13}, {1, 2, 3}}, second: []))
 
-    assert content =~ ~s(<option selected value="2020">2020</option>)
+    assert content =~ ~s(<option selected value="#{year}">#{year}</option>)
     assert content =~ ~s(<option selected value="10">October</option>)
     assert content =~ ~s(<option selected value="13">13</option>)
     assert content =~ ~s(<option selected value="1">01</option>)
