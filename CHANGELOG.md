@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.3.5 (2026-10-30)
+
+* Security
+  * Validate attribute names to prevent attribute injection for user-supplied attributes ([CVE-2026-117645](https://cna.erlef.org/cves/CVE-2026-117645.html))
+
+## v3.3.4 (2024-05-30)
+
+* Enhancements
+  * Add action field to form + input_changed
+
 ## v3.3.3 (2023-10-09)
 
 * Enhancements
