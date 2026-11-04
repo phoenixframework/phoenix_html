@@ -252,6 +252,9 @@ defmodule Phoenix.HTML.Form do
       won't be ignored on submission. This requires however
       that the textarea is rendered with no spaces after its
       content
+
+    * For "file", it returns an empty string because file path
+      can't be set programmatically.
   """
   def normalize_value(type, value)
 
@@ -268,6 +271,10 @@ defmodule Phoenix.HTML.Form do
 
   def normalize_value("checkbox", value) do
     html_escape(value) == {:safe, "true"}
+  end
+
+  def normalize_value("file", _value) do
+    ""
   end
 
   def normalize_value(_type, value) do
